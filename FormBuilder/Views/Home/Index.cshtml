@@ -1,11 +1,14 @@
-﻿<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Hero Section -->
+﻿@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
+
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
     <div class="text-center mb-12">
-        <h2 class="text-4xl font-bold text-gray-900 mb-4">Beautiful Form Templates</h2>
-        <p class="text-xl text-gray-600 max-w-2xl mx-auto">Choose from our collection of professionally designed form templates to get started quickly.</p>
+        <h2 class="text-4xl font-bold text-gray-900 mb-4">@Localizer["HeroTitle"]</h2>
+        <p class="text-xl text-gray-600 max-w-2xl mx-auto">@Localizer["HeroDescription"]</p>
     </div>
 
-    <!-- Featured Templates Grid -->
+ 
     <section class="mb-16">
         <h3 class="text-2xl font-semibold text-gray-900 mb-8">Featured Templates</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -26,13 +29,7 @@
             </div>
 
 
-    
-
-         
-
-
-          
         </div>
     </section>
-
+ </main>
 

@@ -1,5 +1,6 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@using System.Globalization
+<!DOCTYPE html>
+<html lang="en" class="">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,31 +8,34 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body>
-    <nav class="bg-white shadow-sm border-b border-gray-200">
+<body class="bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
+    <nav class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <!-- Logo -->
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <h1 class="text-2xl font-bold text-primary">FormBuildr</h1>
+                        <h1 class="text-2xl font-bold text-primary dark:text-primary-light">FormBuildr</h1>
                     </div>
                 </div>
 
                 <!-- Right side controls -->
                 <div class="flex items-center space-x-4">
                     <!-- Language Switcher -->
-                    <div class="relative">
-                        <select class="bg-gray-100 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
-                            <option value="en"> EN</option>
-                            <option value="ge"> GE</option>
-                         
-                        </select>
-                    </div>
+                  @*   <div class="relative">
+                        <form asp-controller="Culture" asp-action="SetCulture" method="post">
+                            <select name="culture" onchange="this.form.submit()"
+                                    class="rounded border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
+                                <option value="en" selected="@(CultureInfo.CurrentUICulture.Name == "en")">EN</option>
+                                <option value="ge" selected="@(CultureInfo.CurrentUICulture.Name == "ge")">GE</option>
+                            </select>
+                            <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+                        </form>
+                    </div> *@
 
-                    <!-- Theme Switcher -->
-                    <button class="bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-md px-3 py-2 text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary">
-                        🌙 Dark
+                    <button id="theme-toggle" aria-label="Toggle Dark Mode"
+                            class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary">
+                        🌙
                     </button>
 
                     <!-- Login/Register Buttons -->
@@ -46,12 +50,11 @@
                         }
                         else
                         {
-                            <a class="text-gray-700 hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200" asp-action="signin" asp-controller="Auth">
+                            <a class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary-light px-3 py-2 text-sm font-medium transition-colors duration-200" asp-action="signin" asp-controller="Auth">
                                 Login
                             </a>
-                            <a  class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-                            asp-action="signup" asp-controller="Auth"
-                            >
+                            <a class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                               asp-action="signup" asp-controller="Auth">
                                 Register
                             </a>
                         }
@@ -61,17 +64,31 @@
             </div>
         </div>
     </nav>
-    <div class="container">
+    <div class="container mx-auto px-4">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
     </div>
 
-
-
-
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-   
+
+ 
 </body>
 </html>
+<script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+
+    document.getElementById('theme-toggle').addEventListener('click', function() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    });
+</script>
