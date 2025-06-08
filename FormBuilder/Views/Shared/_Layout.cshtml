@@ -1,0 +1,77 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - FormBuilder</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-2xl font-bold text-primary">FormBuildr</h1>
+                    </div>
+                </div>
+
+                <!-- Right side controls -->
+                <div class="flex items-center space-x-4">
+                    <!-- Language Switcher -->
+                    <div class="relative">
+                        <select class="bg-gray-100 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            <option value="en"> EN</option>
+                            <option value="ge"> GE</option>
+                         
+                        </select>
+                    </div>
+
+                    <!-- Theme Switcher -->
+                    <button class="bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-md px-3 py-2 text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary">
+                        🌙 Dark
+                    </button>
+
+                    <!-- Login/Register Buttons -->
+                    <div class="flex items-center space-x-2">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <form asp-controller="Auth" asp-action="Logout" method="post" class="inline">
+                                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+                                    Logout
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a class="text-gray-700 hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200" asp-action="signin" asp-controller="Auth">
+                                Login
+                            </a>
+                            <a  class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                            asp-action="signup" asp-controller="Auth"
+                            >
+                                Register
+                            </a>
+                        }
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+
+
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+   
+</body>
+</html>
