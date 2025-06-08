@@ -4,6 +4,7 @@ using FormBuilder.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FormBuilder.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250608184305_addingTables")]
+    partial class addingTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,6 +45,7 @@ namespace FormBuilder.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -49,29 +53,6 @@ namespace FormBuilder.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("FormTemplates");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Basic job application form.",
-                            Title = "Job Application"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Template for event sign-ups.",
-                            Title = "Event Registration"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Description = "Collect feedback from customers.",
-                            Title = "Customer Feedback"
-                        });
                 });
 
             modelBuilder.Entity("FormBuilder.Models.Question", b =>
@@ -82,7 +63,7 @@ namespace FormBuilder.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("OptionsJson")
+                    b.Property<string>("Options")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TemplateId")
@@ -100,64 +81,6 @@ namespace FormBuilder.Migrations
                     b.HasIndex("TemplateId");
 
                     b.ToTable("Questions");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            TemplateId = 1,
-                            Text = "Full Name",
-                            Type = 0
-                        },
-                        new
-                        {
-                            Id = 2,
-                            TemplateId = 1,
-                            Text = "Email Address",
-                            Type = 0
-                        },
-                        new
-                        {
-                            Id = 3,
-                            TemplateId = 1,
-                            Text = "Position Applying For",
-                            Type = 5
-                        },
-                        new
-                        {
-                            Id = 4,
-                            TemplateId = 2,
-                            Text = "Attendee Name",
-                            Type = 0
-                        },
-                        new
-                        {
-                            Id = 5,
-                            TemplateId = 2,
-                            Text = "Email",
-                            Type = 0
-                        },
-                        new
-                        {
-                            Id = 6,
-                            TemplateId = 2,
-                            Text = "Select Sessions",
-                            Type = 5
-                        },
-                        new
-                        {
-                            Id = 7,
-                            TemplateId = 3,
-                            Text = "Overall Satisfaction",
-                            Type = 5
-                        },
-                        new
-                        {
-                            Id = 8,
-                            TemplateId = 3,
-                            Text = "Comments",
-                            Type = 1
-                        });
                 });
 
             modelBuilder.Entity("FormBuilder.Models.Tag", b =>
@@ -396,7 +319,9 @@ namespace FormBuilder.Migrations
                 {
                     b.HasOne("FormBuilder.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("User");
                 });

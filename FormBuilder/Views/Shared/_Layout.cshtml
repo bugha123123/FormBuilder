@@ -12,36 +12,44 @@
     <nav class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-                <!-- Logo -->
-                <div class="flex items-center">
+               
+                <div class="flex items-center space-x-6">
                     <div class="flex-shrink-0">
-                        <h1 class="text-2xl font-bold text-primary dark:text-primary-light">FormBuildr</h1>
+                        <a asp-action="Index" asp-controller="Home" style="text-decoration:none;">
+                            <h1 class="text-2xl font-bold text-primary dark:text-primary-light">FormBuildR</h1>
+
+                        </a>
                     </div>
+
+                    <!-- Search Bar -->
+                    <form method="get"  class="hidden md:block">
+                        <div class="relative">
+                            <input type="text" name="query" placeholder="Search templates..."
+                                   class="pl-10 pr-4 py-2 w-64 rounded-md border border-gray-800 dark:border-gray-600  dark:text-gray-100 focus:ring-primary focus:border-primary transition duration-200" />
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <svg class="w-5 h-5 text-gray-400 dark:text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M12.9 14.32a8 8 0 111.414-1.414l4.387 4.387-1.414 1.414-4.387-4.387zM8 14a6 6 0 100-12 6 6 0 000 12z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                        </div>
+                    </form>
                 </div>
 
-                <!-- Right side controls -->
-                <div class="flex items-center space-x-4">
-                    <!-- Language Switcher -->
-                  @*   <div class="relative">
-                        <form asp-controller="Culture" asp-action="SetCulture" method="post">
-                            <select name="culture" onchange="this.form.submit()"
-                                    class="rounded border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
-                                <option value="en" selected="@(CultureInfo.CurrentUICulture.Name == "en")">EN</option>
-                                <option value="ge" selected="@(CultureInfo.CurrentUICulture.Name == "ge")">GE</option>
-                            </select>
-                            <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
-                        </form>
-                    </div> *@
 
+                <div class="flex items-center space-x-4">
+      
                     <button id="theme-toggle" aria-label="Toggle Dark Mode"
                             class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary">
                         🌙
                     </button>
 
-                    <!-- Login/Register Buttons -->
                     <div class="flex items-center space-x-2">
                         @if (User.Identity.IsAuthenticated)
                         {
+                            <a asp-controller="User" asp-action="Dashboard"
+                               class="text-gray-700 dark:text-gray-200 hover:text-blue-500 px-3 py-2 text-sm font-medium transition-colors duration-200">
+                                Dashboard
+                            </a>
                             <form asp-controller="Auth" asp-action="Logout" method="post" class="inline">
                                 <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200">
                                     Logout
@@ -64,6 +72,7 @@
             </div>
         </div>
     </nav>
+
     <div class="container mx-auto px-4">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -76,19 +85,3 @@
  
 </body>
 </html>
-<script>
-    (function() {
-      const savedTheme = localStorage.getItem('theme');
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    })();
-
-    document.getElementById('theme-toggle').addEventListener('click', function() {
-      const isDark = document.documentElement.classList.toggle('dark');
-      localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    });
-</script>

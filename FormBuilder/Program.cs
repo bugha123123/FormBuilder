@@ -1,4 +1,5 @@
 using FormBuilder.Data;
+using FormBuilder.Interface;
 using FormBuilder.Interfaces;
 using FormBuilder.Models;
 using FormBuilder.Service;
@@ -58,7 +59,7 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 
 
 builder.Services.AddScoped<IAuthService, AuthService>();
-
+builder.Services.AddScoped<ITemplateService, TemplateService>();
 
 var app = builder.Build();
 
