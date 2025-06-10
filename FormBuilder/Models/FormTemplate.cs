@@ -1,11 +1,12 @@
 ﻿using Azure;
+using FormBuilder.Enums;
 
 namespace FormBuilder.Models
 {
     public class FormTemplate
     {
         public int Id { get; set; }
-        public string Title { get; set; }
+        public TemplateTitle Title { get; set; }
         public string Description { get; set; }
         public string? UserId { get; set; }
 

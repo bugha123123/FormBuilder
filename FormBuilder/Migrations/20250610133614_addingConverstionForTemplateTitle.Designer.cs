@@ -4,6 +4,7 @@ using FormBuilder.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FormBuilder.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250610133614_addingConverstionForTemplateTitle")]
+    partial class addingConverstionForTemplateTitle
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -171,6 +174,11 @@ namespace FormBuilder.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<int?>("FormTemplateId")
                         .HasColumnType("int");
 
@@ -178,9 +186,6 @@ namespace FormBuilder.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("TemplateId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
@@ -190,50 +195,6 @@ namespace FormBuilder.Migrations
                     b.HasIndex("FormTemplateId");
 
                     b.ToTable("Tags");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CreatedAt = new DateTime(2025, 6, 10, 18, 16, 12, 697, DateTimeKind.Local).AddTicks(8127),
-                            Name = "HR",
-                            TemplateId = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CreatedAt = new DateTime(2025, 6, 10, 18, 16, 12, 697, DateTimeKind.Local).AddTicks(8137),
-                            Name = "Recruitment",
-                            TemplateId = 1
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CreatedAt = new DateTime(2025, 6, 10, 18, 16, 12, 697, DateTimeKind.Local).AddTicks(8139),
-                            Name = "Event",
-                            TemplateId = 2
-                        },
-                        new
-                        {
-                            Id = 4,
-                            CreatedAt = new DateTime(2025, 6, 10, 18, 16, 12, 697, DateTimeKind.Local).AddTicks(8140),
-                            Name = "Signup",
-                            TemplateId = 2
-                        },
-                        new
-                        {
-                            Id = 5,
-                            CreatedAt = new DateTime(2025, 6, 10, 18, 16, 12, 697, DateTimeKind.Local).AddTicks(8143),
-                            Name = "Customer",
-                            TemplateId = 3
-                        },
-                        new
-                        {
-                            Id = 6,
-                            CreatedAt = new DateTime(2025, 6, 10, 18, 16, 12, 697, DateTimeKind.Local).AddTicks(8144),
-                            Name = "Survey",
-                            TemplateId = 3
-                        });
                 });
 
             modelBuilder.Entity("FormBuilder.Models.User", b =>

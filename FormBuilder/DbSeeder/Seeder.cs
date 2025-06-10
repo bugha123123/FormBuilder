@@ -15,21 +15,21 @@ namespace FormBuilder.Data
                 new FormTemplate
                 {
                     Id = 1,
-                    Title = "Job Application",
+                    Title = TemplateTitle.JobApplication,
                     Description = "Basic job application form.",
                     UserId = null
                 },
                 new FormTemplate
                 {
                     Id = 2,
-                    Title = "Event Registration",
+                    Title = TemplateTitle.EventRegistration,
                     Description = "Template for event sign-ups.",
                     UserId = null
                 },
                 new FormTemplate
                 {
                     Id = 3,
-                    Title = "Customer Feedback",
+                    Title = TemplateTitle.FeedbackSurvey,
                     Description = "Collect feedback from customers.",
                     UserId = null
                 }
@@ -47,6 +47,18 @@ namespace FormBuilder.Data
       new Question { Id = 7, TemplateId = 3, Text = "Overall Satisfaction", Type = QuestionType.OneFromList, Options = null },
       new Question { Id = 8, TemplateId = 3, Text = "Comments", Type = QuestionType.LongText, Options = null }
   );
+
+            builder.Entity<Tag>().HasData(
+    new Tag { Id = 1, TemplateId = 1, Name = "HR",CreatedAt= DateTime.Now },
+    new Tag { Id = 2, TemplateId = 1, Name = "Recruitment",CreatedAt = DateTime.Now },
+
+    new Tag { Id = 3, TemplateId = 2, Name = "Event", CreatedAt = DateTime.Now },
+    new Tag { Id = 4, TemplateId = 2, Name = "Signup",CreatedAt = DateTime.Now },
+
+    new Tag { Id = 5, TemplateId = 3, Name = "Customer",CreatedAt = DateTime.Now },
+    new Tag { Id = 6, TemplateId = 3, Name = "Survey",CreatedAt = DateTime.Now }
+);
+
 
         }
     }

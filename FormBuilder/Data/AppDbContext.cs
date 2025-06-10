@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Reflection.Emit;
 
 namespace FormBuilder.Data
 {
@@ -18,9 +19,14 @@ namespace FormBuilder.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-
+            builder.Entity<FormTemplate>()
+              .Property(e => e.Title)
+              .HasConversion<string>();
             builder.Seed(); 
         }
+
+   
+
 
     }
 }

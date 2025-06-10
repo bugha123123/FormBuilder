@@ -1,0 +1,148 @@
+﻿@using FormBuilder.Enums
+@using FormBuilder.Models
+@using Markdig
+@model FormTemplate
+@{
+    var titleOptions = Enum.GetValues(typeof(TemplateTitle))
+                          .Cast<TemplateTitle>()
+                          .Select(e => new SelectListItem
+                                  {
+                                      Value = ((int)e).ToString(), 
+                                      Text = e.ToString()
+                                  }).ToList();
+
+
+                              
+   
+
+   
+}
+<div class="container mx-auto px-4 py-8 max-w-4xl">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6">Create New Template</h1>
+
+    <form class="bg-white shadow-md rounded-lg p-6">
+        <!-- Basic Information -->
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold text-gray-700 mb-4 pb-2 border-b">Basic Information</h2>
+
+            <div class="mb-4">
+                <label asp-for="Title" class="block text-sm font-medium text-gray-700">Template Title</label>
+                <select asp-for="Title" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
+                    <option value="">Select a template</option>
+                    @foreach (var option in titleOptions)
+                    {
+                        <option value="@option.Value">@option.Text</option>
+                    }
+                </select>
+            </div>
+            <div class="mb-6">
+                <label asp-for="Description" class="block text-sm font-medium text-gray-700">Description (Markdown supported)</label>
+
+                <textarea id="markdown-editor"
+                          asp-for="Description"
+                          rows="6"
+                          class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:ring-primary focus:border-primary sm:text-sm"
+                          placeholder="Write your description using markdown..."
+                          oninput="renderMarkdownPreview()"></textarea>
+
+                <span asp-validation-for="Description" class="text-sm text-red-600"></span>
+            </div>
+            <div class="mb-4">
+                <label for="tagInput" class="block text-sm font-medium text-gray-700 mb-1">Tags</label>
+                <input type="text" id="tagInput" autocomplete="off"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500"
+                       placeholder="Start typing to add tags..." />
+                <div id="tagSuggestions" class="border rounded bg-white mt-1 hidden max-h-48 overflow-y-auto"></div>
+                <div id="addedTags" class="flex flex-wrap gap-2 mt-2"></div>
+            </div>
+
+
+
+            <div class="mb-4">
+                <label for="imageUrl" class="block text-sm font-medium text-gray-700 mb-1">Image (Optional)</label>
+                <input type="file" id="imageUrl" name="imageUrl" accept="image/*"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+            </div>
+        </div>
+
+        <!-- Questions Section -->
+        <div class="mb-8">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b">
+                <h2 class="text-xl font-semibold text-gray-700">Questions</h2>
+                <button type="button" id="addQuestion"
+                        class="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+                    Add Question
+                </button>
+            </div>
+
+            <div id="questionsContainer">
+                <!-- Questions will be added here dynamically -->
+                <div class="question-item bg-gray-50 p-4 rounded-md mb-4">
+                    <div class="flex justify-between mb-2">
+                        <h3 class="font-medium">Question 1</h3>
+                        <button type="button" class="text-red-600 hover:text-red-800">Remove</button>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Question Text</label>
+                        <input type="text" name="questions[0].text" required
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Question Type</label>
+                        <select name="questions[0].type" required
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <option value="ShortText">Short Text</option>
+                            <option value="LongText">Long Text</option>
+                            <option value="Number">Number</option>
+                            <option value="Checkbox">Checkbox</option>
+                            <option value="Dropdown">Dropdown</option>
+                            <option value="OneFromList">One From List</option>
+                        </select>
+                    </div>
+
+                    <div class="options-container hidden">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Options (for Checkbox, Dropdown, or OneFromList)</label>
+                        <div class="flex items-center mb-2">
+                            <input type="text"  placeholder="Option 1"
+                                   class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
+                            <button type="button" class="ml-2 text-emerald-600 hover:text-emerald-800">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+      
+
+        <!-- Users Section -->
+        <div class="mb-8">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700">Assign Users</label>
+                <input type="text" id="userInput" placeholder="Start typing to get user suggestions..." autocomplete="off"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500" />
+                <div id="userSuggestions" class="border rounded bg-white mt-1 hidden max-h-48 overflow-y-auto"></div>
+                <div id="selectedUsers" class="flex flex-wrap gap-2 mt-2"></div>
+            </div>
+
+            <div id="usersContainer" class="flex flex-wrap gap-2 mb-4">
+                <!-- Selected users' hidden inputs will go here dynamically -->
+            </div>
+
+          
+        </div>
+
+
+        <!-- Submit Button -->
+        <div class="flex justify-end">
+            <button type="submit"
+                    class="btn-success  px-6 py-3 bg-emerald-600 text-white font-medium rounded-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
+                Create Template
+            </button>
+        </div>
+    </form>
+</div>
+
+
+<script src="~/js/Template.js"></script>
