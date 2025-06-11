@@ -1,5 +1,10 @@
-﻿using FormBuilder.Interface;
+﻿using FormBuilder.DTO;
+using FormBuilder.Interface;
+using FormBuilder.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace FormBuilder.Controllers
 {
@@ -12,16 +17,34 @@ namespace FormBuilder.Controllers
             _templateService = templateService;
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            return View();
+            var topics = await _templateService.GetTags();
+            ViewBag.Topics = new SelectList(topics, "Id", "Name");
+            return View(new FormTemplateCreateViewModel());
         }
 
-        public async Task<IActionResult> AutoCompleteTags(string keyWord)
+
+        public async Task<IActionResult> AutoCompleteTags(string keyword)
         {
-            var tags = await _templateService.GetAutoCompleteTags(keyWord);
+            var tags = await _templateService.GetAutoCompleteTags(keyword);
             return Json(tags.Select(t => t.Name));
         }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateTemplate(FormTemplate template, string TagNames, IFormFile? imageFile)
+        {
+            var selectedTagNames = string.IsNullOrWhiteSpace(TagNames)
+                ? new List<string>()
+                : TagNames.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(t => t.Trim()).ToList();
+
+            var createdTemplate = await _templateService.CreateTemplateAsync(template, selectedTagNames, imageFile);
+
+            return RedirectToAction("Details", new { id = createdTemplate.Id });
+        }
+
 
     }
 }

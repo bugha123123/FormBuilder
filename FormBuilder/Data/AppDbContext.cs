@@ -22,10 +22,13 @@ namespace FormBuilder.Data
             builder.Entity<FormTemplate>()
               .Property(e => e.Title)
               .HasConversion<string>();
-            builder.Seed(); 
+            builder.Seed();
+
+          
+
         }
 
-   
+
 
 
     }

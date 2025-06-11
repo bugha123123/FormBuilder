@@ -13,8 +13,17 @@ namespace FormBuilder.Models
         public User User { get; set; }
         public DateTime CreatedAt { get; set; }
 
+        public bool isPublic { get; set; }
         public List<Question> Questions { get; set; }
-        public List<Tag> Tags { get; set; }
+
+
+        public List<string>? AssignedUsers { get; set; }
+
+        public virtual List<string>? SavedTags { get; set; }
+
+
+
+
 
         //public string? ImageUrl { get; set; }
     }

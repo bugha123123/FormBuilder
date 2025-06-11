@@ -9,11 +9,12 @@ namespace FormBuilder.Service
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-
-        public AuthService(UserManager<User> userManager, SignInManager<User> signInManager)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public AuthService(UserManager<User> userManager, SignInManager<User> signInManager, IHttpContextAccessor httpContextAccessor)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<bool> RegisterAsync(RegisterViewModel model)
@@ -48,6 +49,27 @@ namespace FormBuilder.Service
         public async Task LogoutAsync()
         {
             await _signInManager.SignOutAsync();
+        }
+
+
+        public async Task<User?> GetLoggedInUserAsync()
+        {
+            if (_httpContextAccessor.HttpContext.User.Identity?.IsAuthenticated != true)
+            {
+                return null;
+            }
+
+            string? userName = _httpContextAccessor.HttpContext.User.Identity?.Name;
+
+            if (userName == null)
+            {
+
+                return null;
+            }
+
+            var user = await _userManager.FindByNameAsync(userName);
+
+            return user;
         }
     }
 }

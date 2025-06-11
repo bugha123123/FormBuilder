@@ -10,25 +10,23 @@ namespace FormBuilder.Controllers
 
         private readonly IUserService _userService;
 
-
+        public UserController(IUserService userService)
+        {
+            _userService = userService;
+        }
 
         public IActionResult Dashboard()
         {
           
             return View();
         }
-        public async Task<IActionResult> AutoCompleteUsers(string keyWord)
+        // UserController.cs
+        public async Task<IActionResult> AutoCompleteUsers(string keyword)
         {
-            var users = await _userService.SearchUsersAsync(keyWord);
-
-            var result = users.Select(u => new
-            {
-                u.Username,
-                u.Email
-            });
-
-            return Json(result);
+            var users = await _userService.SearchUsersAsync(keyword);
+            return Json(users.Select(u => new { u.Username, u.Email }));
         }
+
 
 
     }

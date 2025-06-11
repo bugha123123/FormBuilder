@@ -4,6 +4,7 @@ using FormBuilder.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FormBuilder.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250610151120_addingProps")]
+    partial class addingProps
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,9 +41,6 @@ namespace FormBuilder.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SavedTags")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
@@ -183,6 +183,9 @@ namespace FormBuilder.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("FormTemplateId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -196,48 +199,50 @@ namespace FormBuilder.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("FormTemplateId");
+
                     b.ToTable("Tags");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 6, 11, 19, 28, 43, 785, DateTimeKind.Local).AddTicks(7298),
+                            CreatedAt = new DateTime(2025, 6, 10, 19, 11, 19, 781, DateTimeKind.Local).AddTicks(1515),
                             Name = "HR",
                             TemplateId = 1
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 6, 11, 19, 28, 43, 785, DateTimeKind.Local).AddTicks(7308),
+                            CreatedAt = new DateTime(2025, 6, 10, 19, 11, 19, 781, DateTimeKind.Local).AddTicks(1524),
                             Name = "Recruitment",
                             TemplateId = 1
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2025, 6, 11, 19, 28, 43, 785, DateTimeKind.Local).AddTicks(7310),
+                            CreatedAt = new DateTime(2025, 6, 10, 19, 11, 19, 781, DateTimeKind.Local).AddTicks(1526),
                             Name = "Event",
                             TemplateId = 2
                         },
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2025, 6, 11, 19, 28, 43, 785, DateTimeKind.Local).AddTicks(7311),
+                            CreatedAt = new DateTime(2025, 6, 10, 19, 11, 19, 781, DateTimeKind.Local).AddTicks(1528),
                             Name = "Signup",
                             TemplateId = 2
                         },
                         new
                         {
                             Id = 5,
-                            CreatedAt = new DateTime(2025, 6, 11, 19, 28, 43, 785, DateTimeKind.Local).AddTicks(7312),
+                            CreatedAt = new DateTime(2025, 6, 10, 19, 11, 19, 781, DateTimeKind.Local).AddTicks(1529),
                             Name = "Customer",
                             TemplateId = 3
                         },
                         new
                         {
                             Id = 6,
-                            CreatedAt = new DateTime(2025, 6, 11, 19, 28, 43, 785, DateTimeKind.Local).AddTicks(7313),
+                            CreatedAt = new DateTime(2025, 6, 10, 19, 11, 19, 781, DateTimeKind.Local).AddTicks(1531),
                             Name = "Survey",
                             TemplateId = 3
                         });
@@ -461,6 +466,13 @@ namespace FormBuilder.Migrations
                     b.Navigation("Template");
                 });
 
+            modelBuilder.Entity("FormBuilder.Models.Tag", b =>
+                {
+                    b.HasOne("FormBuilder.Models.FormTemplate", null)
+                        .WithMany("Tags")
+                        .HasForeignKey("FormTemplateId");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -515,6 +527,8 @@ namespace FormBuilder.Migrations
             modelBuilder.Entity("FormBuilder.Models.FormTemplate", b =>
                 {
                     b.Navigation("Questions");
+
+                    b.Navigation("Tags");
                 });
 #pragma warning restore 612, 618
         }

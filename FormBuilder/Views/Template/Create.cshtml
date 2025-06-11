@@ -1,148 +1,226 @@
-﻿@using FormBuilder.Enums
-@using FormBuilder.Models
-@using Markdig
-@model FormTemplate
+﻿@using FormBuilder.DTO
+@model FormTemplateCreateViewModel
+
 @{
-    var titleOptions = Enum.GetValues(typeof(TemplateTitle))
-                          .Cast<TemplateTitle>()
-                          .Select(e => new SelectListItem
-                                  {
-                                      Value = ((int)e).ToString(), 
-                                      Text = e.ToString()
-                                  }).ToList();
-
-
-                              
-   
-
-   
+    ViewData["Title"] = "Create Template";
 }
-<div class="container mx-auto px-4 py-8 max-w-4xl">
-    <h1 class="text-3xl font-bold text-gray-800 mb-6">Create New Template</h1>
 
-    <form class="bg-white shadow-md rounded-lg p-6">
-        <!-- Basic Information -->
+<div class="max-w-4xl mx-auto my-8 p-6 bg-white rounded-lg shadow-md">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-6">Create Template</h2>
+
+    <form asp-action="CreateTemplate" enctype="multipart/form-data" asp-controller="Template" method="post" id="create-template-form" novalidate>
+        <!-- Title -->
+        <div class="mb-6">
+            <label asp-for="Title" class="block text-gray-700 font-medium mb-2"></label>
+            <input asp-for="Title" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Enter template title" />
+            <span asp-validation-for="Title" class="text-red-600 mt-1 block"></span>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-6">
+            <label asp-for="Description" class="block text-gray-700 font-medium mb-2"></label>
+            <textarea asp-for="Description" rows="5" placeholder="Enter description (Markdown supported)" class="w-full px-4 py-2 border border-gray-300 rounded-md resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+            <p class="text-sm text-gray-500 mt-1">Supports Markdown</p>
+            <span asp-validation-for="Description" class="text-red-600 mt-1 block"></span>
+        </div>
+
+        <!-- Topic -->
+        <div class="mb-6">
+            <label asp-for="TopicId" class="block text-gray-700 font-medium mb-2"></label>
+            <select asp-for="TopicId" asp-items="ViewBag.Topics" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Select a topic</option>
+            </select>
+            <span asp-validation-for="TopicId" class="text-red-600 mt-1 block"></span>
+        </div>
+
+        <!-- Image Upload -->
+        <div class="mb-6">
+            <label asp-for="ImageFile" class="block text-gray-700 font-medium mb-2">Upload Image</label>
+            <input asp-for="ImageFile" type="file" accept="image/*" class="w-full" />
+            <span asp-validation-for="ImageFile" class="text-red-600 mt-1 block"></span>
+        </div>
+
+        <!-- IsPublic Checkbox -->
+        <div class="mb-8 flex items-center">
+            <input asp-for="IsPublic" type="checkbox" id="IsPublic" class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
+            <label asp-for="IsPublic" class="ml-2 block text-gray-700 font-medium cursor-pointer"></label>
+        </div>
+
+        <!-- Tags -->
+        <div class="mb-8 relative">
+            <label class="block text-gray-700 font-medium mb-2">Tags</label>
+            <input id="tag-input" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Enter tag..." autocomplete="off" />
+            <ul id="tag-suggestions" class="absolute z-50 w-full bg-white border border-gray-300 rounded-md max-h-40 overflow-auto mt-1 shadow-lg"></ul>
+            <div id="tags-container" class="flex flex-wrap mt-3 gap-2"></div>
+        </div>
+
+        <!-- Users -->
+        <div class="mb-8 relative">
+            <label class="block text-gray-700 font-medium mb-2">Assign Users</label>
+            <input id="user-autocomplete" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Search by name/email..." autocomplete="off" />
+            <ul id="user-suggestions" class="absolute z-50 w-full bg-white border border-gray-300 rounded-md max-h-40 overflow-auto mt-1 shadow-lg"></ul>
+            <div class="flex justify-end mt-2">
+                <button type="button" id="toggle-sort" class="px-3 py-1 text-sm font-medium text-gray-700 bg-gray-200 rounded hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">Sort by Name</button>
+            </div>
+            <ul id="assigned-users-list" class="mt-3 space-y-2"></ul>
+        </div>
+
+        <!-- Questions -->
         <div class="mb-8">
-            <h2 class="text-xl font-semibold text-gray-700 mb-4 pb-2 border-b">Basic Information</h2>
-
-            <div class="mb-4">
-                <label asp-for="Title" class="block text-sm font-medium text-gray-700">Template Title</label>
-                <select asp-for="Title" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm">
-                    <option value="">Select a template</option>
-                    @foreach (var option in titleOptions)
-                    {
-                        <option value="@option.Value">@option.Text</option>
-                    }
-                </select>
-            </div>
-            <div class="mb-6">
-                <label asp-for="Description" class="block text-sm font-medium text-gray-700">Description (Markdown supported)</label>
-
-                <textarea id="markdown-editor"
-                          asp-for="Description"
-                          rows="6"
-                          class="mt-1 block w-full rounded-md border border-gray-300 shadow-sm focus:ring-primary focus:border-primary sm:text-sm"
-                          placeholder="Write your description using markdown..."
-                          oninput="renderMarkdownPreview()"></textarea>
-
-                <span asp-validation-for="Description" class="text-sm text-red-600"></span>
-            </div>
-            <div class="mb-4">
-                <label for="tagInput" class="block text-sm font-medium text-gray-700 mb-1">Tags</label>
-                <input type="text" id="tagInput" autocomplete="off"
-                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500"
-                       placeholder="Start typing to add tags..." />
-                <div id="tagSuggestions" class="border rounded bg-white mt-1 hidden max-h-48 overflow-y-auto"></div>
-                <div id="addedTags" class="flex flex-wrap gap-2 mt-2"></div>
-            </div>
-
-
-
-            <div class="mb-4">
-                <label for="imageUrl" class="block text-sm font-medium text-gray-700 mb-1">Image (Optional)</label>
-                <input type="file" id="imageUrl" name="imageUrl" accept="image/*"
-                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-            </div>
+            <label class="block text-gray-700 font-medium mb-3">Questions</label>
+            <div id="questions-container" class="space-y-4"></div>
+            <button type="button" id="add-question" class="mt-4 px-4 py-2 border border-blue-600 text-blue-600 rounded hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">Add Question</button>
         </div>
 
-        <!-- Questions Section -->
-        <div class="mb-8">
-            <div class="flex justify-between items-center mb-4 pb-2 border-b">
-                <h2 class="text-xl font-semibold text-gray-700">Questions</h2>
-                <button type="button" id="addQuestion"
-                        class="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
-                    Add Question
-                </button>
-            </div>
+        <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded focus:outline-none focus:ring-2 focus:ring-blue-500">Create Template</button>
 
-            <div id="questionsContainer">
-                <!-- Questions will be added here dynamically -->
-                <div class="question-item bg-gray-50 p-4 rounded-md mb-4">
-                    <div class="flex justify-between mb-2">
-                        <h3 class="font-medium">Question 1</h3>
-                        <button type="button" class="text-red-600 hover:text-red-800">Remove</button>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Question Text</label>
-                        <input type="text" name="questions[0].text" required
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Question Type</label>
-                        <select name="questions[0].type" required
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-                            <option value="ShortText">Short Text</option>
-                            <option value="LongText">Long Text</option>
-                            <option value="Number">Number</option>
-                            <option value="Checkbox">Checkbox</option>
-                            <option value="Dropdown">Dropdown</option>
-                            <option value="OneFromList">One From List</option>
-                        </select>
-                    </div>
-
-                    <div class="options-container hidden">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Options (for Checkbox, Dropdown, or OneFromList)</label>
-                        <div class="flex items-center mb-2">
-                            <input type="text"  placeholder="Option 1"
-                                   class="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500">
-                            <button type="button" class="ml-2 text-emerald-600 hover:text-emerald-800">+</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-      
-
-        <!-- Users Section -->
-        <div class="mb-8">
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700">Assign Users</label>
-                <input type="text" id="userInput" placeholder="Start typing to get user suggestions..." autocomplete="off"
-                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-emerald-500 focus:border-emerald-500" />
-                <div id="userSuggestions" class="border rounded bg-white mt-1 hidden max-h-48 overflow-y-auto"></div>
-                <div id="selectedUsers" class="flex flex-wrap gap-2 mt-2"></div>
-            </div>
-
-            <div id="usersContainer" class="flex flex-wrap gap-2 mb-4">
-                <!-- Selected users' hidden inputs will go here dynamically -->
-            </div>
-
-          
-        </div>
-
-
-        <!-- Submit Button -->
-        <div class="flex justify-end">
-            <button type="submit"
-                    class="btn-success  px-6 py-3 bg-emerald-600 text-white font-medium rounded-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2">
-                Create Template
-            </button>
-        </div>
+        <!-- Hidden fields -->
+        <input type="hidden" name="TagNames" id="hidden-tags" />
+        <input type="hidden" name="AssignedUsers" id="hidden-users" />
     </form>
 </div>
 
+ 
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>
+        let selectedTags = [];
+        let assignedUsers = [];
+        let sortBy = "Username";
 
-<script src="~/js/Template.js"></script>
+            function renderTags() {
+        $('#tags-container').empty();
+        selectedTags.forEach(tag => {
+            $('#tags-container').append(
+                `<span class="badge bg-primary m-1">${tag} <button type="button" class="btn-close btn-close-white ms-1 remove-tag" data-tag="${tag}"></button></span>`
+            );
+        });
+        $('#hidden-tags').val(selectedTags.join(',')); 
+    }
+
+
+        function renderUsers() {
+            const sorted = [...assignedUsers].sort((a, b) => {
+                const key = sortBy.toLowerCase();
+                return a[key].localeCompare(b[key]);
+            });
+
+            $('#assigned-users-list').empty();
+            sorted.forEach(user => {
+                $('#assigned-users-list').append(
+                    `<li class="list-group-item d-flex justify-content-between align-items-center">
+                        ${user.Username} (${user.Email})
+                        <button type="button" class="btn btn-danger btn-sm remove-user" data-email="${user.Email}">Remove</button>
+                    </li>`
+                );
+            });
+            $('#hidden-users').val(JSON.stringify(assignedUsers));
+        }
+
+        // Tags
+        $('#tag-input').on('input', function () {
+            const query = $(this).val();
+            if (query.length < 1) return $('#tag-suggestions').empty();
+            $.get('@Url.Action("AutoCompleteTags", "Template")', { keyword: query }, function (data) {
+                $('#tag-suggestions').empty();
+                data.forEach(tag => {
+                    $('#tag-suggestions').append(`<li class="list-group-item tag-suggestion">${tag}</li>`);
+                });
+            });
+        });
+
+        $(document).on('click', '.tag-suggestion', function () {
+            const tag = $(this).text();
+            if (!selectedTags.includes(tag)) {
+                selectedTags.push(tag);
+                renderTags();
+            }
+            $('#tag-input').val('');
+            $('#tag-suggestions').empty();
+        });
+
+        $(document).on('click', '.remove-tag', function () {
+            const tag = $(this).data('tag');
+            selectedTags = selectedTags.filter(t => t !== tag);
+            renderTags();
+        });
+
+        // Users
+        $('#user-autocomplete').on('input', function () {
+            const query = $(this).val();
+            if (query.length < 1) return $('#user-suggestions').empty();
+            $.get('@Url.Action("AutoCompleteUsers", "User")', { keyword: query }, function (data) {
+                $('#user-suggestions').empty();
+                data.forEach(user => {
+                    $('#user-suggestions').append(`<li class="list-group-item user-suggestion" data-username="${user.username}" data-email="${user.email}">
+                        ${user.username} (${user.email})
+                    </li>`);
+                });
+            });
+        });
+
+        $(document).on('click', '.user-suggestion', function () {
+            const username = $(this).data('username');
+            const email = $(this).data('email');
+            if (!assignedUsers.some(u => u.Email === email)) {
+                assignedUsers.push({ Username: username, Email: email });
+                renderUsers();
+            }
+            $('#user-autocomplete').val('');
+            $('#user-suggestions').empty();
+        });
+
+        $(document).on('click', '.remove-user', function () {
+            const email = $(this).data('email');
+            assignedUsers = assignedUsers.filter(u => u.Email !== email);
+            renderUsers();
+        });
+
+        $('#toggle-sort').on('click', function () {
+            sortBy = sortBy === 'Username' ? 'Email' : 'Username';
+            $(this).text(`Sort by ${sortBy === 'Username' ? 'Name' : 'Email'}`);
+            renderUsers();
+        });
+
+        // Questions
+        let questionIndex = 0;
+        $('#add-question').on('click', function () {
+            const index = questionIndex++;
+            const html = `
+                <div class="card p-3 mt-2" data-index="${index}">
+                    <div class="mb-2">
+                        <label>Question Text</label>
+                        <input type="text" name="Questions[${index}].Text" class="form-control" />
+                    </div>
+                    <div class="mb-2">
+                        <label>Type</label>
+                        <select name="Questions[${index}].Type" class="form-control question-type">
+                            <option value="0">Text</option>
+                            <option value="1">Multiple Choice</option>
+                            <option value="2">Checkboxes</option>
+                        </select>
+                    </div>
+                    <div class="mb-2 options-container"></div>
+                    <button type="button" class="btn btn-sm btn-danger remove-question">Remove</button>
+                </div>`;
+            $('#questions-container').append(html);
+        });
+
+        $(document).on('change', '.question-type', function () {
+            const container = $(this).closest('.card').find('.options-container');
+            const namePrefix = $(this).attr('name').replace('.Type', '');
+            const type = parseInt($(this).val());
+            container.empty();
+
+            if (type === 1 || type === 2) {
+                container.append(`<label>Options</label>`);
+                for (let i = 0; i < 3; i++) {
+                    container.append(`<input type="text" name="${namePrefix}.Options[${i}]" class="form-control mb-1" />`);
+                }
+            }
+        });
+
+        $(document).on('click', '.remove-question', function () {
+            $(this).closest('.card').remove();
+        });
+    </script>
+

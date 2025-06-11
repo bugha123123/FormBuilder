@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+﻿@using FormBuilder.Interface
+@inject ITemplateService _templateService;
+@{
+    var UserTemplates = await _templateService.GetUserTemplates();
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -66,15 +71,11 @@
                                     <span class="ml-1 text-gray-400">↕</span>
                                 </th>
                                 <th class="sortable px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable('templates-table', 1)">
-                                    Category
+                                    Tags
                                     <span class="ml-1 text-gray-400">↕</span>
                                 </th>
                                 <th class="sortable px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable('templates-table', 2)">
                                     Created Date
-                                    <span class="ml-1 text-gray-400">↕</span>
-                                </th>
-                                <th class="sortable px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable('templates-table', 3)">
-                                    Status
                                     <span class="ml-1 text-gray-400">↕</span>
                                 </th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -83,26 +84,31 @@
                             </tr>
                         </thead>
                         <tbody id="templates-table" class="bg-white divide-y divide-gray-200">
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm font-medium text-gray-900">Event Registration Form</div>
-                                    <div class="text-sm text-gray-500">Template for event attendee registration</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">Events</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2023-12-28</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Inactive</span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                    <a href="#" class="text-blue-600 hover:text-blue-900 transition-colors">Edit</a>
-                                    <a href="#" class="text-green-600 hover:text-green-900 transition-colors">View</a>
-                                    <a href="#" class="text-red-600 hover:text-red-900 transition-colors">Delete</a>
-                                </td>
-                            </tr>
-                        
+                            @foreach (var userTemplate in UserTemplates)
+                            {
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900">@userTemplate.Title</div>
+                                        <div class="text-sm text-gray-500">@userTemplate.Description</div>
+                                    </td>
+
+                            
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        @userTemplate.CreatedAt.ToString("yyyy-MM-dd")
+                                    </td>
+
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <!-- Example Actions -->
+                                        <a href="@Url.Action("Edit", new { id = userTemplate.Id })" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                                        |
+                                        <a href="@Url.Action("Delete", new { id = userTemplate.Id })" class="text-red-600 hover:text-red-900">Delete</a>
+                                    </td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 </div>
+
             </div>
         </div>
 

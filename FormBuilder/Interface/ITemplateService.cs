@@ -8,5 +8,11 @@ namespace FormBuilder.Interface
 
         Task<List<Tag>> GetAutoCompleteTags(string kewWord);
 
+        Task<FormTemplate> CreateTemplateAsync(FormTemplate template, List<string> selectedTagNames, IFormFile? imageFile);
+
+        Task<List<FormTemplate>> GetUserTemplates();
+
+        Task<List<Tag>> GetTags();
+
     }
 }
