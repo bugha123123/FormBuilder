@@ -4,6 +4,7 @@ using FormBuilder.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FormBuilder.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250611192350_changingProp")]
+    partial class changingProp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,7 +33,7 @@ namespace FormBuilder.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AssignedUsers")
+                    b.Property<string>("AssignedUsersJson")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
@@ -205,42 +208,42 @@ namespace FormBuilder.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 6, 11, 23, 47, 46, 12, DateTimeKind.Local).AddTicks(1805),
+                            CreatedAt = new DateTime(2025, 6, 11, 23, 23, 50, 298, DateTimeKind.Local).AddTicks(9301),
                             Name = "HR",
                             TemplateId = 1
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 6, 11, 23, 47, 46, 12, DateTimeKind.Local).AddTicks(1816),
+                            CreatedAt = new DateTime(2025, 6, 11, 23, 23, 50, 298, DateTimeKind.Local).AddTicks(9311),
                             Name = "Recruitment",
                             TemplateId = 1
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2025, 6, 11, 23, 47, 46, 12, DateTimeKind.Local).AddTicks(1818),
+                            CreatedAt = new DateTime(2025, 6, 11, 23, 23, 50, 298, DateTimeKind.Local).AddTicks(9312),
                             Name = "Event",
                             TemplateId = 2
                         },
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2025, 6, 11, 23, 47, 46, 12, DateTimeKind.Local).AddTicks(1819),
+                            CreatedAt = new DateTime(2025, 6, 11, 23, 23, 50, 298, DateTimeKind.Local).AddTicks(9313),
                             Name = "Signup",
                             TemplateId = 2
                         },
                         new
                         {
                             Id = 5,
-                            CreatedAt = new DateTime(2025, 6, 11, 23, 47, 46, 12, DateTimeKind.Local).AddTicks(1820),
+                            CreatedAt = new DateTime(2025, 6, 11, 23, 23, 50, 298, DateTimeKind.Local).AddTicks(9315),
                             Name = "Customer",
                             TemplateId = 3
                         },
                         new
                         {
                             Id = 6,
-                            CreatedAt = new DateTime(2025, 6, 11, 23, 47, 46, 12, DateTimeKind.Local).AddTicks(1821),
+                            CreatedAt = new DateTime(2025, 6, 11, 23, 23, 50, 298, DateTimeKind.Local).AddTicks(9316),
                             Name = "Survey",
                             TemplateId = 3
                         });

@@ -1,0 +1,205 @@
+﻿@using FormBuilder.Models
+@using FormBuilder.Enums
+@model FormTemplate
+
+<header class="bg-white shadow-sm border-b">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+            <div class="flex items-center space-x-3">
+                <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                    <i class="fas fa-edit mr-2"></i>Edit Template
+                </button>
+                <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                    <i class="fas fa-play mr-2"></i>Use Template
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Main Content -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Template Header -->
+            <div class="bg-white rounded-lg shadow-sm border p-6">
+                <div class="flex flex-col lg:flex-row justify-between gap-6">
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <h1 class="text-2xl font-bold text-gray-900">@Model.Title</h1>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                <i class="fas fa-globe mr-1"></i>@(Model.isPublic ? "Public" : "Private")
+                            </span>
+                        </div>
+                        <p class="text-gray-600 text-lg mb-4">@Html.Raw(Model.Description)</p>
+
+                        <div class="flex items-center space-x-6 text-sm text-gray-500">
+                            <div class="flex items-center">
+                                <i class="fas fa-calendar mr-2"></i>
+                                <span>@Model.CreatedAt.ToString("yyyy-MM-dd")</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-user mr-2"></i>
+                                <span>By: @Model.User?.UserName?.Substring(0, Math.Min(7, Model.User.UserName.Length))</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-hashtag mr-2"></i>
+                                <span>ID: #@Model.Id</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex-shrink-0">
+                        <img src="@(Model.ImageUrl != null
+                            ? Model.ImageUrl.Replace("/upload/", "/upload/c_fill,w_400,h_200/")
+                            : "/placeholder.svg?height=200&width=400")"
+                             alt="@($"{Model.Title} preview")"
+                             class="object-cover rounded-lg w-80 h-40" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tags -->
+            <div class="bg-white rounded-lg shadow-sm border p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Tags</h3>
+                <div class="flex flex-wrap gap-2">
+                    @foreach (var tag in Model.SavedTags ?? new List<string>())
+                    {
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">@tag</span>
+                    }
+                </div>
+            </div>
+
+            <!-- Questions -->
+            <div class="space-y-6">
+                @for (int i = 0; i < Model.Questions.Count; i++)
+                {
+                    var question = Model.Questions[i];
+                    <div class="border-l-4 border-blue-500 pl-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-medium text-gray-900">@($"{i + 1}. {question.Text}")</h4>
+                            <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">@question.Type</span>
+                        </div>
+
+                        @switch (question.Type)
+                        {
+                            case QuestionType.ShortText:
+                            case QuestionType.LongText:
+                                <input type="text" class="form-input mt-1 block w-full" placeholder="Your answer..." />
+                                break;
+
+                            case QuestionType.Number:
+                                <input type="number" class="form-input mt-1 block w-full" placeholder="Enter a number" />
+                                break;
+
+                            case QuestionType.Checkbox:
+                                <div class="space-y-1">
+                                    @foreach (var option in question.Options)
+                                    {
+                                        <div class="flex items-center">
+                                            <input type="checkbox" class="form-checkbox" id="@($"chk_{i}_{option}")" />
+                                            <label for="@($"chk_{i}_{option}")" class="ml-2 text-sm text-gray-700">@option</label>
+                                        </div>
+                                    }
+                                </div>
+                                break;
+
+                            case QuestionType.Dropdown:
+                                <select class="form-select mt-1 block w-full">
+                                    @foreach (var option in question.Options)
+                                    {
+                                        <option>@option</option>
+                                    }
+                                </select>
+                                break;
+
+                            case QuestionType.OneFromList:
+                                <div class="space-y-1">
+                                    @foreach (var option in question.Options)
+                                    {
+                                        <div class="flex items-center">
+                                            <input type="radio" name="question_@i" class="form-radio" id="@($"opt_{i}_{option}")" />
+                                            <label for="@($"opt_{i}_{option}")" class="ml-2 text-sm text-gray-700">@option</label>
+                                        </div>
+                                    }
+                                </div>
+                                break;
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <!-- Template Stats -->
+            <div class="bg-white rounded-lg shadow-sm border p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Template Statistics</h3>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Total Questions</span>
+                        <span class="font-semibold text-gray-900">@Model.Questions.Count()</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Times Used</span>
+                        <span class="font-semibold text-gray-900">...</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Responses</span>
+                        <span class="font-semibold text-gray-900">...</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Completion Rate</span>
+                        <span class="font-semibold text-green-600">...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assigned Users -->
+            <div class="bg-white rounded-lg shadow-sm border p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Assigned Users</h3>
+                <div class="space-y-3">
+                    @if (Model.AssignedUsers != null && Model.AssignedUsers.Any())
+                    {
+                        foreach (var user in Model.AssignedUsers)
+                        {
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                                    @user?.Substring(0, 1).ToUpper()
+                                </div>
+                                <span class="text-sm text-gray-800">@user</span>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-sm text-gray-500">No assigned users.</p>
+                    }
+
+                    <button class="w-full text-left text-sm text-blue-600 hover:text-blue-800 font-medium mt-2">
+                        <i class="fas fa-plus mr-1"></i>Add more users
+                    </button>
+                </div>
+            </div>
+
+            <!-- Template Actions -->
+            <div class="bg-white rounded-lg shadow-sm border p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Actions</h3>
+                <div class="space-y-3">
+                    <button class="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                        <i class="fas fa-copy mr-2"></i>Duplicate Template
+                    </button>
+                    <button class="w-full flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                        <i class="fas fa-share mr-2"></i>Share Template
+                    </button>
+                    <button class="w-full flex items-center justify-center px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors">
+                        <i class="fas fa-download mr-2"></i>Export Template
+                    </button>
+                    <button class="w-full flex items-center justify-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-archive mr-2"></i>Archive Template
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>

@@ -4,6 +4,7 @@ using FormBuilder.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FormBuilder.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250611193543_blabla")]
+    partial class blabla
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -66,6 +69,7 @@ namespace FormBuilder.Migrations
                         new
                         {
                             Id = 1,
+                            AssignedUsers = "[]",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Basic job application form.",
                             Title = "JobApplication",
@@ -74,6 +78,7 @@ namespace FormBuilder.Migrations
                         new
                         {
                             Id = 2,
+                            AssignedUsers = "[]",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Template for event sign-ups.",
                             Title = "EventRegistration",
@@ -82,6 +87,7 @@ namespace FormBuilder.Migrations
                         new
                         {
                             Id = 3,
+                            AssignedUsers = "[]",
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Collect feedback from customers.",
                             Title = "FeedbackSurvey",
@@ -205,42 +211,42 @@ namespace FormBuilder.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 6, 11, 23, 47, 46, 12, DateTimeKind.Local).AddTicks(1805),
+                            CreatedAt = new DateTime(2025, 6, 11, 23, 35, 43, 107, DateTimeKind.Local).AddTicks(7366),
                             Name = "HR",
                             TemplateId = 1
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 6, 11, 23, 47, 46, 12, DateTimeKind.Local).AddTicks(1816),
+                            CreatedAt = new DateTime(2025, 6, 11, 23, 35, 43, 107, DateTimeKind.Local).AddTicks(7376),
                             Name = "Recruitment",
                             TemplateId = 1
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2025, 6, 11, 23, 47, 46, 12, DateTimeKind.Local).AddTicks(1818),
+                            CreatedAt = new DateTime(2025, 6, 11, 23, 35, 43, 107, DateTimeKind.Local).AddTicks(7377),
                             Name = "Event",
                             TemplateId = 2
                         },
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2025, 6, 11, 23, 47, 46, 12, DateTimeKind.Local).AddTicks(1819),
+                            CreatedAt = new DateTime(2025, 6, 11, 23, 35, 43, 107, DateTimeKind.Local).AddTicks(7379),
                             Name = "Signup",
                             TemplateId = 2
                         },
                         new
                         {
                             Id = 5,
-                            CreatedAt = new DateTime(2025, 6, 11, 23, 47, 46, 12, DateTimeKind.Local).AddTicks(1820),
+                            CreatedAt = new DateTime(2025, 6, 11, 23, 35, 43, 107, DateTimeKind.Local).AddTicks(7380),
                             Name = "Customer",
                             TemplateId = 3
                         },
                         new
                         {
                             Id = 6,
-                            CreatedAt = new DateTime(2025, 6, 11, 23, 47, 46, 12, DateTimeKind.Local).AddTicks(1821),
+                            CreatedAt = new DateTime(2025, 6, 11, 23, 35, 43, 107, DateTimeKind.Local).AddTicks(7381),
                             Name = "Survey",
                             TemplateId = 3
                         });

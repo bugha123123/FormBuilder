@@ -25,6 +25,13 @@ namespace FormBuilder.Controllers
         }
 
 
+        public async Task<IActionResult> Details(int id)
+        {
+
+            var Template = await _templateService.GetTemplateById(id);
+            return View(Template);
+        }
+
         public async Task<IActionResult> AutoCompleteTags(string keyword)
         {
             var tags = await _templateService.GetAutoCompleteTags(keyword);
@@ -34,13 +41,13 @@ namespace FormBuilder.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateTemplate(FormTemplate template, string TagNames, IFormFile? imageFile)
+        public async Task<IActionResult> CreateTemplate(FormTemplate template, string TagNames, IFormFile? ImageFile)
         {
             var selectedTagNames = string.IsNullOrWhiteSpace(TagNames)
                 ? new List<string>()
                 : TagNames.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(t => t.Trim()).ToList();
 
-            var createdTemplate = await _templateService.CreateTemplateAsync(template, selectedTagNames, imageFile);
+            var createdTemplate = await _templateService.CreateTemplateAsync(template, selectedTagNames, ImageFile);
 
             return RedirectToAction("Details", new { id = createdTemplate.Id });
         }

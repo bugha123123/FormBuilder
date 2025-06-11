@@ -1,4 +1,5 @@
 ﻿@using FormBuilder.DTO
+@using FormBuilder.Enums
 @model FormTemplateCreateViewModel
 
 @{
@@ -9,22 +10,29 @@
     <h2 class="text-2xl font-semibold text-gray-800 mb-6">Create Template</h2>
 
     <form asp-action="CreateTemplate" enctype="multipart/form-data" asp-controller="Template" method="post" id="create-template-form" novalidate>
-        <!-- Title -->
         <div class="mb-6">
             <label asp-for="Title" class="block text-gray-700 font-medium mb-2"></label>
-            <input asp-for="Title" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Enter template title" />
+            <select asp-for="Title" asp-items="Html.GetEnumSelectList<TemplateTitle>()" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <option value="">-- Select Template Title --</option>
+            </select>
             <span asp-validation-for="Title" class="text-red-600 mt-1 block"></span>
         </div>
 
-        <!-- Description -->
         <div class="mb-6">
             <label asp-for="Description" class="block text-gray-700 font-medium mb-2"></label>
-            <textarea asp-for="Description" rows="5" placeholder="Enter description (Markdown supported)" class="w-full px-4 py-2 border border-gray-300 rounded-md resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
+            <textarea asp-for="Description" id="markdown-input" rows="5"
+                      placeholder="Enter description (Markdown supported)"
+                      class="w-full px-4 py-2 border border-gray-300 rounded-md resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
             <p class="text-sm text-gray-500 mt-1">Supports Markdown</p>
             <span asp-validation-for="Description" class="text-red-600 mt-1 block"></span>
+
+            <div class="mt-4">
+                <label class="block text-gray-700 font-medium mb-2">Live Preview</label>
+                <div id="markdown-preview" class="prose bg-gray-100 p-4 rounded-md border border-gray-300"></div>
+            </div>
         </div>
 
-        <!-- Topic -->
+
         <div class="mb-6">
             <label asp-for="TopicId" class="block text-gray-700 font-medium mb-2"></label>
             <select asp-for="TopicId" asp-items="ViewBag.Topics" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
@@ -33,20 +41,17 @@
             <span asp-validation-for="TopicId" class="text-red-600 mt-1 block"></span>
         </div>
 
-        <!-- Image Upload -->
         <div class="mb-6">
             <label asp-for="ImageFile" class="block text-gray-700 font-medium mb-2">Upload Image</label>
             <input asp-for="ImageFile" type="file" accept="image/*" class="w-full" />
             <span asp-validation-for="ImageFile" class="text-red-600 mt-1 block"></span>
         </div>
 
-        <!-- IsPublic Checkbox -->
         <div class="mb-8 flex items-center">
             <input asp-for="IsPublic" type="checkbox" id="IsPublic" class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
             <label asp-for="IsPublic" class="ml-2 block text-gray-700 font-medium cursor-pointer"></label>
         </div>
 
-        <!-- Tags -->
         <div class="mb-8 relative">
             <label class="block text-gray-700 font-medium mb-2">Tags</label>
             <input id="tag-input" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Enter tag..." autocomplete="off" />
@@ -54,7 +59,6 @@
             <div id="tags-container" class="flex flex-wrap mt-3 gap-2"></div>
         </div>
 
-        <!-- Users -->
         <div class="mb-8 relative">
             <label class="block text-gray-700 font-medium mb-2">Assign Users</label>
             <input id="user-autocomplete" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Search by name/email..." autocomplete="off" />
@@ -82,7 +86,26 @@
 
  
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script>
+
+            document.addEventListener('DOMContentLoaded', function () {
+        const input = document.getElementById('markdown-input');
+        const preview = document.getElementById('markdown-preview');
+
+        function updatePreview() {
+            const markdown = input.value;
+            preview.innerHTML = marked.parse(markdown);
+        }
+
+        input.addEventListener('input', updatePreview);
+
+        // Initial render
+        updatePreview();
+    });
+
+
+
         let selectedTags = [];
         let assignedUsers = [];
         let sortBy = "Username";
@@ -98,23 +121,26 @@
     }
 
 
-        function renderUsers() {
-            const sorted = [...assignedUsers].sort((a, b) => {
-                const key = sortBy.toLowerCase();
-                return a[key].localeCompare(b[key]);
-            });
+           function renderUsers() {
+        const sorted = [...assignedUsers].sort((a, b) => {
+            const key = sortBy.toLowerCase();
+            return a[key].localeCompare(b[key]);
+        });
 
-            $('#assigned-users-list').empty();
-            sorted.forEach(user => {
-                $('#assigned-users-list').append(
-                    `<li class="list-group-item d-flex justify-content-between align-items-center">
-                        ${user.Username} (${user.Email})
-                        <button type="button" class="btn btn-danger btn-sm remove-user" data-email="${user.Email}">Remove</button>
-                    </li>`
-                );
-            });
-            $('#hidden-users').val(JSON.stringify(assignedUsers));
-        }
+        $('#assigned-users-list').empty();
+        sorted.forEach(user => {
+            $('#assigned-users-list').append(
+                `<li class="list-group-item d-flex justify-content-between align-items-center">
+                    ${user.Username} (${user.Email})
+                    <button type="button" class="btn btn-danger btn-sm remove-user" data-email="${user.Email}">Remove</button>
+                </li>`
+            );
+        });
+
+        $('#hidden-users').val(assignedUsers.map(u => u.Email).join(','));
+
+    }
+
 
         // Tags
         $('#tag-input').on('input', function () {
@@ -180,30 +206,50 @@
             $(this).text(`Sort by ${sortBy === 'Username' ? 'Name' : 'Email'}`);
             renderUsers();
         });
+            const QuestionType = {
+      ShortText: 0,
+      LongText: 1,
+      Number: 2,
+      Checkbox: 3,
+      Dropdown: 4,
+      OneFromList: 5
+    };
 
-        // Questions
-        let questionIndex = 0;
-        $('#add-question').on('click', function () {
-            const index = questionIndex++;
-            const html = `
-                <div class="card p-3 mt-2" data-index="${index}">
-                    <div class="mb-2">
-                        <label>Question Text</label>
-                        <input type="text" name="Questions[${index}].Text" class="form-control" />
-                    </div>
-                    <div class="mb-2">
-                        <label>Type</label>
-                        <select name="Questions[${index}].Type" class="form-control question-type">
-                            <option value="0">Text</option>
-                            <option value="1">Multiple Choice</option>
-                            <option value="2">Checkboxes</option>
-                        </select>
-                    </div>
-                    <div class="mb-2 options-container"></div>
-                    <button type="button" class="btn btn-sm btn-danger remove-question">Remove</button>
-                </div>`;
-            $('#questions-container').append(html);
-        });
+    const QuestionTypeNames = {
+      0: "Short Text",
+      1: "Long Text",
+      2: "Number",
+      3: "Checkbox",
+      4: "Dropdown",
+      5: "One From List"
+    };
+
+          let questionIndex = 0;
+    $('#add-question').on('click', function () {
+        const index = questionIndex++;
+        let optionsHtml = '';
+        for (const [key, value] of Object.entries(QuestionType)) {
+            optionsHtml += `<option value="${value}">${QuestionTypeNames[value]}</option>`;
+        }
+
+        const html = `
+            <div class="card p-3 mt-2" data-index="${index}">
+                <div class="mb-2">
+                    <label>Question Text</label>
+                    <input type="text" name="Questions[${index}].Text" class="form-control" />
+                </div>
+                <div class="mb-2">
+                    <label>Type</label>
+                    <select name="Questions[${index}].Type" class="form-control question-type">
+                        ${optionsHtml}
+                    </select>
+                </div>
+                <div class="mb-2 options-container"></div>
+                <button type="button" class="btn btn-sm btn-danger remove-question">Remove</button>
+            </div>`;
+        $('#questions-container').append(html);
+    });
+
 
         $(document).on('change', '.question-type', function () {
             const container = $(this).closest('.card').find('.options-container');

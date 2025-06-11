@@ -4,6 +4,7 @@ using FormBuilder.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FormBuilder.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250611194437_adawdadwadwafawdD")]
+    partial class adawdadwadwafawdD
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,9 +32,6 @@ namespace FormBuilder.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AssignedUsers")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -205,42 +205,42 @@ namespace FormBuilder.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 6, 11, 23, 47, 46, 12, DateTimeKind.Local).AddTicks(1805),
+                            CreatedAt = new DateTime(2025, 6, 11, 23, 44, 36, 814, DateTimeKind.Local).AddTicks(9141),
                             Name = "HR",
                             TemplateId = 1
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 6, 11, 23, 47, 46, 12, DateTimeKind.Local).AddTicks(1816),
+                            CreatedAt = new DateTime(2025, 6, 11, 23, 44, 36, 814, DateTimeKind.Local).AddTicks(9155),
                             Name = "Recruitment",
                             TemplateId = 1
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2025, 6, 11, 23, 47, 46, 12, DateTimeKind.Local).AddTicks(1818),
+                            CreatedAt = new DateTime(2025, 6, 11, 23, 44, 36, 814, DateTimeKind.Local).AddTicks(9156),
                             Name = "Event",
                             TemplateId = 2
                         },
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2025, 6, 11, 23, 47, 46, 12, DateTimeKind.Local).AddTicks(1819),
+                            CreatedAt = new DateTime(2025, 6, 11, 23, 44, 36, 814, DateTimeKind.Local).AddTicks(9157),
                             Name = "Signup",
                             TemplateId = 2
                         },
                         new
                         {
                             Id = 5,
-                            CreatedAt = new DateTime(2025, 6, 11, 23, 47, 46, 12, DateTimeKind.Local).AddTicks(1820),
+                            CreatedAt = new DateTime(2025, 6, 11, 23, 44, 36, 814, DateTimeKind.Local).AddTicks(9158),
                             Name = "Customer",
                             TemplateId = 3
                         },
                         new
                         {
                             Id = 6,
-                            CreatedAt = new DateTime(2025, 6, 11, 23, 47, 46, 12, DateTimeKind.Local).AddTicks(1821),
+                            CreatedAt = new DateTime(2025, 6, 11, 23, 44, 36, 814, DateTimeKind.Local).AddTicks(9159),
                             Name = "Survey",
                             TemplateId = 3
                         });
@@ -264,6 +264,9 @@ namespace FormBuilder.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<int?>("FormTemplateId")
+                        .HasColumnType("int");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -299,6 +302,8 @@ namespace FormBuilder.Migrations
                         .HasColumnType("nvarchar(256)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("FormTemplateId");
 
                     b.HasIndex("NormalizedEmail")
                         .HasDatabaseName("EmailIndex");
@@ -464,6 +469,13 @@ namespace FormBuilder.Migrations
                     b.Navigation("Template");
                 });
 
+            modelBuilder.Entity("FormBuilder.Models.User", b =>
+                {
+                    b.HasOne("FormBuilder.Models.FormTemplate", null)
+                        .WithMany("AssignedUsers")
+                        .HasForeignKey("FormTemplateId");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -517,6 +529,8 @@ namespace FormBuilder.Migrations
 
             modelBuilder.Entity("FormBuilder.Models.FormTemplate", b =>
                 {
+                    b.Navigation("AssignedUsers");
+
                     b.Navigation("Questions");
                 });
 #pragma warning restore 612, 618

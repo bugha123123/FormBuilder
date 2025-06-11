@@ -14,10 +14,12 @@ namespace FormBuilder.Service
     {
         private readonly AppDbContext _context;
         private readonly IAuthService _authService;
-        public TemplateService(AppDbContext context, IAuthService authService)
+        private readonly CloudinaryService _cloudinaryService;
+        public TemplateService(AppDbContext context, IAuthService authService, CloudinaryService cloudinaryService)
         {
             _context = context;
             _authService = authService;
+            _cloudinaryService = cloudinaryService;
         }
 
         public async Task<List<FormTemplate>> GetFormTemplates()
@@ -44,25 +46,28 @@ namespace FormBuilder.Service
             var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
             template.Description = Markdown.ToHtml(template.Description ?? "", pipeline);
 
-            // If selectedTagNames is null or empty, initialize empty list
             selectedTagNames ??= new List<string>();
 
-            // Fetch only existing tags from the DB, matching user selection
-            var existingTags = await _context.Tags
+            List<string> existingTags = await _context.Tags
                 .Where(t => selectedTagNames.Contains(
                     EF.Functions.Collate(t.Name, "SQL_Latin1_General_CP1_CI_AS")
                 ))
                 .Select(t => t.Name)
                 .ToListAsync();
 
-            // Save the validated existing tags to SavedTags property
             template.SavedTags = existingTags;
             template.User = LoggedInUser;
             template.UserId = LoggedInUser.Id;
-            // Remove duplicate assigned users if any
             if (template.AssignedUsers != null)
             {
                 template.AssignedUsers = template.AssignedUsers.Distinct().ToList();
+            }
+
+
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                string imageUrl = await _cloudinaryService.UploadImageAsync(imageFile);
+                template.ImageUrl = imageUrl;  
             }
 
             template.CreatedAt = DateTime.UtcNow;
@@ -90,6 +95,11 @@ namespace FormBuilder.Service
         public async Task<List<Tag>> GetTags()
         {
             return await _context.Tags.ToListAsync();
+        }
+
+        public async Task<FormTemplate> GetTemplateById(int id)
+        {
+            return await _context.FormTemplates.Include(x => x.User).Include(x => x.Questions).FirstOrDefaultAsync(t => t.Id == id);
         }
     }
 }

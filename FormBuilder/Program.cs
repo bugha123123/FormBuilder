@@ -56,6 +56,8 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     };
 });
 
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+builder.Services.AddSingleton<CloudinaryService>();
 
 
 builder.Services.AddScoped<IAuthService, AuthService>();

@@ -17,7 +17,7 @@ namespace FormBuilder.Models
         public List<Question> Questions { get; set; }
 
 
-        public List<string>? AssignedUsers { get; set; }
+        public  List<string>? AssignedUsers { get; set; }
 
         public virtual List<string>? SavedTags { get; set; }
 
@@ -25,7 +25,7 @@ namespace FormBuilder.Models
 
 
 
-        //public string? ImageUrl { get; set; }
+        public string? ImageUrl { get; set; }
     }
 
 }

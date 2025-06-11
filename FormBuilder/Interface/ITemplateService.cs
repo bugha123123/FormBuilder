@@ -14,5 +14,8 @@ namespace FormBuilder.Interface
 
         Task<List<Tag>> GetTags();
 
+        Task<FormTemplate> GetTemplateById(int id);
+
+
     }
 }
