@@ -1,0 +1,46 @@
+﻿@using FormBuilder.Models
+@model List<FormTemplate>
+@{
+    var tag = Context.Request.Query["Tag"];
+}
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <header class="mb-12">
+        <h1 class="text-4xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
+            Templates tagged with "@tag"
+        </h1>
+        @if (!Model.Any())
+        {
+            <p class="mt-4 text-gray-600 dark:text-gray-300">No templates found with this tag.</p>
+        }
+    </header>
+
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        @foreach (var template in Model)
+        {
+            <article class="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col overflow-hidden">
+                <div class="aspect-w-16 aspect-h-9">
+                    <img src="@(template.ImageUrl != null
+                        ? template.ImageUrl.Replace("/upload/", "/upload/c_fill,w_400,h_200/")
+                        : "/placeholder.svg?height=200&width=400")"
+                         alt="@($"{template.Title} preview")"
+                         class="object-cover rounded-t-lg w-full h-full" />
+                </div>
+                <div class="p-6 flex flex-col flex-grow">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">@template.Title</h3>
+                    <div class="flex flex-wrap gap-2 mb-6">
+                        @foreach (var t in template.SavedTags)
+                        {
+                            <span class="bg-cyan-100 text-cyan-800 text-xs font-medium px-2 py-1 rounded-full">@t</span>
+                        }
+                    </div>
+                    <a asp-controller="Forms" asp-action="Create" asp-route-TemplateId="@template.Id">
+                        <button type="button" class="mt-auto w-full bg-primary hover:bg-secondary focus:ring-4 focus:ring-primary/50 text-white py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none">
+                            Use template
+                        </button>
+                    </a>
+                </div>
+            </article>
+        }
+    </section>
+</main>

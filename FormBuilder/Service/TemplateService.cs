@@ -99,7 +99,21 @@ namespace FormBuilder.Service
 
         public async Task<FormTemplate> GetTemplateById(int id)
         {
-            return await _context.FormTemplates.Include(x => x.User).Include(x => x.Questions).FirstOrDefaultAsync(t => t.Id == id);
+            return await _context.FormTemplates.Include(x => x.User).Include(x => x.Questions).Include(x => x.Comments).FirstOrDefaultAsync(t => t.Id == id);
         }
+
+        public async Task<List<FormTemplate>> SearchTemplates(string tag)
+        {
+            var allTemplates = await _context.FormTemplates.ToListAsync();
+
+            var filtered = allTemplates
+                .Where(t => t.SavedTags != null &&
+                            t.SavedTags.Any(savedTag =>
+                                savedTag.Contains(tag, StringComparison.OrdinalIgnoreCase)))
+                .ToList();
+
+            return filtered;
+        }
+
     }
 }

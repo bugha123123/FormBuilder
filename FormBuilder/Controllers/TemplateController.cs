@@ -31,6 +31,12 @@ namespace FormBuilder.Controllers
             var Template = await _templateService.GetTemplateById(id);
             return View(Template);
         }
+        public async Task<IActionResult> Search(string Tag)
+        {
+
+            var Template = await _templateService.SearchTemplates(Tag);
+            return View(Template);
+        }
 
         public async Task<IActionResult> AutoCompleteTags(string keyword)
         {

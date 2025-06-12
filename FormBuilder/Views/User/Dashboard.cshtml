@@ -4,7 +4,6 @@
     var UserTemplates = await _templateService.GetUserTemplates();
 }
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,15 +12,17 @@
     <title>User Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
 </head>
 <body class="bg-gray-50 min-h-screen">
+
     <!-- Header -->
     <header class="bg-white shadow-sm border-b border-gray-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center py-6">
                 <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
                 <div class="flex items-center space-x-4">
-                    <span class="text-sm text-gray-500">Welcome back, @User.Identity.Name.Substring(0,7)</span>
+                    <span class="text-sm text-gray-500">Welcome back, @User.Identity.Name.Substring(0, 7)</span>
                     <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                         <span class="text-white text-sm font-medium">
                             @User.Identity.Name.Substring(0, 2).ToUpper()
@@ -35,50 +36,44 @@
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <!-- Tab Navigation -->
-        <div class="mb-8">
+        <div class="mb-8 border-b border-gray-200">
             <nav class="flex space-x-8" aria-label="Tabs">
                 <button id="templates-tab"
-                        class="tab-button active whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm focus:outline-none"
+                        class="tab-button active py-2 px-1 border-b-2 font-medium text-sm text-blue-600 border-blue-500 focus:outline-none"
                         onclick="switchTab('templates')">
                     My Templates
                 </button>
                 <button id="forms-tab"
-                        class="tab-button whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm focus:outline-none"
+                        class="tab-button py-2 px-1 border-b-2 font-medium text-sm text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300 focus:outline-none"
                         onclick="switchTab('forms')">
                     My Filled Forms
                 </button>
             </nav>
         </div>
 
-        <!-- Templates Tab Content -->
+        <!-- Templates Tab -->
         <div id="templates-content" class="tab-content">
             <div class="bg-white shadow-sm rounded-lg overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <div class="flex justify-between items-center">
-                        <h2 class="text-lg font-medium text-gray-900">My Templates</h2>
-                        <a asp-action="Create" asp-controller="Template" class="text-white no-underline">
-                            <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
-                                Create New Template
-                            </button>
-                        </a>
-                    </div>
+                <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                    <h2 class="text-lg font-medium text-gray-900">My Templates</h2>
+                    <a asp-action="Create" asp-controller="Template">
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition">
+                            Create New Template
+                        </button>
+                    </a>
                 </div>
-
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="sortable px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable('templates-table', 0)">
-                                    Template Name
-                                    <span class="ml-1 text-gray-400">↕</span>
+                                    Template Name <span class="ml-1 text-gray-400">↕</span>
                                 </th>
                                 <th class="sortable px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable('templates-table', 1)">
-                                    Tags
-                                    <span class="ml-1 text-gray-400">↕</span>
+                                    Tags <span class="ml-1 text-gray-400">↕</span>
                                 </th>
                                 <th class="sortable px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable('templates-table', 2)">
-                                    Created Date
-                                    <span class="ml-1 text-gray-400">↕</span>
+                                    Created Date <span class="ml-1 text-gray-400">↕</span>
                                 </th>
                             </tr>
                         </thead>
@@ -90,7 +85,6 @@
                                         <div class="text-sm font-medium text-gray-900">@userTemplate.Title</div>
                                         <div class="text-sm text-gray-500">@Html.Raw(userTemplate.Description)</div>
                                     </td>
-
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         <div class="flex flex-wrap gap-1">
                                             @foreach (var tag in userTemplate.SavedTags)
@@ -99,56 +93,37 @@
                                             }
                                         </div>
                                     </td>
-
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                         @userTemplate.CreatedAt.ToString("yyyy-MM-dd")
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right">
+                                        <a asp-controller="Forms" asp-action="Create" asp-route-TemplateId="@userTemplate.Id"
+                                           class="inline-block bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-sm font-medium transition">
+                                            Fill New Form
+                                        </a>
                                     </td>
                                 </tr>
                             }
                         </tbody>
+
                     </table>
                 </div>
             </div>
         </div>
 
-
-    
-
-        <!-- Forms Tab Content -->
+        <!-- Forms Tab -->
         <div id="forms-content" class="tab-content hidden">
             <div class="bg-white shadow-sm rounded-lg overflow-hidden">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <div class="flex justify-between items-center">
-                        <h2 class="text-lg font-medium text-gray-900">My Filled Forms</h2>
-                        <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors">
-                            Fill New Form
-                        </button>
-                    </div>
-                </div>
-
+              
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="sortable px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable('forms-table', 0)">
-                                    Form Title
-                                    <span class="ml-1 text-gray-400">↕</span>
-                                </th>
-                                <th class="sortable px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable('forms-table', 1)">
-                                    Template Used
-                                    <span class="ml-1 text-gray-400">↕</span>
-                                </th>
-                                <th class="sortable px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable('forms-table', 2)">
-                                    Submitted Date
-                                    <span class="ml-1 text-gray-400">↕</span>
-                                </th>
-                                <th class="sortable px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable('forms-table', 3)">
-                                    Status
-                                    <span class="ml-1 text-gray-400">↕</span>
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Actions
-                                </th>
+                                <th class="sortable px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Form Title</th>
+                                <th class="sortable px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Template Used</th>
+                                <th class="sortable px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted Date</th>
+                                <th class="sortable px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="forms-table" class="bg-white divide-y divide-gray-200">
@@ -163,9 +138,9 @@
                                     <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">Approved</span>
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                    <a href="#" class="text-blue-600 hover:text-blue-900 transition-colors">Edit</a>
-                                    <a href="#" class="text-green-600 hover:text-green-900 transition-colors">View</a>
-                                    <a href="#" class="text-purple-600 hover:text-purple-900 transition-colors">Download</a>
+                                    <a href="#" class="text-blue-600 hover:text-blue-900 transition">Edit</a>
+                                    <a href="#" class="text-green-600 hover:text-green-900 transition">View</a>
+                                    <a href="#" class="text-purple-600 hover:text-purple-900 transition">Download</a>
                                 </td>
                             </tr>
                         </tbody>
@@ -177,65 +152,40 @@
 
     <script>
         function switchTab(tabName) {
-            const tabContents = document.querySelectorAll('.tab-content');
-            tabContents.forEach(content => content.classList.add('hidden'));
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`${tabName}-content`).classList.remove('hidden');
 
-            // Remove active class from all tab buttons
-            const tabButtons = document.querySelectorAll('.tab-button');
-            tabButtons.forEach(button => {
-                button.classList.remove('active', 'border-blue-500', 'text-blue-600');
-                button.classList.add('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('text-blue-600', 'border-blue-500');
+                btn.classList.add('text-gray-500', 'border-transparent');
             });
-
-            document.getElementById(tabName + '-content').classList.remove('hidden');
-
-            const activeButton = document.getElementById(tabName + '-tab');
-            activeButton.classList.add('active', 'border-blue-500', 'text-blue-600');
-            activeButton.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
+            const activeTab = document.getElementById(`${tabName}-tab`);
+            activeTab.classList.add('text-blue-600', 'border-blue-500');
+            activeTab.classList.remove('text-gray-500', 'border-transparent');
         }
-
-        switchTab('templates');
 
         function sortTable(tableId, columnIndex) {
             const table = document.getElementById(tableId);
             const rows = Array.from(table.rows);
             const isAscending = table.getAttribute('data-sort-direction') !== 'asc';
-
-            rows.sort((a, b) => {
-                const aText = a.cells[columnIndex].textContent.trim();
-                const bText = b.cells[columnIndex].textContent.trim();
-
-                if (columnIndex === 2) {
-                    const aDate = new Date(aText);
-                    const bDate = new Date(bText);
-                    return isAscending ? aDate - bDate : bDate - aDate;
-                }
-
-                // Handle text
-                return isAscending ?
-                    aText.localeCompare(bText) :
-                    bText.localeCompare(aText);
-            });
-
-            table.innerHTML = '';
-            rows.forEach(row => table.appendChild(row));
-
             table.setAttribute('data-sort-direction', isAscending ? 'asc' : 'desc');
 
-            const headers = table.parentElement.parentElement.querySelectorAll('.sortable');
-            headers.forEach((header, index) => {
-                const indicator = header.querySelector('span');
-                if (index === columnIndex) {
-                    indicator.textContent = isAscending ? '↑' : '↓';
-                    indicator.classList.remove('text-gray-400');
-                    indicator.classList.add('text-blue-600');
-                } else {
-                    indicator.textContent = '↕';
-                    indicator.classList.remove('text-blue-600');
-                    indicator.classList.add('text-gray-400');
+            rows.sort((a, b) => {
+                const aText = a.cells[columnIndex]?.textContent.trim();
+                const bText = b.cells[columnIndex]?.textContent.trim();
+
+                if (!aText || !bText) return 0;
+                if (Date.parse(aText) && Date.parse(bText)) {
+                    return isAscending ? new Date(aText) - new Date(bText) : new Date(bText) - new Date(aText);
                 }
+                return isAscending ? aText.localeCompare(bText) : bText.localeCompare(aText);
             });
+
+            rows.forEach(row => table.appendChild(row));
         }
+
+        switchTab('templates');
     </script>
+
 </body>
 </html>

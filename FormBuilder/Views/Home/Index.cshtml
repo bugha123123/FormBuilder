@@ -2,10 +2,14 @@
 @inject ITemplateService _templateService;
 @{
     var formTemplates = await _templateService.GetFormTemplates();
- 
-    
 
+    var allTags = formTemplates
+                  .SelectMany(t => t.SavedTags ?? Enumerable.Empty<string>())
+                  .Distinct()
+                  .OrderBy(tag => tag)
+                  .ToList();
 }
+
 <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
     <header class="text-center mb-12">
@@ -45,14 +49,35 @@
                             {
                                 <span class="bg-cyan-100 text-cyan-800 text-xs font-medium px-2 py-1 rounded-full">@tag</span>
                             }
-                        </div> 
-                        <button type="button" class="mt-auto w-full bg-primary hover:bg-secondary focus:ring-4 focus:ring-primary/50 text-white py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none">
-                            Use template
-                        </button>
+                        </div>
+                        <a asp-controller="Forms" asp-action="Create" asp-route-TemplateId="@template.Id">
+                            <button type="button" class="mt-auto w-full bg-primary hover:bg-secondary focus:ring-4 focus:ring-primary/50 text-white py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none">
+                                Use template
+                            </button>
+                      </a>
                     </div>
                 </article>
             }
         </div>
+
+
     </section>
+
+    <section aria-labelledby="tag-cloud-heading" class="mb-16">
+        <h2 id="tag-cloud-heading" class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-6">
+            Tag Cloud
+        </h2>
+        <div class="flex flex-wrap gap-3">
+            @foreach (var tag in allTags)
+            {
+                <a asp-action="Search" asp-controller="Template" asp-route-Tag="@tag"
+                   class="bg-indigo-100 text-indigo-800 text-sm font-medium px-3 py-1 rounded-full hover:bg-indigo-200 transition-colors cursor-pointer">
+                    @tag
+                </a>
+            }
+        </div>
+    </section>
+
+
 
 </main>

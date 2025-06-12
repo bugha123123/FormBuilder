@@ -1,4 +1,5 @@
 ﻿using FormBuilder.Models;
+using FormBuilder.Models.FormBuilder.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -15,6 +16,10 @@ namespace FormBuilder.Data
         public DbSet<FormTemplate> FormTemplates { get; set; }
         public DbSet<Question> Questions { get; set; }
         public DbSet<Tag> Tags { get; set; }
+
+        public DbSet<FormAnswer> Answers { get; set; }
+
+        public DbSet<Comment> Comments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

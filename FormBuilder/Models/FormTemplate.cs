@@ -1,5 +1,6 @@
 ﻿using Azure;
 using FormBuilder.Enums;
+using FormBuilder.Models.FormBuilder.Models;
 
 namespace FormBuilder.Models
 {
@@ -16,7 +17,11 @@ namespace FormBuilder.Models
         public bool isPublic { get; set; }
         public List<Question> Questions { get; set; }
 
+        public List<Comment> Comments { get; set; }
 
+        
+
+        public int CommentId { get; set; }
         public  List<string>? AssignedUsers { get; set; }
 
         public virtual List<string>? SavedTags { get; set; }
