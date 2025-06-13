@@ -63,6 +63,7 @@ builder.Services.AddSingleton<CloudinaryService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITemplateService, TemplateService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IFormService, FormService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

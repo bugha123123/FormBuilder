@@ -21,6 +21,8 @@ namespace FormBuilder.Data
 
         public DbSet<Comment> Comments { get; set; }
 
+        public DbSet<Form> Forms { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -29,7 +31,19 @@ namespace FormBuilder.Data
               .HasConversion<string>();
             builder.Seed();
 
-          
+            builder.Entity<FormAnswer>()
+       .HasOne(fa => fa.form)
+       .WithMany(f => f.Answers)
+       .HasForeignKey("FormId")
+       .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<FormAnswer>()
+                .HasOne(fa => fa.formTemplate)
+                .WithMany() 
+                .HasForeignKey("TemplateId")
+                .OnDelete(DeleteBehavior.Restrict);
+
+
 
         }
 

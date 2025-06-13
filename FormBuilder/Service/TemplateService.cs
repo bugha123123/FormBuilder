@@ -115,5 +115,27 @@ namespace FormBuilder.Service
             return filtered;
         }
 
+        public async Task<bool> AssignUserToTemplateAsync(int templateId, string userEmail)
+        {
+            if (string.IsNullOrWhiteSpace(userEmail)) return false;
+
+            var template = await _context.FormTemplates
+                .FirstOrDefaultAsync(t => t.Id == templateId);
+
+            if (template == null) return false;
+
+            if (template.AssignedUsers == null)
+                template.AssignedUsers = new List<string>();
+
+            if (!template.AssignedUsers.Contains(userEmail))
+            {
+                template.AssignedUsers.Add(userEmail);
+                _context.Update(template);
+                await _context.SaveChangesAsync();
+            }
+
+            return true;
+        }
+
     }
 }

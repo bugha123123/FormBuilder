@@ -18,6 +18,8 @@ namespace FormBuilder.Interface
 
         Task<List<FormTemplate>> SearchTemplates(string Tag);
 
+        Task<bool> AssignUserToTemplateAsync(int templateId, string userEmail);
+
 
     }
 }

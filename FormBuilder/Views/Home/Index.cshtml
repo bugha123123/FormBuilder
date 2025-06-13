@@ -34,11 +34,13 @@
                 var secureImageUrl = template.ImageUrl?.Replace("/upload/", "/upload/c_fill,w_400,h_200/");
                 <article class="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col overflow-hidden">
                     <div class="aspect-w-16 aspect-h-9">
-                        <img src="@(template.ImageUrl != null
+                        <a asp-action="Details" asp-controller="Template" asp-route-id="@template.Id">
+                            <img src="@(template.ImageUrl != null
                 ? template.ImageUrl.Replace("/upload/", "/upload/c_fill,w_400,h_200/")
                 : "/placeholder.svg?height=200&width=400")"
-                             alt="@($"{template.Title} preview")"
-                             class="object-cover rounded-t-lg w-full h-full" />
+                                 alt="@($"{template.Title} preview")"
+                                 class="object-cover rounded-t-lg w-full h-full" />
+                       </a>
 
 
                     </div>

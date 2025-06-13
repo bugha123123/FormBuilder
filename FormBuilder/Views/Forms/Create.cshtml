@@ -1,135 +1,209 @@
 ﻿@using FormBuilder.Enums
-@model FormBuilder.Models.FormTemplate
+@model FormBuilder.Models.Form
 
 @{
     ViewData["Title"] = "Fill Out Form";
+    var TemplateId = Context.Request.Query["TemplateId"];
 }
 
-<h1 class="text-3xl font-bold text-gray-800 mb-4 max-w-4xl mx-auto px-6 mt-10">@Model.Title</h1>
-<p class="text-gray-600 mb-6 max-w-4xl mx-auto px-6">@Model.Description</p>
-
-<div class="max-w-6xl mx-auto px-6 py-10 bg-white shadow-lg rounded-lg mt-6 flex gap-10">
-    <!-- Left side: Form -->
-    <div class="flex-1">
-        <form asp-action="Create" asp-controller="Form" method="post">
-            <input type="hidden" name="TemplateId" value="@Model.Id" />
-            @for (int i = 0; i < Model.Questions.Count; i++)
-            {
-                var question = Model.Questions[i];
-                <div class="mb-6">
-                    <label class="block text-gray-700 font-semibold mb-2">@question.Text</label>
-
-                    @switch (question.Type)
-                    {
-                        case QuestionType.ShortText:
-                            <input name="Answers[@i].Response" type="text" class="w-full border border-gray-300 rounded px-4 py-2 focus:ring focus:ring-blue-200" />
-                            break;
-
-                        case QuestionType.LongText:
-                            <textarea name="Answers[@i].Response" rows="4" class="w-full border border-gray-300 rounded px-4 py-2 focus:ring focus:ring-blue-200"></textarea>
-                            break;
-
-                        case QuestionType.Number:
-                            <input name="Answers[@i].Response" type="number" class="w-full border border-gray-300 rounded px-4 py-2 focus:ring focus:ring-blue-200" />
-                            break;
-
-                        case QuestionType.Checkbox:
-                            foreach (var option in question.Options)
-                            {
-                                <div class="flex items-center mb-2">
-                                    <input type="checkbox" name="Answers[@i].Response" value="@option" class="mr-2 border-gray-300 rounded" />
-                                    <label class="text-gray-700">@option</label>
-                                </div>
-                            }
-                            break;
-
-                        case QuestionType.Dropdown:
-                            <select name="Answers[@i].Response" class="w-full border border-gray-300 rounded px-4 py-2">
-                                @foreach (var option in question.Options)
-                                {
-                                    <option value="@option">@option</option>
-                                }
-                            </select>
-                            break;
-
-                        case QuestionType.OneFromList:
-                            foreach (var option in question.Options)
-                            {
-                                <div class="flex items-center mb-2">
-                                    <input type="radio" name="Answers[@i].Response" value="@option" class="mr-2 border-gray-300" />
-                                    <label class="text-gray-700">@option</label>
-                                </div>
-                            }
-                            break;
-                    }
-
-                    <input type="hidden" name="Answers[@i].QuestionId" value="@question.Id" />
-                </div>
-            }
-
-            <button type="submit" class="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition">
-                Submit
-            </button>
-        </form>
+<div class="max-w-6xl mx-auto px-4 py-8">
+    <!-- Form Header -->
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-3">@Model.Template.Title</h1>
+        <p class="text-gray-600 max-w-2xl mx-auto">@Model.Template.Description</p>
     </div>
 
-    <!-- Right side: Comments + Tags stacked vertically -->
-    <div class="w-96 flex flex-col gap-8">
-        <!-- Comments Section -->
-        <div class="bg-gray-100 rounded-lg shadow-inner p-6 max-h-[400px] overflow-y-auto">
-            @if (Model.Comments != null && Model.Comments.Any())
-            {
-                <h3 class="text-xl font-semibold mb-4 text-gray-700">Comments (@Model.Comments.Count)</h3>
-                <ul class="space-y-4">
-                    @foreach (var comment in Model.Comments.OrderByDescending(c => c.PostedAt))
-                    {
-                        <li class="bg-white p-4 rounded shadow">
-                            <div class="flex justify-between mb-2 text-sm text-gray-500">
-                                <span>@comment.UserName</span>
-                                <span>@comment.PostedAt.ToString("g")</span>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left side: Form (spans 2 columns on large screens) -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-6 sm:p-8">
+                    <form asp-action="Create" asp-controller="Forms" method="post">
+                        <input type="hidden" name="TemplateId" value="@TemplateId" />
+
+                        @for (int i = 0; i < Model.Template.Questions.Count; i++)
+                        {
+                            var question = Model.Template.Questions[i];
+                            <div class="mb-8 last:mb-6">
+                                <label class="block text-gray-800 font-medium mb-2">@question.Text</label>
+
+                                @switch (question.Type)
+                                {
+                                    case QuestionType.ShortText:
+                                        <input name="Answers[@i].Response" type="text"
+                                               class="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" />
+                                        break;
+
+                                    case QuestionType.LongText:
+                                        <textarea name="Answers[@i].Response" rows="4"
+                                                  class="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"></textarea>
+                                        break;
+
+                                    case QuestionType.Number:
+                                        <input name="Answers[@i].Response" type="number"
+                                               class="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" />
+                                        break;
+
+                                    case QuestionType.Checkbox:
+                                        <div class="space-y-2 mt-2">
+                                            @foreach (var option in question.Options)
+                                            {
+                                                <div class="flex items-center">
+                                                    <input type="checkbox" name="Answers[@i].Response" value="@option" id="checkbox-@i-@option.GetHashCode()"
+                                                           class="w-5 h-5 text-purple-600 rounded border-gray-300 focus:ring-purple-500" />
+                                                    <label for="checkbox-@i-@option.GetHashCode()" class="ml-3 text-gray-700">@option</label>
+                                                </div>
+                                            }
+                                        </div>
+                                        break;
+
+                                    case QuestionType.Dropdown:
+                                        <div class="relative">
+                                            <select name="Answers[@i].Response"
+                                                    class="appearance-none w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all pr-10">
+                                                @foreach (var option in question.Options)
+                                                {
+                                                    <option value="@option">@option</option>
+                                                }
+                                            </select>
+                                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                                </svg>
+                                            </div>
+                                        </div>
+                                        break;
+
+                                    case QuestionType.OneFromList:
+                                        <div class="space-y-2 mt-2">
+                                            @foreach (var option in question.Options)
+                                            {
+                                                <div class="flex items-center">
+                                                    <input type="radio" name="Answers[@i].Response" value="@option" id="radio-@i-@option.GetHashCode()"
+                                                           class="w-5 h-5 text-purple-600 border-gray-300 focus:ring-purple-500" />
+                                                    <label for="radio-@i-@option.GetHashCode()" class="ml-3 text-gray-700">@option</label>
+                                                </div>
+                                            }
+                                        </div>
+                                        break;
+                                }
+
+                                <input type="hidden" name="Answers[@i].QuestionId" value="@question.Id" />
                             </div>
-                            <p class="text-gray-800">@comment.Text</p>
-                        </li>
-                    }
-                </ul>
-            }
-            else
-            {
-                <p class="text-center text-gray-500 mt-2">No comments yet — be the first to comment!</p>
-            }
+                        }
+
+                        <div class="mt-8">
+                            <button type="submit" class="w-full sm:w-auto px-6 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors">
+                                Submit Response
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
 
-        <!-- Tags Section -->
-        <div class="bg-gray-100 rounded-lg shadow-inner p-6 max-h-[200px] overflow-y-auto">
-            <h3 class="text-xl font-semibold mb-4 text-gray-700">Tags (@Model.SavedTags?.Count)</h3>
-            @if (Model.SavedTags != null && Model.SavedTags.Any())
-            {
-                <div class="flex flex-wrap gap-2">
-                    @foreach (var tag in Model.SavedTags)
+      
+        <div class="space-y-8">
+           
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                        </svg>
+                        Comments (@(Model.Template.Comments?.Count ?? 0))
+                    </h3>
+
+                    <div class="max-h-[400px] overflow-y-auto pr-1">
+                        @if (Model.Template.Comments != null && Model.Template.Comments.Any())
+                        {
+                            <div class="space-y-4">
+                                @foreach (var comment in Model.Template.Comments.OrderByDescending(c => c.PostedAt))
+                                {
+                                    <div class="bg-gray-50 rounded-lg p-4">
+                                        <div class="flex justify-between items-center mb-2">
+                                            <span class="font-medium text-gray-900">@comment.UserName</span>
+                                            <span class="text-xs text-gray-500">@comment.PostedAt.ToString("MMM d, yyyy h:mm tt")</span>
+                                        </div>
+                                        <p class="text-gray-700 text-sm">@comment.Text</p>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-8">
+                                <svg class="w-12 h-12 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                </svg>
+                                <p class="mt-2 text-gray-500">No comments yet</p>
+                                <p class="text-sm text-gray-400">Be the first to share your thoughts!</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tags Section -->
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                        </svg>
+                        Tags (@(Model.Template.SavedTags?.Count ?? 0))
+                    </h3>
+
+                    @if (Model.Template.SavedTags != null && Model.Template.SavedTags.Any())
                     {
-                        <span class="bg-blue-200 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">@tag</span>
+                        <div class="flex flex-wrap gap-2">
+                            @foreach (var tag in Model.Template.SavedTags)
+                            {
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+                                    @tag
+                                </span>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-6">
+                            <svg class="w-10 h-10 mx-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                            </svg>
+                            <p class="mt-2 text-gray-500">No tags available</p>
+                        </div>
                     }
                 </div>
-            }
-            else
-            {
-                <p class="text-gray-500 text-center">No tags available.</p>
-            }
+            </div>
+        </div>
+    </div>
+
+    <!-- Add comment form -->
+    <div class="mt-10 max-w-3xl mx-auto">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="p-6">
+                <h4 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    Add a Comment
+                </h4>
+
+                <form asp-action="AddComment" asp-controller="Form" method="post" class="space-y-4">
+                    <input type="hidden" name="TemplateId" value="@Model.Id" />
+                    <textarea name="NewCommentText" rows="4" required
+                              class="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                              placeholder="Share your thoughts or feedback..."></textarea>
+
+                    <div>
+                        <button type="submit"
+                                class="px-5 py-2 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors">
+                            Post Comment
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
-
-<!-- Add comment form below full width -->
-<section class="max-w-4xl mx-auto px-6 py-6 bg-white rounded-lg shadow mt-10">
-    <h4 class="text-lg font-semibold mb-3 text-gray-700">Add a Comment</h4>
-    <form asp-action="AddComment" asp-controller="Form" method="post" class="space-y-4">
-        <input type="hidden" name="TemplateId" value="@Model.Id" />
-        <textarea name="NewCommentText" rows="4" required
-                  class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
-                  placeholder="Write your comment here..."></textarea>
-        <button type="submit"
-                class="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition">
-            Post Comment
-        </button>
-    </form>
-</section>

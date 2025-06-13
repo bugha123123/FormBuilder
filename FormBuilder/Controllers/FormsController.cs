@@ -1,21 +1,56 @@
 ﻿using FormBuilder.Interface;
+using FormBuilder.Interfaces;
+using FormBuilder.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
-namespace FormBuilder.Controllers
+public class FormsController : Controller
 {
-    public class FormsController : Controller
+    private readonly ITemplateService _templateService;
+    private readonly IFormService _formService;
+    private readonly IAuthService _authService;
+
+    public FormsController(ITemplateService templateService, IFormService formService, IAuthService authService)
     {
-        private readonly ITemplateService _templateService;
+        _templateService = templateService;
+        _formService = formService;
+        _authService = authService;
+    }
 
-        public FormsController(ITemplateService templateService)
+    [HttpGet]
+    public async Task<IActionResult> Create(int templateId)
+    {
+ 
+
+        var form = await _formService.GetEmptyFormForTemplateAsync(templateId);
+        if (form == null) return NotFound();
+
+        return View(form);
+    }
+    [HttpGet]
+    public async Task<IActionResult> AccessDenied()
+    {
+        return View();
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Details(int formId)
+    {
+        var result = await _formService.GetFormById(formId);
+        var user = await _authService.GetLoggedInUserAsync();
+        if (result.UserId == user.Id || result.Template.AssignedUsers.Contains(user.Email) || !result.Template.isPublic)
         {
-            _templateService = templateService;
+            return View(result);
         }
 
-        public async Task<IActionResult> Create(int TemplateId)
-        {
-            var Result = await _templateService.GetTemplateById(TemplateId);
-            return View(Result);
-        }
+
+        return RedirectToAction("AccessDenied", "Forms");
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create(Form form, int templateId)
+    {
+        await _formService.CreateForm(form, templateId);
+        return RedirectToAction("Details", "Forms", new { id = templateId });
     }
 }

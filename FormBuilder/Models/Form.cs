@@ -18,5 +18,7 @@ namespace FormBuilder.Models
 
         public List<FormAnswer> Answers { get; set; }
 
+        public  int FilledCount { get; set; }
+
     }
 }

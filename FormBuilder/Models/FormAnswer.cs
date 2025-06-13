@@ -7,9 +7,9 @@
         {
             public int Id { get; set; }
 
-          
 
-
+            public Form form { get; set; }
+            public int QuestionId { get; set; }
 
             public  int TemplateId { get; set; }
 

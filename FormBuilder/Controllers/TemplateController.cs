@@ -1,6 +1,8 @@
 ﻿using FormBuilder.DTO;
 using FormBuilder.Interface;
+using FormBuilder.Interfaces;
 using FormBuilder.Models;
+using FormBuilder.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -11,10 +13,11 @@ namespace FormBuilder.Controllers
     public class TemplateController : Controller
     {
         private readonly ITemplateService _templateService;
-
-        public TemplateController(ITemplateService templateService)
+        private readonly IAuthService _AuthService;
+        public TemplateController(ITemplateService templateService, IAuthService authService)
         {
             _templateService = templateService;
+            _AuthService = authService;
         }
 
         public async Task<IActionResult> Create()
@@ -24,12 +27,24 @@ namespace FormBuilder.Controllers
             return View(new FormTemplateCreateViewModel());
         }
 
+        [HttpGet]
+        public async Task<IActionResult> AccessDenied()
+        {
 
+            return View();
+        }
         public async Task<IActionResult> Details(int id)
         {
 
             var Template = await _templateService.GetTemplateById(id);
-            return View(Template);
+            var user = await _AuthService.GetLoggedInUserAsync();
+            if (Template.UserId == user.Id || Template.AssignedUsers.Contains(user.Email) || !Template.isPublic)
+            {
+                return View(Template);
+            }
+            return RedirectToAction("AccessDenied", "Template");
+
+
         }
         public async Task<IActionResult> Search(string Tag)
         {
@@ -57,6 +72,18 @@ namespace FormBuilder.Controllers
 
             return RedirectToAction("Details", new { id = createdTemplate.Id });
         }
+
+        [HttpPost]
+        public async Task<IActionResult> AssignUser(int TemplateId, string email)
+        {
+            var success = await _templateService.AssignUserToTemplateAsync(TemplateId, email);
+
+            if (success)
+                return RedirectToAction("Details", new { TemplateId });
+            else
+                return RedirectToAction("Details", new { TemplateId });
+        }
+
 
 
     }
