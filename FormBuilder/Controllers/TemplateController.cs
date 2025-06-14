@@ -3,6 +3,7 @@ using FormBuilder.Interface;
 using FormBuilder.Interfaces;
 using FormBuilder.Models;
 using FormBuilder.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -33,19 +34,36 @@ namespace FormBuilder.Controllers
 
             return View();
         }
+
+        [HttpGet]
+        public async Task<IActionResult> All()
+        {
+            var result = await _templateService.GetFormTemplates();
+            return View(result);
+        }
+
         public async Task<IActionResult> Details(int id)
         {
-
-            var Template = await _templateService.GetTemplateById(id);
             var user = await _AuthService.GetLoggedInUserAsync();
-            if (Template.UserId == user.Id || Template.AssignedUsers.Contains(user.Email) || !Template.isPublic)
+
+            // If user is not logged in, redirect to signup
+            if (user == null)
             {
-                return View(Template);
+                return RedirectToAction("signup", "Auth");
             }
+
+            var template = await _templateService.GetTemplateById(id);
+
+            if (template.UserId == user.Id ||
+                template.AssignedUsers.Contains(user.Email) ||
+                template.isPublic)
+            {
+                return View(template);
+            }
+
             return RedirectToAction("AccessDenied", "Template");
-
-
         }
+
         public async Task<IActionResult> Search(string Tag)
         {
 

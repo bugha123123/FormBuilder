@@ -24,7 +24,7 @@ namespace FormBuilder.Service
 
         public async Task<List<FormTemplate>> GetFormTemplates()
         {
-            return await _context.FormTemplates.ToListAsync();
+            return await _context.FormTemplates.Include(x => x.User).ToListAsync();
         }
 
         public async Task<List<Tag>> GetAutoCompleteTags(string keyWord)

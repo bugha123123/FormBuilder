@@ -6,122 +6,293 @@
     ViewData["Title"] = "Create Template";
 }
 
-<div class="max-w-4xl mx-auto my-8 p-6 bg-white rounded-lg shadow-md">
-    <h2 class="text-2xl font-semibold text-gray-800 mb-6">Create Template</h2>
-
-    <form asp-action="CreateTemplate" enctype="multipart/form-data" asp-controller="Template" method="post" id="create-template-form" novalidate>
-        <div class="mb-6">
-            <label asp-for="Title" class="block text-gray-700 font-medium mb-2"></label>
-            <select asp-for="Title" asp-items="Html.GetEnumSelectList<TemplateTitle>()" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <option value="">-- Select Template Title --</option>
-            </select>
-            <span asp-validation-for="Title" class="text-red-600 mt-1 block"></span>
-        </div>
-
-        <div class="mb-6">
-            <label asp-for="Description" class="block text-gray-700 font-medium mb-2"></label>
-            <textarea asp-for="Description" id="markdown-input" rows="5"
-                      placeholder="Enter description (Markdown supported)"
-                      class="w-full px-4 py-2 border border-gray-300 rounded-md resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"></textarea>
-            <p class="text-sm text-gray-500 mt-1">Supports Markdown</p>
-            <span asp-validation-for="Description" class="text-red-600 mt-1 block"></span>
-
-            <div class="mt-4">
-                <label class="block text-gray-700 font-medium mb-2">Live Preview</label>
-                <div id="markdown-preview" class="prose bg-gray-100 p-4 rounded-md border border-gray-300"></div>
+<div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-12">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Header Section -->
+        <div class="text-center mb-12">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full mb-4">
+                <i class="fas fa-magic text-white text-2xl"></i>
             </div>
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">Create New Template</h1>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">Design a professional form template that perfectly fits your needs</p>
         </div>
 
+        <form asp-action="CreateTemplate" enctype="multipart/form-data" asp-controller="Template" method="post" id="create-template-form" novalidate>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Main Content Area -->
+                <div class="lg:col-span-2 space-y-8">
+                    <!-- Basic Information Card -->
+                    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-6">
+                            <h2 class="text-2xl font-bold text-white flex items-center">
+                                <i class="fas fa-info-circle mr-3"></i>
+                                Basic Information
+                            </h2>
+                            <p class="text-blue-100 mt-1">Set up the foundation of your template</p>
+                        </div>
+                        <div class="p-8 space-y-6">
+                            <!-- Template Title -->
+                            <div class="group">
+                                <label asp-for="Title" class="block text-sm font-semibold text-gray-700 mb-3 group-focus-within:text-blue-600 transition-colors">
+                                    Template Title *
+                                </label>
+                                <div class="relative">
+                                    <select asp-for="Title" asp-items="Html.GetEnumSelectList<TemplateTitle>()"
+                                            class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white">
+                                        <option value="">-- Select Template Title --</option>
+                                    </select>
+                                    <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                                </div>
+                                <span asp-validation-for="Title" class="text-red-500 text-sm mt-2 block font-medium"></span>
+                            </div>
 
-        <div class="mb-6">
-            <label asp-for="TopicId" class="block text-gray-700 font-medium mb-2"></label>
-            <select asp-for="TopicId" asp-items="ViewBag.Topics" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                <option value="">Select a topic</option>
-            </select>
-            <span asp-validation-for="TopicId" class="text-red-600 mt-1 block"></span>
-        </div>
+                            <!-- Topic Selection -->
+                            <div class="group">
+                                <label asp-for="TopicId" class="block text-sm font-semibold text-gray-700 mb-3 group-focus-within:text-blue-600 transition-colors">
+                                    Category *
+                                </label>
+                                <div class="relative">
+                                    <select asp-for="TopicId" asp-items="ViewBag.Topics"
+                                            class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white">
+                                        <option value="">Select a category</option>
+                                    </select>
+                                    <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                                </div>
+                                <span asp-validation-for="TopicId" class="text-red-500 text-sm mt-2 block font-medium"></span>
+                            </div>
 
-        <div class="mb-6">
-            <label asp-for="ImageFile" class="block text-gray-700 font-medium mb-2">Upload Image</label>
-            <input asp-for="ImageFile" type="file" accept="image/*" class="w-full" />
-            <span asp-validation-for="ImageFile" class="text-red-600 mt-1 block"></span>
-        </div>
+                            <!-- Description with Markdown -->
+                            <div class="group">
+                                <label asp-for="Description" class="block text-sm font-semibold text-gray-700 mb-3 group-focus-within:text-blue-600 transition-colors">
+                                    Description
+                                </label>
+                                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                    <div>
+                                        <textarea asp-for="Description" id="markdown-input" rows="8"
+                                                  placeholder="Enter description (Markdown supported)"
+                                                  class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white"></textarea>
+                                        <div class="flex items-center mt-2 text-sm text-gray-500">
+                                            <i class="fab fa-markdown mr-2 text-blue-500"></i>
+                                            Markdown supported
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-semibold text-gray-700 mb-2">Live Preview</div>
+                                        <div id="markdown-preview" class="prose prose-sm max-w-none bg-gradient-to-br from-gray-50 to-gray-100 p-4 rounded-xl border-2 border-gray-200 h-40 overflow-y-auto"></div>
+                                    </div>
+                                </div>
+                                <span asp-validation-for="Description" class="text-red-500 text-sm mt-2 block font-medium"></span>
+                            </div>
+                        </div>
+                    </div>
 
-        <div class="mb-8 flex items-center">
-            <input asp-for="IsPublic" type="checkbox" id="IsPublic" class="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" />
-            <label asp-for="IsPublic" class="ml-2 block text-gray-700 font-medium cursor-pointer"></label>
-        </div>
+                    <!-- Questions Builder Card -->
+                    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                        <div class="bg-gradient-to-r from-green-600 to-emerald-600 px-8 py-6">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <h2 class="text-2xl font-bold text-white flex items-center">
+                                        <i class="fas fa-question-circle mr-3"></i>
+                                        Form Questions
+                                    </h2>
+                                    <p class="text-green-100 mt-1">Build your form with custom questions</p>
+                                </div>
+                                <button type="button" id="add-question"
+                                        class="bg-white text-green-600 px-6 py-3 rounded-xl font-semibold hover:bg-green-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                                    <i class="fas fa-plus mr-2"></i>
+                                    Add Question
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-8">
+                            <div id="questions-container" class="space-y-6">
+                                <div class="text-center py-12 text-gray-500">
+                                    <div class="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <i class="fas fa-clipboard-question text-3xl text-gray-400"></i>
+                                    </div>
+                                    <h3 class="text-lg font-semibold text-gray-600 mb-2">No questions yet</h3>
+                                    <p class="text-gray-500">Click "Add Question" to start building your form</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="mb-8 relative">
-            <label class="block text-gray-700 font-medium mb-2">Tags</label>
-            <input id="tag-input" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Enter tag..." autocomplete="off" />
-            <ul id="tag-suggestions" class="absolute z-50 w-full bg-white border border-gray-300 rounded-md max-h-40 overflow-auto mt-1 shadow-lg"></ul>
-            <div id="tags-container" class="flex flex-wrap mt-3 gap-2"></div>
-        </div>
+                <!-- Sidebar -->
+                <div class="space-y-8">
+                    <!-- Settings Card -->
+                    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                        <div class="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-4">
+                            <h3 class="text-xl font-bold text-white flex items-center">
+                                <i class="fas fa-cog mr-3"></i>
+                                Settings
+                            </h3>
+                        </div>
+                        <div class="p-6 space-y-6">
+                            <!-- Image Upload -->
+                            <div>
+                                <label asp-for="ImageFile" class="block text-sm font-semibold text-gray-700 mb-3">
+                                    Template Image
+                                </label>
+                                <div class="border-3 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-purple-400 transition-all duration-200 bg-gradient-to-br from-gray-50 to-gray-100 hover:from-purple-50 hover:to-pink-50">
+                                    <input asp-for="ImageFile" type="file" accept="image/*" class="hidden" id="image-upload" />
+                                    <label for="image-upload" class="cursor-pointer">
+                                        <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <i class="fas fa-cloud-upload-alt text-white text-2xl"></i>
+                                        </div>
+                                        <p class="text-gray-700 font-semibold">Click to upload image</p>
+                                        <p class="text-sm text-gray-500 mt-1">PNG, JPG up to 5MB</p>
+                                    </label>
+                                </div>
+                                <span asp-validation-for="ImageFile" class="text-red-500 text-sm mt-2 block font-medium"></span>
+                            </div>
 
-        <div class="mb-8 relative">
-            <label class="block text-gray-700 font-medium mb-2">Assign Users</label>
-            <input id="user-autocomplete" type="text" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Search by name/email..." autocomplete="off" />
-            <ul id="user-suggestions" class="absolute z-50 w-full bg-white border border-gray-300 rounded-md max-h-40 overflow-auto mt-1 shadow-lg"></ul>
-            <div class="flex justify-end mt-2">
-                <button type="button" id="toggle-sort" class="px-3 py-1 text-sm font-medium text-gray-700 bg-gray-200 rounded hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">Sort by Name</button>
+                            <!-- Public/Private Toggle -->
+                            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-xl border border-blue-200">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <label class="text-sm font-semibold text-gray-700 flex items-center">
+                                            <i class="fas fa-globe mr-2 text-blue-500"></i>
+                                            Public Template
+                                        </label>
+                                        <p class="text-xs text-gray-600 mt-1">Allow others to discover and use this template</p>
+                                    </div>
+                                    <div class="relative">
+                                        <input asp-for="IsPublic" type="checkbox" id="public-toggle" class="hidden" />
+                                        <label for="public-toggle" class="flex items-center cursor-pointer">
+                                            <div class="relative">
+                                                <div class="toggle-bg w-14 h-8 bg-gray-300 rounded-full shadow-inner transition-all duration-300"></div>
+                                                <div class="toggle-dot absolute w-6 h-6 bg-white rounded-full shadow-md top-1 left-1 transition-all duration-300"></div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tags Card -->
+                    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                        <div class="bg-gradient-to-r from-orange-500 to-red-500 px-6 py-4">
+                            <h3 class="text-xl font-bold text-white flex items-center">
+                                <i class="fas fa-tags mr-3"></i>
+                                Tags
+                            </h3>
+                        </div>
+                        <div class="p-6">
+                            <div class="relative mb-4">
+                                <input id="tag-input" type="text"
+                                       class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-orange-100 focus:border-orange-500 transition-all duration-200 bg-gray-50 hover:bg-white"
+                                       placeholder="Add tags..." autocomplete="off" />
+                                <i class="fas fa-tag absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                <ul id="tag-suggestions" class="absolute z-50 w-full bg-white border-2 border-gray-200 rounded-xl max-h-40 overflow-auto mt-2 shadow-xl hidden"></ul>
+                            </div>
+                            <div id="tags-container" class="flex flex-wrap gap-2"></div>
+                        </div>
+                    </div>
+
+                    <!-- Assign Users Card -->
+                    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+                        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-xl font-bold text-white flex items-center">
+                                    <i class="fas fa-users mr-3"></i>
+                                    Assign Users
+                                </h3>
+                                <button type="button" id="toggle-sort"
+                                        class="text-xs px-3 py-2 bg-white bg-opacity-20 text-white rounded-lg hover:bg-opacity-30 transition-all duration-200">
+                                    Sort by Name
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <div class="relative mb-4">
+                                <input id="user-autocomplete" type="text"
+                                       class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all duration-200 bg-gray-50 hover:bg-white"
+                                       placeholder="Search users..." autocomplete="off" />
+                                <i class="fas fa-search absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                <ul id="user-suggestions" class="absolute z-50 w-full bg-white border-2 border-gray-200 rounded-xl max-h-40 overflow-auto mt-2 shadow-xl hidden"></ul>
+                            </div>
+                            <ul id="assigned-users-list" class="space-y-3"></ul>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit"
+                            class="w-full py-4 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-200 text-lg">
+                        <i class="fas fa-rocket mr-3"></i>
+                        Create Template
+                    </button>
+                </div>
             </div>
-            <ul id="assigned-users-list" class="mt-3 space-y-2"></ul>
-        </div>
 
-        <!-- Questions -->
-        <div class="mb-8">
-            <label class="block text-gray-700 font-medium mb-3">Questions</label>
-            <div id="questions-container" class="space-y-4"></div>
-            <button type="button" id="add-question" class="mt-4 px-4 py-2 border border-blue-600 text-blue-600 rounded hover:bg-blue-600 hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">Add Question</button>
-        </div>
-
-        <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded focus:outline-none focus:ring-2 focus:ring-blue-500">Create Template</button>
-
-        <!-- Hidden fields -->
-        <input type="hidden" name="TagNames" id="hidden-tags" />
-        <input type="hidden" name="AssignedUsers" id="hidden-users" />
-    </form>
+            <!-- Hidden fields -->
+            <input type="hidden" name="TagNames" id="hidden-tags" />
+            <input type="hidden" name="AssignedUsers" id="hidden-users" />
+        </form>
+    </div>
 </div>
 
- 
+<style>
+    /* Custom Toggle Switch Styles */
+    #public-toggle:checked + label .toggle-bg {
+        background: linear-gradient(to right, #3b82f6, #6366f1);
+    }
+
+    #public-toggle:checked + label .toggle-dot {
+        transform: translateX(24px);
+    }
+
+    .toggle-bg {
+        transition: background-color 0.3s ease;
+    }
+
+    .toggle-dot {
+        transition: transform 0.3s ease;
+    }
+</style>
+
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script>
-
-            document.addEventListener('DOMContentLoaded', function () {
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
         const input = document.getElementById('markdown-input');
         const preview = document.getElementById('markdown-preview');
 
         function updatePreview() {
             const markdown = input.value;
-            preview.innerHTML = marked.parse(markdown);
+            if (markdown.trim()) {
+                preview.innerHTML = marked.parse(markdown);
+            } else {
+                preview.innerHTML = '<p class="text-gray-400 italic">Preview will appear here...</p>';
+            }
         }
 
         input.addEventListener('input', updatePreview);
-
-        // Initial render
         updatePreview();
     });
 
+    let selectedTags = [];
+    let assignedUsers = [];
+    let sortBy = "Username";
 
-
-        let selectedTags = [];
-        let assignedUsers = [];
-        let sortBy = "Username";
-
-            function renderTags() {
+    function renderTags() {
         $('#tags-container').empty();
         selectedTags.forEach(tag => {
-            $('#tags-container').append(
-                `<span class="badge bg-primary m-1">${tag} <button type="button" class="btn-close btn-close-white ms-1 remove-tag" data-tag="${tag}"></button></span>`
-            );
+            $('#tags-container').append(`
+                <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-gradient-to-r from-orange-100 to-red-100 text-orange-800 border border-orange-200">
+                    <i class="fas fa-tag mr-2"></i>
+                    ${tag}
+                    <button type="button" class="ml-2 inline-flex items-center justify-center w-5 h-5 text-orange-600 hover:text-red-600 remove-tag transition-colors duration-200" data-tag="${tag}">
+                        <i class="fas fa-times text-xs"></i>
+                    </button>
+                </span>
+            `);
         });
-        $('#hidden-tags').val(selectedTags.join(',')); 
+        $('#hidden-tags').val(selectedTags.join(','));
     }
 
-
-           function renderUsers() {
+    function renderUsers() {
         const sorted = [...assignedUsers].sort((a, b) => {
             const key = sortBy.toLowerCase();
             return a[key].localeCompare(b[key]);
@@ -129,102 +300,151 @@
 
         $('#assigned-users-list').empty();
         sorted.forEach(user => {
-            $('#assigned-users-list').append(
-                `<li class="list-group-item d-flex justify-content-between align-items-center">
-                    ${user.Username} (${user.Email})
-                    <button type="button" class="btn btn-danger btn-sm remove-user" data-email="${user.Email}">Remove</button>
-                </li>`
-            );
+            $('#assigned-users-list').append(`
+                <li class="flex items-center justify-between p-4 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-200">
+                    <div class="flex items-center">
+                        <div class="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center mr-3">
+                            <span class="text-white text-sm font-bold">${user.Username.substring(0, 2).toUpperCase()}</span>
+                        </div>
+                        <div>
+                            <div class="text-sm font-semibold text-gray-900">${user.Username}</div>
+                            <div class="text-xs text-gray-600">${user.Email}</div>
+                        </div>
+                    </div>
+                    <button type="button" class="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-all duration-200 remove-user" data-email="${user.Email}">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </li>
+            `);
         });
 
         $('#hidden-users').val(assignedUsers.map(u => u.Email).join(','));
-
     }
 
+    // Tags functionality
+    $('#tag-input').on('input', function () {
+        const query = $(this).val();
+        const suggestions = $('#tag-suggestions');
 
-        // Tags
-        $('#tag-input').on('input', function () {
-            const query = $(this).val();
-            if (query.length < 1) return $('#tag-suggestions').empty();
-            $.get('@Url.Action("AutoCompleteTags", "Template")', { keyword: query }, function (data) {
-                $('#tag-suggestions').empty();
+        if (query.length < 1) {
+            suggestions.addClass('hidden').empty();
+            return;
+        }
+
+        $.get('@Url.Action("AutoCompleteTags", "Template")', { keyword: query }, function (data) {
+            suggestions.empty();
+            if (data.length > 0) {
+                suggestions.removeClass('hidden');
                 data.forEach(tag => {
-                    $('#tag-suggestions').append(`<li class="list-group-item tag-suggestion">${tag}</li>`);
+                    suggestions.append(`
+                        <li class="px-4 py-3 hover:bg-gradient-to-r hover:from-orange-50 hover:to-red-50 cursor-pointer tag-suggestion border-b border-gray-100 last:border-b-0 transition-all duration-200">
+                            <i class="fas fa-tag mr-2 text-orange-500"></i>
+                            ${tag}
+                        </li>
+                    `);
                 });
-            });
-        });
-
-        $(document).on('click', '.tag-suggestion', function () {
-            const tag = $(this).text();
-            if (!selectedTags.includes(tag)) {
-                selectedTags.push(tag);
-                renderTags();
+            } else {
+                suggestions.addClass('hidden');
             }
-            $('#tag-input').val('');
-            $('#tag-suggestions').empty();
         });
+    });
 
-        $(document).on('click', '.remove-tag', function () {
-            const tag = $(this).data('tag');
-            selectedTags = selectedTags.filter(t => t !== tag);
+    $(document).on('click', '.tag-suggestion', function () {
+        const tag = $(this).text().trim();
+        if (!selectedTags.includes(tag)) {
+            selectedTags.push(tag);
             renderTags();
-        });
+        }
+        $('#tag-input').val('');
+        $('#tag-suggestions').addClass('hidden').empty();
+    });
 
-        // Users
-        $('#user-autocomplete').on('input', function () {
-            const query = $(this).val();
-            if (query.length < 1) return $('#user-suggestions').empty();
-            $.get('@Url.Action("AutoCompleteUsers", "User")', { keyword: query }, function (data) {
-                $('#user-suggestions').empty();
+    $(document).on('click', '.remove-tag', function () {
+        const tag = $(this).data('tag');
+        selectedTags = selectedTags.filter(t => t !== tag);
+        renderTags();
+    });
+
+    // Users functionality
+    $('#user-autocomplete').on('input', function () {
+        const query = $(this).val();
+        const suggestions = $('#user-suggestions');
+
+        if (query.length < 1) {
+            suggestions.addClass('hidden').empty();
+            return;
+        }
+
+        $.get('@Url.Action("AutoCompleteUsers", "User")', { keyword: query }, function (data) {
+            suggestions.empty();
+            if (data.length > 0) {
+                suggestions.removeClass('hidden');
                 data.forEach(user => {
-                    $('#user-suggestions').append(`<li class="list-group-item user-suggestion" data-username="${user.username}" data-email="${user.email}">
-                        ${user.username} (${user.email})
-                    </li>`);
+                    suggestions.append(`
+                        <li class="px-4 py-3 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 cursor-pointer user-suggestion border-b border-gray-100 last:border-b-0 transition-all duration-200"
+                            data-username="${user.username}" data-email="${user.email}">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-gradient-to-r from-gray-400 to-gray-500 rounded-full flex items-center justify-center mr-3">
+                                    <span class="text-white text-xs font-bold">${user.username.substring(0, 2).toUpperCase()}</span>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-semibold text-gray-900">${user.username}</div>
+                                    <div class="text-xs text-gray-600">${user.email}</div>
+                                </div>
+                            </div>
+                        </li>
+                    `);
                 });
-            });
-        });
-
-        $(document).on('click', '.user-suggestion', function () {
-            const username = $(this).data('username');
-            const email = $(this).data('email');
-            if (!assignedUsers.some(u => u.Email === email)) {
-                assignedUsers.push({ Username: username, Email: email });
-                renderUsers();
+            } else {
+                suggestions.addClass('hidden');
             }
-            $('#user-autocomplete').val('');
-            $('#user-suggestions').empty();
         });
+    });
 
-        $(document).on('click', '.remove-user', function () {
-            const email = $(this).data('email');
-            assignedUsers = assignedUsers.filter(u => u.Email !== email);
+    $(document).on('click', '.user-suggestion', function () {
+        const username = $(this).data('username');
+        const email = $(this).data('email');
+        if (!assignedUsers.some(u => u.Email === email)) {
+            assignedUsers.push({ Username: username, Email: email });
             renderUsers();
-        });
+        }
+        $('#user-autocomplete').val('');
+        $('#user-suggestions').addClass('hidden').empty();
+    });
 
-        $('#toggle-sort').on('click', function () {
-            sortBy = sortBy === 'Username' ? 'Email' : 'Username';
-            $(this).text(`Sort by ${sortBy === 'Username' ? 'Name' : 'Email'}`);
-            renderUsers();
-        });
-            const QuestionType = {
-      ShortText: 0,
-      LongText: 1,
-      Number: 2,
-      Checkbox: 3,
-      Dropdown: 4,
-      OneFromList: 5
+    $(document).on('click', '.remove-user', function () {
+        const email = $(this).data('email');
+        assignedUsers = assignedUsers.filter(u => u.Email !== email);
+        renderUsers();
+    });
+
+    $('#toggle-sort').on('click', function () {
+        sortBy = sortBy === 'Username' ? 'Email' : 'Username';
+        $(this).text(`Sort by ${sortBy === 'Username' ? 'Name' : 'Email'}`);
+        renderUsers();
+    });
+
+    // Questions functionality
+    const QuestionType = {
+        ShortText: 0,
+        LongText: 1,
+        Number: 2,
+        Checkbox: 3,
+        Dropdown: 4,
+        OneFromList: 5
     };
 
     const QuestionTypeNames = {
-      0: "Short Text",
-      1: "Long Text",
-      2: "Number",
-      3: "Checkbox",
-      4: "Dropdown",
-      5: "One From List"
+        0: "Short Text",
+        1: "Long Text",
+        2: "Number",
+        3: "Checkbox",
+        4: "Dropdown",
+        5: "One From List"
     };
 
-          let questionIndex = 0;
+    let questionIndex = 0;
+
     $('#add-question').on('click', function () {
         const index = questionIndex++;
         let optionsHtml = '';
@@ -232,41 +452,94 @@
             optionsHtml += `<option value="${value}">${QuestionTypeNames[value]}</option>`;
         }
 
+        // Remove empty state if it exists
+        if ($('#questions-container .text-center').length) {
+            $('#questions-container').empty();
+        }
+
         const html = `
-            <div class="card p-3 mt-2" data-index="${index}">
-                <div class="mb-2">
-                    <label>Question Text</label>
-                    <input type="text" name="Questions[${index}].Text" class="form-control" />
+            <div class="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-6 shadow-lg" data-index="${index}">
+                <div class="flex items-center justify-between mb-6">
+                    <h4 class="text-lg font-bold text-gray-900 flex items-center">
+                        <div class="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mr-3">
+                            <span class="text-white text-sm font-bold">${index + 1}</span>
+                        </div>
+                        Question ${index + 1}
+                    </h4>
+                    <button type="button" class="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 transition-all duration-200 remove-question">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </div>
-                <div class="mb-2">
-                    <label>Type</label>
-                    <select name="Questions[${index}].Type" class="form-control question-type">
-                        ${optionsHtml}
-                    </select>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Question Text</label>
+                        <input type="text" name="Questions[${index}].Text"
+                               class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-green-100 focus:border-green-500 transition-all duration-200 bg-white"
+                               placeholder="Enter your question..." />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Question Type</label>
+                        <div class="relative">
+                            <select name="Questions[${index}].Type" class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-green-100 focus:border-green-500 transition-all duration-200 bg-white question-type">
+                                ${optionsHtml}
+                            </select>
+                            <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                        </div>
+                    </div>
+                    <div class="options-container"></div>
                 </div>
-                <div class="mb-2 options-container"></div>
-                <button type="button" class="btn btn-sm btn-danger remove-question">Remove</button>
-            </div>`;
+            </div>
+        `;
         $('#questions-container').append(html);
     });
 
+    $(document).on('change', '.question-type', function () {
+        const container = $(this).closest('.bg-gradient-to-br').find('.options-container');
+        const namePrefix = $(this).attr('name').replace('.Type', '');
+        const type = parseInt($(this).val());
+        container.empty();
 
-        $(document).on('change', '.question-type', function () {
-            const container = $(this).closest('.card').find('.options-container');
-            const namePrefix = $(this).attr('name').replace('.Type', '');
-            const type = parseInt($(this).val());
-            container.empty();
-
-            if (type === 1 || type === 2) {
-                container.append(`<label>Options</label>`);
-                for (let i = 0; i < 3; i++) {
-                    container.append(`<input type="text" name="${namePrefix}.Options[${i}]" class="form-control mb-1" />`);
-                }
+        if (type === 3 || type === 4 || type === 5) { // Checkbox, Dropdown, OneFromList
+            container.append(`
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-3">Options</label>
+                    <div class="space-y-3">
+            `);
+            for (let i = 0; i < 3; i++) {
+                container.find('div:last').append(`
+                    <input type="text" name="${namePrefix}.Options[${i}]"
+                           class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-green-100 focus:border-green-500 transition-all duration-200 bg-white"
+                           placeholder="Option ${i + 1}" />
+                `);
             }
-        });
+            container.append('</div></div>');
+        }
+    });
 
-        $(document).on('click', '.remove-question', function () {
-            $(this).closest('.card').remove();
-        });
-    </script>
+    $(document).on('click', '.remove-question', function () {
+        $(this).closest('.bg-gradient-to-br').remove();
 
+        // Show empty state if no questions remain
+        if ($('#questions-container').children().length === 0) {
+            $('#questions-container').html(`
+                <div class="text-center py-12 text-gray-500">
+                    <div class="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-clipboard-question text-3xl text-gray-400"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-gray-600 mb-2">No questions yet</h3>
+                    <p class="text-gray-500">Click "Add Question" to start building your form</p>
+                </div>
+            `);
+        }
+    });
+
+    // Hide suggestions when clicking outside
+    $(document).on('click', function(e) {
+        if (!$(e.target).closest('#tag-input, #tag-suggestions').length) {
+            $('#tag-suggestions').addClass('hidden');
+        }
+        if (!$(e.target).closest('#user-autocomplete, #user-suggestions').length) {
+            $('#user-suggestions').addClass('hidden');
+        }
+    });
+</script>

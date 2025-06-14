@@ -36,6 +36,7 @@ public class FormsController : Controller
     [HttpGet]
     public async Task<IActionResult> Details(int formId)
     {
+
         var result = await _formService.GetFormById(formId);
         var user = await _authService.GetLoggedInUserAsync();
         if (result.UserId == user.Id || result.Template.AssignedUsers.Contains(user.Email) || !result.Template.isPublic)
