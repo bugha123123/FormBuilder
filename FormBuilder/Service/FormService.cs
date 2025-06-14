@@ -38,17 +38,17 @@ public class FormService : IFormService
         };
     }
 
-    public async Task CreateForm(Form form, int templateId)
+    public async Task<Form> CreateForm(Form form, int templateId)
     {
         var user = await _authService.GetLoggedInUserAsync();
         var template = await _templateService.GetTemplateById(templateId);
 
         if (user is null || template is null)
-            return;
+            return null;
 
         if (await FormAlreadyExists(user, templateId))
         {
-            return;
+            return null;
         }
 
         form.SubmittedAt = DateTime.Now;
@@ -70,6 +70,7 @@ public class FormService : IFormService
 
         await _context.Forms.AddAsync(form);
         await _context.SaveChangesAsync();
+        return form;
     }
 
     private async Task<bool> FormAlreadyExists(User user, int templateId)
@@ -88,6 +89,6 @@ public class FormService : IFormService
 
     public async Task<Form> GetFormById(int formId)
     {
-        return await _context.Forms.FirstOrDefaultAsync(x => x.Id == formId);
+        return await _context.Forms.Include(x => x.Template).Include(x => x.User).FirstOrDefaultAsync(x => x.Id == formId);
     }
 }

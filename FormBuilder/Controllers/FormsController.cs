@@ -47,11 +47,18 @@ public class FormsController : Controller
 
         return RedirectToAction("AccessDenied", "Forms");
     }
-
     [HttpPost]
     public async Task<IActionResult> Create(Form form, int templateId)
     {
-        await _formService.CreateForm(form, templateId);
-        return RedirectToAction("Details", "Forms", new { id = templateId });
+        var result = await _formService.CreateForm(form, templateId);
+
+        if (result == null)
+        {
+            TempData["Error"] = "You have already submitted this form.";
+            return RedirectToAction("Create", "Forms", new { TemplateId  = templateId }); 
+        }
+
+        return RedirectToAction("Details", "Forms", new { formId = result.Id });
     }
+
 }
