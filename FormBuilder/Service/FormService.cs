@@ -1,9 +1,11 @@
 ﻿using FormBuilder.Data;
+using FormBuilder.Enums;
 using FormBuilder.Interface;
 using FormBuilder.Interfaces;
 using FormBuilder.Models;
-using FormBuilder.Models.FormBuilder.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.SqlServer.Server;
+using static System.Net.Mime.MediaTypeNames;
 
 public class FormService : IFormService
 {
@@ -47,9 +49,7 @@ public class FormService : IFormService
             return null;
 
         if (await FormAlreadyExists(user, templateId))
-        {
             return null;
-        }
 
         form.SubmittedAt = DateTime.Now;
         form.TemplateId = template.Id;
@@ -57,21 +57,25 @@ public class FormService : IFormService
         form.Template = template;
         form.User = user;
         form.FilledCount += 1;
-
- 
         if (form.Answers != null)
         {
             foreach (var answer in form.Answers)
             {
-                answer.form = form; 
-                answer.TemplateId = template.Id; 
+                var question = template.Questions.FirstOrDefault(q => q.Id == answer.QuestionId);
+                answer.QuestionType = question != null ? question.Type : QuestionType.ShortText;
+                answer.form = form;
+                answer.TemplateId = template.Id;
             }
         }
+
+
 
         await _context.Forms.AddAsync(form);
         await _context.SaveChangesAsync();
         return form;
     }
+
+
 
     private async Task<bool> FormAlreadyExists(User user, int templateId)
     {
@@ -89,6 +93,77 @@ public class FormService : IFormService
 
     public async Task<Form> GetFormById(int formId)
     {
-        return await _context.Forms.Include(x => x.Template).Include(x => x.User).FirstOrDefaultAsync(x => x.Id == formId);
+        return await _context.Forms.Include(x => x.Template).Include(x => x.User).Include(x => x.Answers).FirstOrDefaultAsync(x => x.Id == formId);
     }
+
+    public async Task AddFormComment(Comment comment, int formId, string text)
+    {
+        var FoundForm = await GetFormById(formId);
+        var LoggedInUser = await _authService.GetLoggedInUserAsync();
+        if (FoundForm is null || LoggedInUser is null) return;
+
+        comment.Text = text;
+        comment.user = LoggedInUser;
+        comment.UserId = LoggedInUser.Id;
+        comment.TemplateId = null;
+        comment.formTemplate = null;
+        comment.CommentTargetType = CommentTargetType.Form;
+        comment.FormId = FoundForm.Id;
+        await _context.Comments.AddAsync(comment);
+        await _context.SaveChangesAsync();
+
+    }
+
+    public async Task AddTemplateComment(Comment comment, int templateId, string Text)
+    {
+        var FoundTemplate = await _templateService.GetTemplateById(templateId);
+        var LoggedInUser = await _authService.GetLoggedInUserAsync();
+        if (FoundTemplate is null || LoggedInUser is null) return;
+
+        comment.Text = Text;
+        comment.user = LoggedInUser;
+        comment.UserId = LoggedInUser.Id;
+        comment.TemplateId = FoundTemplate.Id;
+        
+        comment.formTemplate = FoundTemplate;
+        comment.CommentTargetType = CommentTargetType.Template;
+
+        await _context.Comments.AddAsync(comment);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<List<Comment>> GetComments(
+        int? formId = null,
+        int? templateId = null,
+        CommentTargetType? commentTargetType = null)
+    {
+        var query = _context.Comments
+            .Include(x => x.user)
+            .Include(x => x.formTemplate)
+                .ThenInclude(x => x.Questions)
+            .Include(x => x.form)
+            .AsQueryable();
+
+        if (commentTargetType.HasValue)
+        {
+            query = query.Where(x => x.CommentTargetType == commentTargetType.Value);
+        }
+
+        if (formId.HasValue)
+        {
+            query = query.Where(x => x.FormId == formId.Value);
+        }
+
+        if (templateId.HasValue)
+        {
+            query = query.Where(x => x.TemplateId == templateId.Value);
+        }
+
+        var comments = await query.ToListAsync();
+
+        return comments ?? new List<Comment>();
+    }
+
+
+
 }

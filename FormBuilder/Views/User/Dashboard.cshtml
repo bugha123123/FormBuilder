@@ -1,19 +1,21 @@
 ﻿@using FormBuilder.Interface
-@inject ITemplateService _templateService;
-@inject IFormService _formService;
+@using FormBuilder.Models
+@inject ITemplateService _templateService
+@inject IFormService _formService
+
 @{
-    var UserTemplates = await _templateService.GetUserTemplates();
+    var UserTemplates = await _templateService.GetUserTemplates() ?? new List<FormTemplate>();
+    var Forms = await _formService.GetFormsForUser() ??   new List<Form>();
 }
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>User Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
 </head>
 <body class="bg-gray-50 min-h-screen">
 
@@ -23,10 +25,10 @@
             <div class="flex justify-between items-center py-6">
                 <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
                 <div class="flex items-center space-x-4">
-                    <span class="text-sm text-gray-500">Welcome back, @User.Identity.Name.Substring(0, 7)</span>
+                    <span class="text-sm text-gray-500">Welcome back, @User.Identity.Name?.Substring(0, Math.Min(7, User.Identity.Name.Length))</span>
                     <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                         <span class="text-white text-sm font-medium">
-                            @User.Identity.Name.Substring(0, 2).ToUpper()
+                            @User.Identity.Name?.Substring(0, 2).ToUpper()
                         </span>
                     </div>
                 </div>
@@ -36,6 +38,7 @@
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
         <!-- Tab Navigation -->
         <div class="mb-8 border-b border-gray-200">
             <nav class="flex space-x-8" aria-label="Tabs">
@@ -64,7 +67,7 @@
                     </a>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200" id="templates-table" data-sort-direction="desc">
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="sortable px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable('templates-table', 0)">
@@ -76,37 +79,46 @@
                                 <th class="sortable px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable('templates-table', 2)">
                                     Created Date <span class="ml-1 text-gray-400">↕</span>
                                 </th>
+                                <th class="px-6 py-3"></th>
                             </tr>
                         </thead>
-                        <tbody id="templates-table" class="bg-white divide-y divide-gray-200">
-                            @foreach (var userTemplate in UserTemplates)
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            @if (UserTemplates.Any())
                             {
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">@userTemplate.Title</div>
-                                        <div class="text-sm text-gray-500">@Html.Raw(userTemplate.Description)</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        <div class="flex flex-wrap gap-1">
-                                            @foreach (var tag in userTemplate.SavedTags)
-                                            {
-                                                <span class="bg-gray-100 text-gray-800 text-xs font-semibold px-2 py-0.5 rounded">@tag</span>
-                                            }
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        @userTemplate.CreatedAt.ToString("yyyy-MM-dd")
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-right">
-                                        <a asp-controller="Forms" asp-action="Create" asp-route-TemplateId="@userTemplate.Id"
-                                           class="inline-block bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-sm font-medium transition">
-                                            Fill New Form
-                                        </a>
-                                    </td>
+                                foreach (var userTemplate in UserTemplates)
+                                {
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="text-sm font-medium text-gray-900">@userTemplate.Title</div>
+                                            <div class="text-sm text-gray-500">@Html.Raw(userTemplate.Description)</div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <div class="flex flex-wrap gap-1">
+                                                @foreach (var tag in userTemplate.SavedTags ?? new List<string>())
+                                                {
+                                                    <span class="bg-gray-100 text-gray-800 text-xs font-semibold px-2 py-0.5 rounded">@tag</span>
+                                                }
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            @userTemplate.CreatedAt.ToString("yyyy-MM-dd")
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right">
+                                            <a asp-controller="Forms" asp-action="Create" asp-route-TemplateId="@userTemplate.Id"
+                                               class="inline-block bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-sm font-medium transition">
+                                                Fill New Form
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center text-gray-500 px-6 py-4">No templates available.</td>
                                 </tr>
                             }
                         </tbody>
-
                     </table>
                 </div>
             </div>
@@ -115,9 +127,8 @@
         <!-- Forms Tab -->
         <div id="forms-content" class="tab-content hidden">
             <div class="bg-white shadow-sm rounded-lg overflow-hidden">
-              
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200" id="forms-table" data-sort-direction="desc">
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="sortable px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Form Title</th>
@@ -126,29 +137,41 @@
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
-                      @foreach (var item in await _formService.GetFormsForUser())
-                        {
-                            <tbody id="forms-table" class="bg-white divide-y divide-gray-200">
-                                <tr class="hover:bg-gray-50">
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="text-sm font-medium text-gray-900">@item.Template.Title</div>
-                                        <div class="text-sm text-gray-500">@item.Template.Description</div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">@item.Template.Title</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">@item.SubmittedAt</td>
-
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                        <a href="#" class="text-blue-600 hover:text-blue-900 transition">Edit</a>
-                                        <a href="#" class="text-green-600 hover:text-green-900 transition">View</a>
-                                        <a href="#" class="text-purple-600 hover:text-purple-900 transition">Download</a>
-                                    </td>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            @if (Forms.Any())
+                            {
+                                foreach (var item in Forms)
+                                {
+                                    if (item.Template != null)
+                                    {
+                                        <tr class="hover:bg-gray-50">
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <div class="text-sm font-medium text-gray-900">@item.Template.Title</div>
+                                                <div class="text-sm text-gray-500">@item.Template.Description</div>
+                                            </td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">@item.Template.Title</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">@item.SubmittedAt.ToString("yyyy-MM-dd")</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                                                <a class="text-blue-600 hover:text-blue-900 transition" href="#">Edit</a>
+                                                <a class="text-green-600 hover:text-green-900 transition" asp-controller="Forms" asp-action="Details" asp-route-formId="@item.Id">View</a>
+                                                <a class="text-purple-600 hover:text-purple-900 transition" href="#">Download</a>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center text-gray-500 px-6 py-4">No forms found.</td>
                                 </tr>
-                            </tbody>
-                        }
+                            }
+                        </tbody>
                     </table>
                 </div>
             </div>
         </div>
+
     </main>
 
     <script>
@@ -167,7 +190,7 @@
 
         function sortTable(tableId, columnIndex) {
             const table = document.getElementById(tableId);
-            const rows = Array.from(table.rows);
+            const rows = Array.from(table.tBodies[0].rows);
             const isAscending = table.getAttribute('data-sort-direction') !== 'asc';
             table.setAttribute('data-sort-direction', isAscending ? 'asc' : 'desc');
 
@@ -182,7 +205,7 @@
                 return isAscending ? aText.localeCompare(bText) : bText.localeCompare(aText);
             });
 
-            rows.forEach(row => table.appendChild(row));
+            rows.forEach(row => table.tBodies[0].appendChild(row));
         }
 
         switchTab('templates');

@@ -1,10 +1,22 @@
 ﻿@using FormBuilder.Enums
+@using FormBuilder.Interface
+@using FormBuilder.Models
 @model FormBuilder.Models.Form
-
+@inject IFormService _formService;
 
 @{
     ViewData["Title"] = "Fill Out Form";
     var TemplateId = Context.Request.Query["TemplateId"];
+
+
+
+    var comments = await _formService.GetComments(
+        formId: null,
+        templateId: Model.TemplateId,
+        commentTargetType: CommentTargetType.Template
+    ) ?? new List<Comment>();
+
+
 }
 
 
@@ -39,17 +51,17 @@
                                 @switch (question.Type)
                                 {
                                     case QuestionType.ShortText:
-                                        <input name="Answers[@i].Response" type="text"
+                                        <input name="Answers[@i].Response[]" type="text"
                                                class="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" />
                                         break;
 
                                     case QuestionType.LongText:
-                                        <textarea name="Answers[@i].Response" rows="4"
+                                        <textarea name="Answers[@i].Response[]" rows="4"
                                                   class="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"></textarea>
                                         break;
 
                                     case QuestionType.Number:
-                                        <input name="Answers[@i].Response" type="number"
+                                        <input name="Answers[@i].Response[]" type="number"
                                                class="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" />
                                         break;
 
@@ -68,7 +80,7 @@
 
                                     case QuestionType.Dropdown:
                                         <div class="relative">
-                                            <select name="Answers[@i].Response"
+                                            <select name="Answers[@i].Response[]"
                                                     class="appearance-none w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all pr-10">
                                                 @foreach (var option in question.Options)
                                                 {
@@ -88,7 +100,7 @@
                                             @foreach (var option in question.Options)
                                             {
                                                 <div class="flex items-center">
-                                                    <input type="radio" name="Answers[@i].Response" value="@option" id="radio-@i-@option.GetHashCode()"
+                                                    <input type="radio" name="Answers[@i].Response[]" value="@option" id="radio-@i-@option.GetHashCode()"
                                                            class="w-5 h-5 text-purple-600 border-gray-300 focus:ring-purple-500" />
                                                     <label for="radio-@i-@option.GetHashCode()" class="ml-3 text-gray-700">@option</label>
                                                 </div>
@@ -100,12 +112,16 @@
                                 <input type="hidden" name="Answers[@i].QuestionId" value="@question.Id" />
                             </div>
                         }
-
                         <div class="mt-8">
                             <button type="submit" class="w-full sm:w-auto px-6 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors">
                                 Submit Response
                             </button>
                         </div>
+
+                   
+
+
+
                     </form>
                 </div>
             </div>
@@ -120,18 +136,18 @@
                         <svg class="w-5 h-5 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
                         </svg>
-                        Comments (@(Model.Template.Comments?.Count ?? 0))
+                        Comments @comments.Count()
                     </h3>
 
                     <div class="max-h-[400px] overflow-y-auto pr-1">
-                        @if (Model.Template.Comments != null && Model.Template.Comments.Any())
+                        @if (comments != null && comments.Any())
                         {
                             <div class="space-y-4">
-                                @foreach (var comment in Model.Template.Comments.OrderByDescending(c => c.PostedAt))
+                                @foreach (var comment in comments.OrderByDescending(c => c.PostedAt))
                                 {
                                     <div class="bg-gray-50 rounded-lg p-4">
                                         <div class="flex justify-between items-center mb-2">
-                                            <span class="font-medium text-gray-900">@comment.UserName</span>
+                                            <span class="font-medium text-gray-900">@comment.user.UserName.Substring(0,7)</span>
                                             <span class="text-xs text-gray-500">@comment.PostedAt.ToString("MMM d, yyyy h:mm tt")</span>
                                         </div>
                                         <p class="text-gray-700 text-sm">@comment.Text</p>
@@ -199,9 +215,9 @@
                     Add a Comment
                 </h4>
 
-                <form asp-action="AddComment" asp-controller="Form" method="post" class="space-y-4">
-                    <input type="hidden" name="TemplateId" value="@Model.Id" />
-                    <textarea name="NewCommentText" rows="4" required
+                <form asp-action="AddTemplateComment" asp-controller="Forms" method="post" class="space-y-4">
+                    <input type="hidden" name="templateId" value="@Model.TemplateId" />
+                    <textarea name="Text" rows="4" required
                               class="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                               placeholder="Share your thoughts or feedback..."></textarea>
 

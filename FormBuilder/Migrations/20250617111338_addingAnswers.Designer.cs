@@ -4,6 +4,7 @@ using FormBuilder.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FormBuilder.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250617111338_addingAnswers")]
+    partial class addingAnswers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,34 +33,24 @@ namespace FormBuilder.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CommentTargetType")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("FormId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("PostedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("TemplateId")
+                    b.Property<int>("TemplateId")
                         .HasColumnType("int");
 
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
+                    b.Property<string>("UserName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("formTemplateId")
+                    b.Property<int>("formTemplateId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("FormId");
-
-                    b.HasIndex("UserId");
 
                     b.HasIndex("formTemplateId");
 
@@ -315,42 +308,42 @@ namespace FormBuilder.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 6, 17, 15, 40, 59, 713, DateTimeKind.Local).AddTicks(7455),
+                            CreatedAt = new DateTime(2025, 6, 17, 15, 13, 38, 141, DateTimeKind.Local).AddTicks(7073),
                             Name = "HR",
                             TemplateId = 1
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 6, 17, 15, 40, 59, 713, DateTimeKind.Local).AddTicks(7468),
+                            CreatedAt = new DateTime(2025, 6, 17, 15, 13, 38, 141, DateTimeKind.Local).AddTicks(7082),
                             Name = "Recruitment",
                             TemplateId = 1
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2025, 6, 17, 15, 40, 59, 713, DateTimeKind.Local).AddTicks(7469),
+                            CreatedAt = new DateTime(2025, 6, 17, 15, 13, 38, 141, DateTimeKind.Local).AddTicks(7084),
                             Name = "Event",
                             TemplateId = 2
                         },
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2025, 6, 17, 15, 40, 59, 713, DateTimeKind.Local).AddTicks(7470),
+                            CreatedAt = new DateTime(2025, 6, 17, 15, 13, 38, 141, DateTimeKind.Local).AddTicks(7085),
                             Name = "Signup",
                             TemplateId = 2
                         },
                         new
                         {
                             Id = 5,
-                            CreatedAt = new DateTime(2025, 6, 17, 15, 40, 59, 713, DateTimeKind.Local).AddTicks(7471),
+                            CreatedAt = new DateTime(2025, 6, 17, 15, 13, 38, 141, DateTimeKind.Local).AddTicks(7086),
                             Name = "Customer",
                             TemplateId = 3
                         },
                         new
                         {
                             Id = 6,
-                            CreatedAt = new DateTime(2025, 6, 17, 15, 40, 59, 713, DateTimeKind.Local).AddTicks(7472),
+                            CreatedAt = new DateTime(2025, 6, 17, 15, 13, 38, 141, DateTimeKind.Local).AddTicks(7087),
                             Name = "Survey",
                             TemplateId = 3
                         });
@@ -556,25 +549,13 @@ namespace FormBuilder.Migrations
 
             modelBuilder.Entity("FormBuilder.Models.Comment", b =>
                 {
-                    b.HasOne("FormBuilder.Models.Form", "form")
-                        .WithMany()
-                        .HasForeignKey("FormId");
-
-                    b.HasOne("FormBuilder.Models.User", "user")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                    b.HasOne("FormBuilder.Models.FormTemplate", "formTemplate")
+                        .WithMany("Comments")
+                        .HasForeignKey("formTemplateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FormBuilder.Models.FormTemplate", "formTemplate")
-                        .WithMany("Comments")
-                        .HasForeignKey("formTemplateId");
-
-                    b.Navigation("form");
-
                     b.Navigation("formTemplate");
-
-                    b.Navigation("user");
                 });
 
             modelBuilder.Entity("FormBuilder.Models.Form", b =>
