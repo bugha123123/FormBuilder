@@ -152,7 +152,7 @@
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">@item.Template.Title</td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">@item.SubmittedAt.ToString("yyyy-MM-dd")</td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                                <a class="text-blue-600 hover:text-blue-900 transition" href="#">Edit</a>
+                                                <a class="text-blue-600 hover:text-blue-900 transition" asp-action="Edit" asp-controller="Forms" asp-route-FormId="@item.Id" asp-route-templateId="@item.TemplateId">Edit</a>
                                                 <a class="text-green-600 hover:text-green-900 transition" asp-controller="Forms" asp-action="Details" asp-route-formId="@item.Id">View</a>
                                                 <a class="text-purple-600 hover:text-purple-900 transition" href="#">Download</a>
                                             </td>

@@ -1,8 +1,12 @@
-﻿using FormBuilder.Interface;
+﻿using FormBuilder.DTO;
+using FormBuilder.Interface;
 using FormBuilder.Interfaces;
 using FormBuilder.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.SqlServer.Server;
 using System.Linq;
+using System.Numerics;
 
 public class FormsController : Controller
 {
@@ -31,6 +35,13 @@ public class FormsController : Controller
     public async Task<IActionResult> AccessDenied()
     {
         return View();
+    }
+    [HttpGet]
+    [Authorize]
+    public async Task<IActionResult> Edit(int FormId, int templateId )
+    {
+        var result = await _formService.GetFormById(FormId);       
+        return View(result);
     }
 
     [HttpGet]
@@ -71,6 +82,16 @@ public class FormsController : Controller
     {
         await _formService.AddTemplateComment(comment, templateId, text);
         return RedirectToAction("Create", "Forms", new { TemplateId = templateId });
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Edit(Form model, int templateId, int FormId)
+    {
+      
+          var result =   await _formService.Edit(model, templateId, FormId);
+            return RedirectToAction("Details","Forms", new { formId = result.Id });
+        
+   
     }
 
 }

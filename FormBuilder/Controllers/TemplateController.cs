@@ -46,7 +46,6 @@ namespace FormBuilder.Controllers
         {
             var user = await _AuthService.GetLoggedInUserAsync();
 
-            // If user is not logged in, redirect to signup
             if (user == null)
             {
                 return RedirectToAction("signup", "Auth");
@@ -90,17 +89,17 @@ namespace FormBuilder.Controllers
 
             return RedirectToAction("Details", new { id = createdTemplate.Id });
         }
-
         [HttpPost]
         public async Task<IActionResult> AssignUser(int TemplateId, string email)
         {
             var success = await _templateService.AssignUserToTemplateAsync(TemplateId, email);
 
             if (success)
-                return RedirectToAction("Details", new { TemplateId });
+                return RedirectToAction("Details", new { id = TemplateId });
             else
-                return RedirectToAction("Details", new { TemplateId });
+                return RedirectToAction("Details", new { id = TemplateId });
         }
+
 
 
 

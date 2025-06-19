@@ -1,4 +1,5 @@
 ﻿using FormBuilder.Data;
+using FormBuilder.DTO;
 using FormBuilder.Enums;
 using FormBuilder.Interface;
 using FormBuilder.Interfaces;
@@ -93,7 +94,7 @@ public class FormService : IFormService
 
     public async Task<Form> GetFormById(int formId)
     {
-        return await _context.Forms.Include(x => x.Template).Include(x => x.User).Include(x => x.Answers).FirstOrDefaultAsync(x => x.Id == formId);
+        return await _context.Forms.Include(x => x.Template).ThenInclude(x => x.Questions).Include(x => x.User).Include(x => x.Answers).FirstOrDefaultAsync(x => x.Id == formId);
     }
 
     public async Task AddFormComment(Comment comment, int formId, string text)
@@ -164,6 +165,36 @@ public class FormService : IFormService
         return comments ?? new List<Comment>();
     }
 
+    public async Task<Form> Edit(Form updatedForm, int TemplateId, int FormId)
+    {
+        var existingForm = await GetFormById(FormId);
 
+        var Template = await _templateService.GetTemplateById(TemplateId);
+
+        if (existingForm == null)
+            throw new Exception("Form not found");
+
+        _context.Answers.RemoveRange(existingForm.Answers);
+
+        foreach (var updatedAnswer in updatedForm.Answers)
+        {
+            var newAnswer = new FormAnswer
+            {
+                form = existingForm,
+                QuestionId = updatedAnswer.QuestionId,
+                TemplateId = Template.Id,  
+                formTemplate = Template, 
+                Response = updatedAnswer.Response,
+                QuestionType = updatedAnswer.QuestionType
+            };
+
+           await  _context.Answers.AddAsync(newAnswer);
+        }
+
+        await _context.SaveChangesAsync();
+        return existingForm;
+    }
 
 }
+
+

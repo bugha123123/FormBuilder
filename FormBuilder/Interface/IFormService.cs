@@ -1,4 +1,5 @@
-﻿using FormBuilder.Enums;
+﻿using FormBuilder.DTO;
+using FormBuilder.Enums;
 using FormBuilder.Models;
 
 namespace FormBuilder.Interface
@@ -19,6 +20,9 @@ namespace FormBuilder.Interface
         int? formId = null,
         int? templateId = null,
         CommentTargetType? commentTargetType = null);
+
+        Task<Form> Edit(Form updatedForm, int TemplateId, int FormId);
+
     }
 
 
