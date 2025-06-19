@@ -12,14 +12,7 @@ namespace FormBuilder.Interface
         Task<List<Form>> GetFormsForUser();
 
 
-        Task AddFormComment(Comment comment, int formId, string Text);
 
-        Task AddTemplateComment(Comment comment, int templateId, string Text);
-
-        Task<List<Comment>> GetComments(
-        int? formId = null,
-        int? templateId = null,
-        CommentTargetType? commentTargetType = null);
 
         Task<Form> Edit(Form updatedForm, int TemplateId, int FormId);
 

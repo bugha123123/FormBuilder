@@ -5,7 +5,7 @@
 
 @{
     var UserTemplates = await _templateService.GetUserTemplates() ?? new List<FormTemplate>();
-    var Forms = await _formService.GetFormsForUser() ??   new List<Form>();
+    var Forms = await _formService.GetFormsForUser() ?? new List<Form>();
 }
 
 <!DOCTYPE html>
@@ -80,7 +80,7 @@
                                 <th class="sortable px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable('templates-table', 2)">
                                     Created Date <span class="ml-1 text-gray-400">↕</span>
                                 </th>
-                                <th class="px-6 py-3"></th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -104,11 +104,19 @@
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                             @userTemplate.CreatedAt.ToString("yyyy-MM-dd")
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-right">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                                             <a asp-controller="Forms" asp-action="Create" asp-route-TemplateId="@userTemplate.Id"
                                                class="inline-block bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-sm font-medium transition">
                                                 Fill New Form
                                             </a>
+                                            <a asp-controller="Template" asp-action="Edit" asp-route-id="@userTemplate.Id"
+                                               class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm font-medium transition">
+                                                Edit
+                                            </a>
+                                            <button onclick="deleteTemplate('@userTemplate.Id', '@userTemplate.Title')"
+                                                    class="inline-block bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-sm font-medium transition">
+                                                Delete
+                                            </button>
                                         </td>
                                     </tr>
                                 }
@@ -156,6 +164,7 @@
                                                 <a class="text-blue-600 hover:text-blue-900 transition" asp-action="Edit" asp-controller="Forms" asp-route-FormId="@item.Id" asp-route-templateId="@item.TemplateId">Edit</a>
                                                 <a class="text-green-600 hover:text-green-900 transition" asp-controller="Forms" asp-action="Details" asp-route-formId="@item.Id">View</a>
                                                 <a class="text-purple-600 hover:text-purple-900 transition" href="#">Download</a>
+                                                <button onclick="deleteForm('@item.Id', '@item.Template.Title')" class="text-red-600 hover:text-red-900 transition">Delete</button>
                                             </td>
                                         </tr>
                                     }
@@ -208,6 +217,11 @@
 
             rows.forEach(row => table.tBodies[0].appendChild(row));
         }
+
+
+
+
+        
 
         switchTab('templates');
     </script>

@@ -72,26 +72,15 @@ public class FormsController : Controller
         return RedirectToAction("Details", "Forms", new { formId = result.Id });
     }
 
-    public async Task<IActionResult> AddFormComment(Comment comment, int formId, string text)
-    {
-        await _formService.AddFormComment(comment, formId, text);
-        return RedirectToAction("Details", "Forms", new { formId  = formId});
-    }
-
-    public async Task<IActionResult> AddTemplateComment(Comment comment, int templateId, string text)
-    {
-        await _formService.AddTemplateComment(comment, templateId, text);
-        return RedirectToAction("Create", "Forms", new { TemplateId = templateId });
-    }
 
     [HttpPost]
     public async Task<IActionResult> Edit(Form model, int templateId, int FormId)
     {
-      
-          var result =   await _formService.Edit(model, templateId, FormId);
-            return RedirectToAction("Details","Forms", new { formId = result.Id });
-        
-   
+
+        var result = await _formService.Edit(model, templateId, FormId);
+        return RedirectToAction("Details", "Forms", new { formId = result.Id });
+
+
     }
 
 }

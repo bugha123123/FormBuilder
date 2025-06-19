@@ -22,6 +22,8 @@ namespace FormBuilder.Data
 
         public DbSet<Form> Forms { get; set; }
 
+        public DbSet<Like> Likes { get; set; }
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
