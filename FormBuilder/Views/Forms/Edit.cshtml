@@ -11,102 +11,105 @@
     var FormId = Context.Request.Query["FormId"];
 }
 
+<div class="min-h-screen bg-slate-50">
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-slate-900 mb-3">Edit: @Model.Template.Title</h1>
+            <p class="text-slate-600 max-w-2xl mx-auto leading-relaxed">@Model.Template.Description</p>
+        </div>
 
+        <!-- Main Form Card -->
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="p-8">
+                <form asp-action="Edit" asp-controller="Forms" method="post">
+                    <input type="hidden" name="templateId" value="@TemplateId" />
+                    <input type="hidden" name="FormId" value="@FormId" />
 
-<div class="max-w-6xl mx-auto px-4 py-8">
-    <div class="text-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-3">Edit: @Model.Template.Title</h1>
-        <p class="text-gray-600 max-w-2xl mx-auto">@Model.Template.Description</p>
-    </div>
+                    @for (int i = 0; i < Model.Template.Questions.Count; i++)
+                    {
+                        var question = Model.Template.Questions[i];
+                        var answer = Model.Answers.FirstOrDefault(a => a.QuestionId == question.Id);
+                        <div class="mb-8 last:mb-6">
+                            <label class="block text-slate-800 font-semibold mb-3 text-base">@question.Text</label>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div class="lg:col-span-2">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                <div class="p-6 sm:p-8">
-                    <form asp-action="Edit" asp-controller="Forms" method="post">
-                        <input type="hidden" name="templateId" value="@TemplateId" />
-                        <input type="hidden" name="FormId" value="@FormId" />
+                            @switch (question.Type)
+                            {
+                                case QuestionType.ShortText:
+                                    <input name="Answers[@i].Response[]" type="text" value="@answer?.Response?"
+                                           class="w-full border border-slate-300 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 text-slate-900" />
+                                    break;
 
-                        @for (int i = 0; i < Model.Template.Questions.Count; i++)
-                        {
-                            var question = Model.Template.Questions[i];
-                            var answer = Model.Answers.FirstOrDefault(a => a.QuestionId == question.Id);
-                            <div class="mb-8 last:mb-6">
-                                <label class="block text-gray-800 font-medium mb-2">@question.Text</label>
+                                case QuestionType.LongText:
+                                    <textarea name="Answers[@i].Response[]" rows="4"
+                                              class="w-full border border-slate-300 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 text-slate-900 resize-none">@answer?.Response?</textarea>
+                                    break;
 
-                                @switch (question.Type)
-                                {
-                                    case QuestionType.ShortText:
-                                        <input name="Answers[@i].Response[]" type="text" value="@answer?.Response?"
-                                               class="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500"  />
-                                        break;
+                                case QuestionType.Number:
+                                    <input name="Answers[@i].Response[]" type="number" value="@answer?.Response"
+                                           class="w-full border border-slate-300 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 text-slate-900" />
+                                    break;
 
-                                    case QuestionType.LongText:
-                                        <textarea name="Answers[@i].Response[]" rows="4"
-                                                  class="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500">@answer?.Response?</textarea>
-                                        break;
+                                case QuestionType.Checkbox:
+                                    <div class="space-y-3 mt-3">
+                                        @foreach (var option in question.Options)
+                                        {
+                                            var isChecked = answer?.Response?.Contains(option) == true ? "checked" : "";
+                                            <div class="flex items-center">
+                                                <input type="checkbox" name="Answers[@i].Response" value="@option" id="checkbox-@i-@option.GetHashCode()" @isChecked
+                                                       class="w-5 h-5 text-emerald-600 rounded-md border-slate-300 focus:ring-emerald-500 focus:ring-2" />
+                                                <label for="checkbox-@i-@option.GetHashCode()" class="ml-3 text-slate-700 font-medium">@option</label>
+                                            </div>
+                                        }
+                                    </div>
+                                    break;
 
-                                    case QuestionType.Number:
-                                        <input name="Answers[@i].Response[]" type="number" value="@answer?.Response"
-                                               class="w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500" />
-                                        break;
-
-                                    case QuestionType.Checkbox:
-                                        <div class="space-y-2 mt-2">
-                                            @foreach (var option in question.Options)
-                                            {
-                                                var isChecked = answer?.Response?.Contains(option) == true ? "checked" : "";
-                                                <div class="flex items-center">
-                                                    <input type="checkbox" name="Answers[@i].Response" value="@option" id="checkbox-@i-@option.GetHashCode()" @isChecked
-                                                           class="w-5 h-5 text-purple-600 rounded border-gray-300 focus:ring-purple-500" />
-                                                    <label for="checkbox-@i-@option.GetHashCode()" class="ml-3 text-gray-700">@option</label>
-                                                </div>
-                                            }
-                                        </div>
-                                        break;
-
-                                    case QuestionType.Dropdown:
-                                        <div class="relative">
-                                            <select name="Answers[@i].Response"
-                                                    class="appearance-none w-full border border-gray-200 rounded-lg px-4 py-3 bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 pr-10">
-                                                @foreach (var option in question.Options)
-                                                {
-                                                    var selectedValue = answer?.Response;
-                                                    var isSelected = selectedValue.ToString() == option ? "selected" : "";
-                                                    <option value="@option" isSelected>@option</option>
-                                                }
-                                            </select>
-                                        </div>
-                                        break;
-
-                                    case QuestionType.OneFromList:
-                                        <div class="space-y-2 mt-2">
+                                case QuestionType.Dropdown:
+                                    <div class="relative">
+                                        <select name="Answers[@i].Response"
+                                                class="appearance-none w-full border border-slate-300 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 pr-10 text-slate-900">
                                             @foreach (var option in question.Options)
                                             {
                                                 var selectedValue = answer?.Response;
-                                                var isChecked = selectedValue.ToString() == option ? "checked" : "";
-                                                var radioId = $"radio-{i}-{option.GetHashCode()}";
-                                                <div class="flex items-center">
-                                                    <input type="radio" name="Answers[@i].Response" value="@option" id="@radioId" @isChecked
-                                                           class="w-5 h-5 text-purple-600 border-gray-300 focus:ring-purple-500" />
-                                                    <label for="@radioId" class="ml-3 text-gray-700">@option</label>
-                                                </div>
+                                                var isSelected = selectedValue.ToString() == option ? "selected" : "";
+                                                <option value="@option" isSelected>@option</option>
                                             }
+                                        </select>
+                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                            </svg>
                                         </div>
-                                        break;
-                                }
+                                    </div>
+                                    break;
 
-                                <input type="hidden" name="Answers[@i].QuestionId" value="@question.Id" />
-                            </div>
-                        }
+                                case QuestionType.OneFromList:
+                                    <div class="space-y-3 mt-3">
+                                        @foreach (var option in question.Options)
+                                        {
+                                            var selectedValue = answer?.Response;
+                                            var isChecked = selectedValue.ToString() == option ? "checked" : "";
+                                            var radioId = $"radio-{i}-{option.GetHashCode()}";
+                                            <div class="flex items-center">
+                                                <input type="radio" name="Answers[@i].Response" value="@option" id="@radioId" @isChecked
+                                                       class="w-5 h-5 text-emerald-600 border-slate-300 focus:ring-emerald-500 focus:ring-2" />
+                                                <label for="@radioId" class="ml-3 text-slate-700 font-medium">@option</label>
+                                            </div>
+                                        }
+                                    </div>
+                                    break;
+                            }
 
-                        <div class="mt-8">
-                            <button type="submit" class="w-full sm:w-auto px-6 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500">
-                                Save Changes
-                            </button>
+                            <input type="hidden" name="Answers[@i].QuestionId" value="@question.Id" />
                         </div>
-                    </form>
-                </div>
+                    }
+
+                    <div class="mt-8 pt-6 border-t border-slate-200">
+                        <button type="submit" class="btn-dark w-full sm:w-auto px-8 py-3 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all duration-200 shadow-sm">
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

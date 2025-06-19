@@ -146,6 +146,7 @@ namespace FormBuilder.Service
             var templates = await _context.FormTemplates
                 .Include(t => t.Questions)
                 .Include(t => t.Comments)
+                .Where(x => x.isPublic)
                 .ToListAsync();
 
             return templates

@@ -2,45 +2,76 @@
 @model List<FormTemplate>
 @{
     var tag = Context.Request.Query["Tag"];
+    
 }
 
-<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <header class="mb-12">
-        <h1 class="text-4xl font-extrabold text-gray-900 dark:text-gray-100 tracking-tight">
-            Templates tagged with "@tag"
-        </h1>
-        @if (!Model.Any())
-        {
-            <p class="mt-4 text-gray-600 dark:text-gray-300">No templates found with this tag.</p>
-        }
-    </header>
+<div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <div class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center">
+                <h1 class="text-3xl font-bold text-gray-900 mb-3">
+                    Templates tagged with "@tag"
+                </h1>
+                @if (!Model.Any())
+                {
+                    <p class="text-gray-600">No templates found with this tag.</p>
+                }
+                else
+                {
+                    <p class="text-gray-600">@Model.Count() template@(Model.Count() == 1 ? "" : "s") found</p>
+                }
+            </div>
+        </div>
+    </div>
 
-    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        @foreach (var template in Model)
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        @if (Model.Any())
         {
-            <article class="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col overflow-hidden">
-                <div class="aspect-w-16 aspect-h-9">
-                    <img src="@(template.ImageUrl != null
-                        ? template.ImageUrl.Replace("/upload/", "/upload/c_fill,w_400,h_200/")
-                        : "/placeholder.svg?height=200&width=400")"
-                         alt="@($"{template.Title} preview")"
-                         class="object-cover rounded-t-lg w-full h-full" />
-                </div>
-                <div class="p-6 flex flex-col flex-grow">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">@template.Title</h3>
-                    <div class="flex flex-wrap gap-2 mb-6">
-                        @foreach (var t in template.SavedTags)
-                        {
-                            <span class="bg-cyan-100 text-cyan-800 text-xs font-medium px-2 py-1 rounded-full">@t</span>
-                        }
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                @foreach (var template in Model)
+                {
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200 overflow-hidden">
+                        <div class="aspect-w-16 aspect-h-9 h-48">
+                            <img src="@(template.ImageUrl != null
+                                ? template.ImageUrl.Replace("/upload/", "/upload/c_fill,w_400,h_200/")
+                                : "/placeholder.svg?height=200&width=400")"
+                                 alt="@($"{template.Title} preview")"
+                                 class="object-cover w-full h-full" />
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4">@template.Title</h3>
+                            <div class="flex flex-wrap gap-2 mb-6">
+                                @foreach (var t in template.SavedTags)
+                                {
+                                    <span class="bg-purple-100 text-purple-800 text-xs font-medium px-3 py-1 rounded-full">@t</span>
+                                }
+                            </div>
+                            <a asp-controller="Forms" asp-action="Create" asp-route-TemplateId="@template.Id">
+                                <button type="button" class="w-full bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:ring-purple-100 text-white py-3 px-4 rounded-lg font-medium transition-colors duration-200 focus:outline-none">
+                                    Use template
+                                </button>
+                            </a>
+                        </div>
                     </div>
-                    <a asp-controller="Forms" asp-action="Create" asp-route-TemplateId="@template.Id">
-                        <button type="button" class="mt-auto w-full bg-primary hover:bg-secondary focus:ring-4 focus:ring-primary/50 text-white py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none">
-                            Use template
-                        </button>
-                    </a>
-                </div>
-            </article>
+                }
+            </div>
         }
-    </section>
-</main>
+        else
+        {
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+                <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-tag text-gray-400 text-3xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-900 mb-3">No templates found</h3>
+                <p class="text-gray-600 mb-6">No templates are currently tagged with "@tag"</p>
+                <a href="@Url.Action("Index", "Template")">
+                    <button class="inline-flex items-center px-6 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Browse All Templates
+                    </button>
+                </a>
+            </div>
+        }
+    </div>
+</div>

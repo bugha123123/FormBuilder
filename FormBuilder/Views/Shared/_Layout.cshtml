@@ -6,144 +6,258 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - FormBuilder</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+ 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
 </head>
-<body class="bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
-    <nav class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+<body>
+    <!-- Navigation -->
+    <nav class="bg-white dark:bg-slate-800 shadow-sm border-b border-slate-200 dark:border-slate-700 sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
-               
-                <div class="flex items-center space-x-6">
+                <!-- Logo and Search -->
+                <div class="flex items-center space-x-8">
+                    <!-- Logo -->
                     <div class="flex-shrink-0">
-                        <a asp-action="Index" asp-controller="Home" style="text-decoration:none;">
-                            <h1 class="text-2xl font-bold text-primary dark:text-primary-light">FormBuildR</h1>
-
+                        <a asp-action="Index" asp-controller="Home" class="flex items-center space-x-2 text-decoration-none">
+                            <div class="w-8 h-8 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-cube text-white text-sm"></i>
+                            </div>
+                            <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                                FormBuildR
+                            </h1>
                         </a>
                     </div>
 
-               @if (User.Identity.IsAuthenticated)
+                    <!-- Search Bar -->
+                    @if (User.Identity.IsAuthenticated)
                     {
-                        <form method="get" class="hidden md:block">
-                            <div class="relative">
-                                <input type="text" name="query" placeholder="Search templates..."
-                                       class="pl-10 pr-4 py-2 w-64 rounded-md border border-gray-800 dark:border-gray-600  dark:text-gray-100 focus:ring-primary focus:border-primary transition duration-200" />
-                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                    <svg class="w-5 h-5 text-gray-400 dark:text-gray-300" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M12.9 14.32a8 8 0 111.414-1.414l4.387 4.387-1.414 1.414-4.387-4.387zM8 14a6 6 0 100-12 6 6 0 000 12z" clip-rule="evenodd" />
-                                    </svg>
+                        <div class="hidden md:block relative">
+                            <form method="get" class="relative">
+                                <div class="relative">
+                                    <input type="text" name="query" placeholder="Search templates..."
+                                           class="pl-10 pr-4 py-2.5 w-80 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 text-sm" />
+                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                        <i class="fas fa-search text-slate-400 dark:text-slate-300"></i>
+                                    </div>
                                 </div>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     }
                 </div>
 
-
+                <!-- Right Side Navigation -->
                 <div class="flex items-center space-x-4">
-      
+                    <!-- Theme Toggle -->
                     <button id="theme-toggle" aria-label="Toggle Dark Mode"
-                            class="bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-sm transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary">
-                        🌙
+                            class="bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2 text-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <i class="fas fa-moon dark:hidden"></i>
+                        <i class="fas fa-sun hidden dark:inline"></i>
                     </button>
 
-                    <div class="flex items-center space-x-2">
+                    <!-- Navigation Links -->
+                    <div class="flex items-center space-x-3">
                         @if (User.Identity.IsAuthenticated)
                         {
                             <a asp-controller="User" asp-action="Dashboard"
-                               class="text-gray-700 dark:text-gray-200 hover:text-blue-500 px-3 py-2 text-sm font-medium transition-colors duration-200">
+                               class="text-slate-700 dark:text-slate-200 hover:text-purple-600 dark:hover:text-purple-400 px-4 py-2 text-sm font-medium transition-colors duration-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700">
+                                <i class="fas fa-tachometer-alt mr-2"></i>
                                 Dashboard
                             </a>
                             <form asp-controller="Auth" asp-action="Logout" method="post" class="inline">
-                                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200">
+                                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-xl text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500 shadow-sm">
+                                    <i class="fas fa-sign-out-alt mr-2"></i>
                                     Logout
                                 </button>
                             </form>
                         }
                         else
                         {
-                            <a class="text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary-light px-3 py-2 text-sm font-medium transition-colors duration-200" asp-action="signin" asp-controller="Auth">
+                            <a class="text-slate-700 dark:text-slate-200 hover:text-purple-600 dark:hover:text-purple-400 px-4 py-2 text-sm font-medium transition-colors duration-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700"
+                               asp-action="signin" asp-controller="Auth">
+                                <i class="fas fa-sign-in-alt mr-2"></i>
                                 Login
                             </a>
-                            <a class="bg-primary hover:bg-secondary text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                            <a class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 shadow-sm"
                                asp-action="signup" asp-controller="Auth">
+                                <i class="fas fa-user-plus mr-2"></i>
                                 Register
                             </a>
                         }
                     </div>
-
                 </div>
             </div>
         </div>
     </nav>
 
+    <!-- Search Results Dropdown -->
     <div id="search-results-wrapper" class="relative z-50 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div id="search-results" class="hidden absolute w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg max-h-80 overflow-y-auto">
+        <div id="search-results" class="hidden absolute left-0 right-0 mt-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl max-h-80 overflow-y-auto ml-32">
             <!-- Search results will be inserted here -->
         </div>
     </div>
 
-
-    <div class="container mx-auto px-4">
-        <main role="main" class="pb-3">
+    <!-- Main Content -->
+    <div class="flex-1">
+        <main role="main">
             @RenderBody()
         </main>
     </div>
 
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Brand -->
+                <div class="col-span-1 md:col-span-2">
+                    <div class="flex items-center space-x-2 mb-4">
+                        <div class="w-8 h-8 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-cube text-white text-sm"></i>
+                        </div>
+                        <h3 class="text-xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
+                            FormBuildR
+                        </h3>
+                    </div>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed max-w-md">
+                        Create beautiful, professional forms with ease. Build, customize, and deploy forms that work perfectly across all devices.
+                    </p>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-4">Quick Links</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-slate-600 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">Templates</a></li>
+                        <li><a href="#" class="text-slate-600 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">Dashboard</a></li>
+                        <li><a href="#" class="text-slate-600 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">Help Center</a></li>
+                        <li><a href="#" class="text-slate-600 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- Support -->
+                <div>
+                    <h4 class="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-4">Support</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="text-slate-600 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">Documentation</a></li>
+                        <li><a href="#" class="text-slate-600 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">API Reference</a></li>
+                        <li><a href="#" class="text-slate-600 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">Community</a></li>
+                        <li><a href="#" class="text-slate-600 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">Status</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-slate-200 dark:border-slate-700 mt-8 pt-6">
+                <div class="flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+                    <p class="text-sm text-slate-600 dark:text-slate-400">
+                        © @DateTime.Now.Year FormBuildR. All rights reserved.
+                    </p>
+                    <div class="flex items-center space-x-6 text-sm">
+                        <a href="#" class="text-slate-600 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">Privacy Policy</a>
+                        <a href="#" class="text-slate-600 dark:text-slate-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
- 
+    <!-- Theme Toggle Script -->
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        // Check for saved theme preference or default to light mode
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        html.classList.toggle('dark', currentTheme === 'dark');
+
+        themeToggle.addEventListener('click', () => {
+            const isDark = html.classList.contains('dark');
+            html.classList.toggle('dark', !isDark);
+            localStorage.setItem('theme', isDark ? 'light' : 'dark');
+        });
+    </script>
+
+    <!-- Search Functionality -->
+    <script>
+        $(document).ready(function () {
+            const $input = $('input[name="query"]');
+            const $resultsWrapper = $('#search-results-wrapper');
+            const $resultsBox = $('#search-results');
+            let timeout;
+
+            $input.on("input", function () {
+                clearTimeout(timeout);
+                const query = $(this).val().trim();
+
+                timeout = setTimeout(() => {
+                    if (query.length < 2) {
+                        $resultsBox.empty().hide();
+                        return;
+                    }
+
+                    $.ajax({
+                        url: '/Template/SearchTemplates',
+                        data: { query },
+                        success: function (results) {
+                            $resultsBox.empty().show();
+
+                            if (results.length === 0) {
+                                $resultsBox.append(`
+                                    <div class="px-6 py-4 text-center">
+                                        <div class="text-slate-500 dark:text-slate-400 mb-2">
+                                            <i class="fas fa-search text-2xl"></i>
+                                        </div>
+                                        <p class="text-sm text-slate-500 dark:text-slate-400">No templates found for "${query}"</p>
+                                    </div>
+                                `);
+                                return;
+                            }
+
+                            results.forEach((r, index) => {
+                                $resultsBox.append(`
+                                    <a href="${r.link}" class="block px-6 py-4 hover:bg-slate-50 dark:hover:bg-slate-700 ${index !== results.length - 1 ? 'border-b border-slate-200 dark:border-slate-700' : ''} transition-colors duration-200 group">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="w-8 h-8 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center group-hover:bg-purple-200 dark:group-hover:bg-purple-800 transition-colors">
+                                                <i class="fas fa-file-alt text-purple-600 dark:text-purple-400 text-sm"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-sm font-medium text-slate-900 dark:text-slate-100">${r.title}</p>
+                                                <p class="text-xs text-slate-500 dark:text-slate-400">Template</p>
+                                            </div>
+                                        </div>
+                                    </a>
+                                `);
+                            });
+                        },
+                        error: function () {
+                            $resultsBox.empty().append(`
+                                <div class="px-6 py-4 text-center">
+                                    <div class="text-red-500 mb-2">
+                                        <i class="fas fa-exclamation-triangle text-2xl"></i>
+                                    </div>
+                                    <p class="text-sm text-red-500">Search error. Please try again later.</p>
+                                </div>
+                            `).show();
+                        }
+                    });
+                }, 300);
+            });
+
+            $(document).click(function (e) {
+                if (!$(e.target).closest('#search-results, input[name="query"]').length) {
+                    $resultsBox.hide();
+                }
+            });
+
+            $input.on('focus', function() {
+                if ($(this).val().trim().length >= 2) {
+                    $resultsBox.show();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
-
-
-<script>
-    $(document).ready(function () {
-        const $input = $('input[name="query"]');
-        const $resultsWrapper = $('#search-results-wrapper');
-        const $resultsBox = $('#search-results');
-        let timeout;
-
-        $input.on("input", function () {
-            clearTimeout(timeout);
-            const query = $(this).val().trim();
-
-            timeout = setTimeout(() => {
-                if (query.length < 2) {
-                    $resultsBox.empty().hide();
-                    return;
-                }
-
-                $.ajax({
-                    url: '/Template/SearchTemplates',
-                    data: { query },
-                    success: function (results) {
-                        $resultsBox.empty().show();
-
-                        if (results.length === 0) {
-                            $resultsBox.append('<div class="px-4 py-3 text-gray-500 dark:text-gray-400">No templates found.</div>');
-                            return;
-                        }
-
-                        results.forEach(r => {
-                            $resultsBox.append(`
-                                <a href="${r.link}" class="block px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-800 dark:text-gray-200">
-                                    ${r.title} ${r.}
-                                </a>
-                            `);
-                        });
-                    },
-                    error: function () {
-                        $resultsBox.empty().append('<div class="px-4 py-3 text-red-500">Search error. Try again later.</div>').show();
-                    }
-                });
-            }, 300);
-        });
-
-        $(document).click(function (e) {
-            if (!$(e.target).closest('#search-results, input[name="query"]').length) {
-                $resultsBox.hide();
-            }
-        });
-    });
-</script>
-
