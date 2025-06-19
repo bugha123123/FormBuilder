@@ -137,5 +137,26 @@ namespace FormBuilder.Service
             return true;
         }
 
+        public async Task<List<FormTemplate>> SearchTemplatesAsync(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query)) return new List<FormTemplate>();
+
+            query = query.ToLower();
+
+            var templates = await _context.FormTemplates
+                .Include(t => t.Questions)
+                .Include(t => t.Comments)
+                .ToListAsync();
+
+            return templates
+                .Where(t =>
+                    t.Title.ToString().ToLower().Contains(query) ||
+                    t.Description.ToLower().Contains(query) ||
+                    t.Questions.Any(q => q.Text.ToLower().Contains(query)) ||
+                    t.Comments.Any(c => c.Text.ToLower().Contains(query)))
+                .ToList();
+        }
+
+
     }
 }

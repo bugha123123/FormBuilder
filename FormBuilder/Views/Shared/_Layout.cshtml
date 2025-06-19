@@ -75,6 +75,13 @@
         </div>
     </nav>
 
+    <div id="search-results-wrapper" class="relative z-50 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div id="search-results" class="hidden absolute w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg max-h-80 overflow-y-auto">
+            <!-- Search results will be inserted here -->
+        </div>
+    </div>
+
+
     <div class="container mx-auto px-4">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -87,3 +94,56 @@
  
 </body>
 </html>
+
+
+<script>
+    $(document).ready(function () {
+        const $input = $('input[name="query"]');
+        const $resultsWrapper = $('#search-results-wrapper');
+        const $resultsBox = $('#search-results');
+        let timeout;
+
+        $input.on("input", function () {
+            clearTimeout(timeout);
+            const query = $(this).val().trim();
+
+            timeout = setTimeout(() => {
+                if (query.length < 2) {
+                    $resultsBox.empty().hide();
+                    return;
+                }
+
+                $.ajax({
+                    url: '/Template/SearchTemplates',
+                    data: { query },
+                    success: function (results) {
+                        $resultsBox.empty().show();
+
+                        if (results.length === 0) {
+                            $resultsBox.append('<div class="px-4 py-3 text-gray-500 dark:text-gray-400">No templates found.</div>');
+                            return;
+                        }
+
+                        results.forEach(r => {
+                            $resultsBox.append(`
+                                <a href="${r.link}" class="block px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-700 border-b border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-800 dark:text-gray-200">
+                                    ${r.title} ${r.}
+                                </a>
+                            `);
+                        });
+                    },
+                    error: function () {
+                        $resultsBox.empty().append('<div class="px-4 py-3 text-red-500">Search error. Try again later.</div>').show();
+                    }
+                });
+            }, 300);
+        });
+
+        $(document).click(function (e) {
+            if (!$(e.target).closest('#search-results, input[name="query"]').length) {
+                $resultsBox.hide();
+            }
+        });
+    });
+</script>
+

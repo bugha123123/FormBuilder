@@ -20,6 +20,8 @@ namespace FormBuilder.Interface
 
         Task<bool> AssignUserToTemplateAsync(int templateId, string userEmail);
 
+        Task<List<FormTemplate>> SearchTemplatesAsync(string query);
+
 
 
     }

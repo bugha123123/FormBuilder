@@ -176,7 +176,7 @@ public class FormService : IFormService
 
         _context.Answers.RemoveRange(existingForm.Answers);
 
-        foreach (var updatedAnswer in updatedForm.Answers)
+        foreach (var updatedAnswer in updatedForm.Answers)  
         {
             var newAnswer = new FormAnswer
             {
@@ -194,6 +194,9 @@ public class FormService : IFormService
         await _context.SaveChangesAsync();
         return existingForm;
     }
+
+
+
 
 }
 

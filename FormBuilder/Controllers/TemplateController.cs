@@ -101,6 +101,19 @@ namespace FormBuilder.Controllers
         }
 
 
+        
+        public async Task<IActionResult> SearchTemplates(string query)
+        {
+            var results = await _templateService.SearchTemplatesAsync(query);
+
+            return Json(results.Select(r => new
+            {
+                id = r.Id,
+                title = r.Title.ToString(),
+                link = Url.Action("Details", "Template", new { id = r.Id })
+            }));
+        }
+
 
 
     }

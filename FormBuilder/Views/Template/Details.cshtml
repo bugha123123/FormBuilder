@@ -114,16 +114,7 @@
                                 </select>
                                 break;
 
-                            case QuestionType.OneFromList:
-                                <div class="space-y-1">
-                                    @foreach (var option in question.Options)
-                                    {
-                                        <div class="flex items-center">
-                                            <input type="radio" name="question_@i" class="form-radio" id="@($"opt_{i}_{option}")" />
-                                        </div>
-                                    }
-                                </div>
-                                break;
+                        
                         }
                     </div>
                 }
