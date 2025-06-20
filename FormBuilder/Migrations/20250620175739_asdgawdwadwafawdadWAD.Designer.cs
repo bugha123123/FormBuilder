@@ -4,6 +4,7 @@ using FormBuilder.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FormBuilder.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250620175739_asdgawdwadwafawdadWAD")]
+    partial class asdgawdwadwafawdadWAD
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -101,9 +104,6 @@ namespace FormBuilder.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("FormId")
-                        .HasColumnType("int");
-
                     b.Property<int>("QuestionId")
                         .HasColumnType("int");
 
@@ -117,11 +117,17 @@ namespace FormBuilder.Migrations
                     b.Property<int>("TemplateId")
                         .HasColumnType("int");
 
+                    b.Property<int>("formId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("formTemplateId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("FormId");
+                    b.HasIndex("formId");
 
-                    b.HasIndex("TemplateId");
+                    b.HasIndex("formTemplateId");
 
                     b.ToTable("Answers");
                 });
@@ -350,42 +356,42 @@ namespace FormBuilder.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 6, 20, 21, 58, 12, 520, DateTimeKind.Local).AddTicks(6752),
+                            CreatedAt = new DateTime(2025, 6, 20, 21, 57, 38, 997, DateTimeKind.Local).AddTicks(1805),
                             Name = "HR",
                             TemplateId = 1
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 6, 20, 21, 58, 12, 520, DateTimeKind.Local).AddTicks(6764),
+                            CreatedAt = new DateTime(2025, 6, 20, 21, 57, 38, 997, DateTimeKind.Local).AddTicks(1815),
                             Name = "Recruitment",
                             TemplateId = 1
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2025, 6, 20, 21, 58, 12, 520, DateTimeKind.Local).AddTicks(6765),
+                            CreatedAt = new DateTime(2025, 6, 20, 21, 57, 38, 997, DateTimeKind.Local).AddTicks(1816),
                             Name = "Event",
                             TemplateId = 2
                         },
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2025, 6, 20, 21, 58, 12, 520, DateTimeKind.Local).AddTicks(6766),
+                            CreatedAt = new DateTime(2025, 6, 20, 21, 57, 38, 997, DateTimeKind.Local).AddTicks(1817),
                             Name = "Signup",
                             TemplateId = 2
                         },
                         new
                         {
                             Id = 5,
-                            CreatedAt = new DateTime(2025, 6, 20, 21, 58, 12, 520, DateTimeKind.Local).AddTicks(6767),
+                            CreatedAt = new DateTime(2025, 6, 20, 21, 57, 38, 997, DateTimeKind.Local).AddTicks(1818),
                             Name = "Customer",
                             TemplateId = 3
                         },
                         new
                         {
                             Id = 6,
-                            CreatedAt = new DateTime(2025, 6, 20, 21, 58, 12, 520, DateTimeKind.Local).AddTicks(6768),
+                            CreatedAt = new DateTime(2025, 6, 20, 21, 57, 38, 997, DateTimeKind.Local).AddTicks(1819),
                             Name = "Survey",
                             TemplateId = 3
                         });
@@ -633,13 +639,13 @@ namespace FormBuilder.Migrations
                 {
                     b.HasOne("FormBuilder.Models.Form", "form")
                         .WithMany("Answers")
-                        .HasForeignKey("FormId")
+                        .HasForeignKey("formId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("FormBuilder.Models.FormTemplate", "formTemplate")
                         .WithMany()
-                        .HasForeignKey("TemplateId")
+                        .HasForeignKey("formTemplateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

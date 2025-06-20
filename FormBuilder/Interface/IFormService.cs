@@ -12,7 +12,7 @@ namespace FormBuilder.Interface
         Task<List<Form>> GetFormsForUser();
 
 
-
+        Task DeleteFormAsync(int formId);
 
         Task<Form> Edit(Form updatedForm, int TemplateId, int FormId);
 

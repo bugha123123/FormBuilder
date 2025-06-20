@@ -6,6 +6,7 @@ using FormBuilder.Interfaces;
 using FormBuilder.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.SqlServer.Server;
+using System.Security.Claims;
 using static System.Net.Mime.MediaTypeNames;
 
 public class FormService : IFormService
@@ -128,6 +129,34 @@ public class FormService : IFormService
         await _context.SaveChangesAsync();
         return existingForm;
     }
+
+    public async Task DeleteFormAsync(int formId)
+    {
+        var user = await _authService.GetLoggedInUserAsync();
+
+        // Delete Comments linked to this form
+        var comments = await _context.Comments
+                                     .Where(c => c.FormId == formId)
+                                     .ToListAsync();
+        _context.Comments.RemoveRange(comments);
+
+        // Delete Answers linked to this form
+        var answers = await _context.Answers
+                                    .Where(a => a.form.Id == formId)
+                                    .ToListAsync();
+        _context.Answers.RemoveRange(answers);
+
+        var form = await _context.Forms
+                                 .FirstOrDefaultAsync(f => f.Id == formId);
+        if (form != null)
+        {
+            _context.Forms.Remove(form);
+        }
+
+        await _context.SaveChangesAsync();
+    }
+
+
 
 
 

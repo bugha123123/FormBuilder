@@ -109,14 +109,18 @@
                                                class="inline-block bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-sm font-medium transition">
                                                 Fill New Form
                                             </a>
-                                            <a asp-controller="Template" asp-action="Edit" asp-route-id="@userTemplate.Id"
+                                            <a asp-controller="Template" asp-action="Edit" asp-route-templateId="@userTemplate.Id"
                                                class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm font-medium transition">
                                                 Edit
                                             </a>
-                                            <button onclick="deleteTemplate('@userTemplate.Id', '@userTemplate.Title')"
-                                                    class="inline-block bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-sm font-medium transition">
-                                                Delete
-                                            </button>
+                                            <form asp-action="Delete" asp-controller="Template" method="post">
+                                                <input hidden value="@userTemplate.Id" name="templateId" />
+                                                <button type="submit" 
+                                                        class="inline-block bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-sm font-medium transition">
+                                                    Delete
+                                                </button>
+                                            </form>
+                                         
                                         </td>
                                     </tr>
                                 }
@@ -164,7 +168,11 @@
                                                 <a class="text-blue-600 hover:text-blue-900 transition" asp-action="Edit" asp-controller="Forms" asp-route-FormId="@item.Id" asp-route-templateId="@item.TemplateId">Edit</a>
                                                 <a class="text-green-600 hover:text-green-900 transition" asp-controller="Forms" asp-action="Details" asp-route-formId="@item.Id">View</a>
                                                 <a class="text-purple-600 hover:text-purple-900 transition" href="#">Download</a>
-                                                <button onclick="deleteForm('@item.Id', '@item.Template.Title')" class="text-red-600 hover:text-red-900 transition">Delete</button>
+
+                                                <form asp-action="Delete" asp-controller="Forms" method="post">
+                                                <input hidden value="@item.Id" name="formId" />
+                                                <button  class="text-red-600 hover:text-red-900 transition">Delete</button>
+                                                </form>
                                             </td>
                                         </tr>
                                     }

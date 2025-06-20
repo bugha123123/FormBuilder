@@ -83,4 +83,11 @@ public class FormsController : Controller
 
     }
 
+    [HttpPost]
+    public async Task<IActionResult> Delete(int formId)
+    {
+        await _formService.DeleteFormAsync(formId);
+        return RedirectToAction("User", "Dashboard");
+    }
+
 }

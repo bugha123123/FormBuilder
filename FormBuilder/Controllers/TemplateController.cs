@@ -41,7 +41,12 @@ namespace FormBuilder.Controllers
             var result = await _templateService.GetFormTemplates();
             return View(result);
         }
-
+        [HttpGet]
+        public async Task<IActionResult> Edit(int templateId)
+        {
+            var template = await _templateService.GetTemplateById(templateId);
+            return View(template);
+        }
         public async Task<IActionResult> Details(int id)
         {
             var user = await _AuthService.GetLoggedInUserAsync();
@@ -114,6 +119,12 @@ namespace FormBuilder.Controllers
             }));
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Delete(int templateId)
+        {
+            await _templateService.DeleteTemplateAsync(templateId);
+            return RedirectToAction("User", "Dashboard");
+        }
 
 
     }
