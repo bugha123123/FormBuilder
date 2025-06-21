@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FormBuilder.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250611152844_addingSavedTags")]
-    partial class addingSavedTags
+    [Migration("20250621205251_addingLIKES")]
+    partial class addingLIKES
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,110 @@ namespace FormBuilder.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("FormBuilder.Models.Comment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CommentTargetType")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("FormId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("PostedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("TemplateId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("formTemplateId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FormId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("formTemplateId");
+
+                    b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("FormBuilder.Models.Form", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("FilledCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("SubmittedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("TemplateId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TemplateId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Forms");
+                });
+
+            modelBuilder.Entity("FormBuilder.Models.FormAnswer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("FormId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuestionType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Response")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TemplateId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FormId");
+
+                    b.HasIndex("TemplateId");
+
+                    b.ToTable("Answers");
+                });
 
             modelBuilder.Entity("FormBuilder.Models.FormTemplate", b =>
                 {
@@ -36,11 +140,17 @@ namespace FormBuilder.Migrations
                     b.Property<string>("AssignedUsers")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("CommentId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SavedTags")
@@ -66,6 +176,7 @@ namespace FormBuilder.Migrations
                         new
                         {
                             Id = 1,
+                            CommentId = 0,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Basic job application form.",
                             Title = "JobApplication",
@@ -74,6 +185,7 @@ namespace FormBuilder.Migrations
                         new
                         {
                             Id = 2,
+                            CommentId = 0,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Template for event sign-ups.",
                             Title = "EventRegistration",
@@ -82,11 +194,52 @@ namespace FormBuilder.Migrations
                         new
                         {
                             Id = 3,
+                            CommentId = 0,
                             CreatedAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Description = "Collect feedback from customers.",
                             Title = "FeedbackSurvey",
                             isPublic = false
                         });
+                });
+
+            modelBuilder.Entity("FormBuilder.Models.Like", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("CommentId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("FormId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LikeTargetType")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("LikedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("TemplateId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CommentId");
+
+                    b.HasIndex("FormId");
+
+                    b.HasIndex("TemplateId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Likes");
                 });
 
             modelBuilder.Entity("FormBuilder.Models.Question", b =>
@@ -205,42 +358,42 @@ namespace FormBuilder.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 6, 11, 19, 28, 43, 785, DateTimeKind.Local).AddTicks(7298),
+                            CreatedAt = new DateTime(2025, 6, 22, 0, 52, 51, 532, DateTimeKind.Local).AddTicks(4958),
                             Name = "HR",
                             TemplateId = 1
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 6, 11, 19, 28, 43, 785, DateTimeKind.Local).AddTicks(7308),
+                            CreatedAt = new DateTime(2025, 6, 22, 0, 52, 51, 532, DateTimeKind.Local).AddTicks(4971),
                             Name = "Recruitment",
                             TemplateId = 1
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2025, 6, 11, 19, 28, 43, 785, DateTimeKind.Local).AddTicks(7310),
+                            CreatedAt = new DateTime(2025, 6, 22, 0, 52, 51, 532, DateTimeKind.Local).AddTicks(4972),
                             Name = "Event",
                             TemplateId = 2
                         },
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2025, 6, 11, 19, 28, 43, 785, DateTimeKind.Local).AddTicks(7311),
+                            CreatedAt = new DateTime(2025, 6, 22, 0, 52, 51, 532, DateTimeKind.Local).AddTicks(4973),
                             Name = "Signup",
                             TemplateId = 2
                         },
                         new
                         {
                             Id = 5,
-                            CreatedAt = new DateTime(2025, 6, 11, 19, 28, 43, 785, DateTimeKind.Local).AddTicks(7312),
+                            CreatedAt = new DateTime(2025, 6, 22, 0, 52, 51, 532, DateTimeKind.Local).AddTicks(4975),
                             Name = "Customer",
                             TemplateId = 3
                         },
                         new
                         {
                             Id = 6,
-                            CreatedAt = new DateTime(2025, 6, 11, 19, 28, 43, 785, DateTimeKind.Local).AddTicks(7313),
+                            CreatedAt = new DateTime(2025, 6, 22, 0, 52, 51, 532, DateTimeKind.Local).AddTicks(4976),
                             Name = "Survey",
                             TemplateId = 3
                         });
@@ -444,6 +597,65 @@ namespace FormBuilder.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("FormBuilder.Models.Comment", b =>
+                {
+                    b.HasOne("FormBuilder.Models.Form", "form")
+                        .WithMany()
+                        .HasForeignKey("FormId");
+
+                    b.HasOne("FormBuilder.Models.User", "user")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FormBuilder.Models.FormTemplate", "formTemplate")
+                        .WithMany("Comments")
+                        .HasForeignKey("formTemplateId");
+
+                    b.Navigation("form");
+
+                    b.Navigation("formTemplate");
+
+                    b.Navigation("user");
+                });
+
+            modelBuilder.Entity("FormBuilder.Models.Form", b =>
+                {
+                    b.HasOne("FormBuilder.Models.FormTemplate", "Template")
+                        .WithMany()
+                        .HasForeignKey("TemplateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("FormBuilder.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Template");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("FormBuilder.Models.FormAnswer", b =>
+                {
+                    b.HasOne("FormBuilder.Models.Form", "form")
+                        .WithMany("Answers")
+                        .HasForeignKey("FormId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("FormBuilder.Models.FormTemplate", "formTemplate")
+                        .WithMany()
+                        .HasForeignKey("TemplateId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("form");
+
+                    b.Navigation("formTemplate");
+                });
+
             modelBuilder.Entity("FormBuilder.Models.FormTemplate", b =>
                 {
                     b.HasOne("FormBuilder.Models.User", "User")
@@ -451,6 +663,35 @@ namespace FormBuilder.Migrations
                         .HasForeignKey("UserId");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("FormBuilder.Models.Like", b =>
+                {
+                    b.HasOne("FormBuilder.Models.Comment", "Comment")
+                        .WithMany()
+                        .HasForeignKey("CommentId");
+
+                    b.HasOne("FormBuilder.Models.Form", "form")
+                        .WithMany()
+                        .HasForeignKey("FormId");
+
+                    b.HasOne("FormBuilder.Models.FormTemplate", "Template")
+                        .WithMany()
+                        .HasForeignKey("TemplateId");
+
+                    b.HasOne("FormBuilder.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Comment");
+
+                    b.Navigation("Template");
+
+                    b.Navigation("User");
+
+                    b.Navigation("form");
                 });
 
             modelBuilder.Entity("FormBuilder.Models.Question", b =>
@@ -515,8 +756,15 @@ namespace FormBuilder.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("FormBuilder.Models.Form", b =>
+                {
+                    b.Navigation("Answers");
+                });
+
             modelBuilder.Entity("FormBuilder.Models.FormTemplate", b =>
                 {
+                    b.Navigation("Comments");
+
                     b.Navigation("Questions");
                 });
 #pragma warning restore 612, 618

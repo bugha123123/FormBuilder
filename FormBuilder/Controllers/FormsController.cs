@@ -1,9 +1,12 @@
-﻿using FormBuilder.DTO;
+﻿using FormBuilder.Data;
+using FormBuilder.DTO;
+using FormBuilder.Enums;
 using FormBuilder.Interface;
 using FormBuilder.Interfaces;
 using FormBuilder.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.SqlServer.Server;
 using System.Linq;
 using System.Numerics;
@@ -13,12 +16,13 @@ public class FormsController : Controller
     private readonly ITemplateService _templateService;
     private readonly IFormService _formService;
     private readonly IAuthService _authService;
-
-    public FormsController(ITemplateService templateService, IFormService formService, IAuthService authService)
+    private readonly AppDbContext _context;
+    public FormsController(ITemplateService templateService, IFormService formService, IAuthService authService, AppDbContext context)
     {
         _templateService = templateService;
         _formService = formService;
         _authService = authService;
+        _context = context;
     }
 
     [HttpGet]
@@ -47,17 +51,18 @@ public class FormsController : Controller
     [HttpGet]
     public async Task<IActionResult> Details(int formId)
     {
-
         var result = await _formService.GetFormById(formId);
         var user = await _authService.GetLoggedInUserAsync();
+
         if (result.UserId == user.Id || result.Template.AssignedUsers.Contains(user.Email) || !result.Template.isPublic)
         {
+
             return View(result);
         }
 
-
         return RedirectToAction("AccessDenied", "Forms");
     }
+
     [HttpPost]
     public async Task<IActionResult> Create(Form form, int templateId)
     {

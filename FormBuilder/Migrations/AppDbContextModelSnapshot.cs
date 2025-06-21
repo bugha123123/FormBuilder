@@ -210,6 +210,9 @@ namespace FormBuilder.Migrations
                     b.Property<int?>("CommentId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("FormId")
+                        .HasColumnType("int");
+
                     b.Property<int>("LikeTargetType")
                         .HasColumnType("int");
 
@@ -226,6 +229,8 @@ namespace FormBuilder.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CommentId");
+
+                    b.HasIndex("FormId");
 
                     b.HasIndex("TemplateId");
 
@@ -350,42 +355,42 @@ namespace FormBuilder.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 6, 20, 21, 58, 12, 520, DateTimeKind.Local).AddTicks(6752),
+                            CreatedAt = new DateTime(2025, 6, 22, 0, 52, 51, 532, DateTimeKind.Local).AddTicks(4958),
                             Name = "HR",
                             TemplateId = 1
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 6, 20, 21, 58, 12, 520, DateTimeKind.Local).AddTicks(6764),
+                            CreatedAt = new DateTime(2025, 6, 22, 0, 52, 51, 532, DateTimeKind.Local).AddTicks(4971),
                             Name = "Recruitment",
                             TemplateId = 1
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2025, 6, 20, 21, 58, 12, 520, DateTimeKind.Local).AddTicks(6765),
+                            CreatedAt = new DateTime(2025, 6, 22, 0, 52, 51, 532, DateTimeKind.Local).AddTicks(4972),
                             Name = "Event",
                             TemplateId = 2
                         },
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2025, 6, 20, 21, 58, 12, 520, DateTimeKind.Local).AddTicks(6766),
+                            CreatedAt = new DateTime(2025, 6, 22, 0, 52, 51, 532, DateTimeKind.Local).AddTicks(4973),
                             Name = "Signup",
                             TemplateId = 2
                         },
                         new
                         {
                             Id = 5,
-                            CreatedAt = new DateTime(2025, 6, 20, 21, 58, 12, 520, DateTimeKind.Local).AddTicks(6767),
+                            CreatedAt = new DateTime(2025, 6, 22, 0, 52, 51, 532, DateTimeKind.Local).AddTicks(4975),
                             Name = "Customer",
                             TemplateId = 3
                         },
                         new
                         {
                             Id = 6,
-                            CreatedAt = new DateTime(2025, 6, 20, 21, 58, 12, 520, DateTimeKind.Local).AddTicks(6768),
+                            CreatedAt = new DateTime(2025, 6, 22, 0, 52, 51, 532, DateTimeKind.Local).AddTicks(4976),
                             Name = "Survey",
                             TemplateId = 3
                         });
@@ -634,13 +639,13 @@ namespace FormBuilder.Migrations
                     b.HasOne("FormBuilder.Models.Form", "form")
                         .WithMany("Answers")
                         .HasForeignKey("FormId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("FormBuilder.Models.FormTemplate", "formTemplate")
                         .WithMany()
                         .HasForeignKey("TemplateId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("form");
@@ -663,6 +668,10 @@ namespace FormBuilder.Migrations
                         .WithMany()
                         .HasForeignKey("CommentId");
 
+                    b.HasOne("FormBuilder.Models.Form", "form")
+                        .WithMany()
+                        .HasForeignKey("FormId");
+
                     b.HasOne("FormBuilder.Models.FormTemplate", "Template")
                         .WithMany()
                         .HasForeignKey("TemplateId");
@@ -678,6 +687,8 @@ namespace FormBuilder.Migrations
                     b.Navigation("Template");
 
                     b.Navigation("User");
+
+                    b.Navigation("form");
                 });
 
             modelBuilder.Entity("FormBuilder.Models.Question", b =>
