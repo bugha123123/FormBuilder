@@ -132,9 +132,7 @@ public class FormService : IFormService
 
     public async Task DeleteFormAsync(int formId)
     {
-        var user = await _authService.GetLoggedInUserAsync();
 
-        // Delete Comments linked to this form
         var comments = await _context.Comments
                                      .Where(c => c.FormId == formId)
                                      .ToListAsync();
@@ -142,10 +140,12 @@ public class FormService : IFormService
 
         // Delete Answers linked to this form
         var answers = await _context.Answers
+            .Include(x => x.form)
                                     .Where(a => a.form.Id == formId)
                                     .ToListAsync();
         _context.Answers.RemoveRange(answers);
 
+        // Delete the form itself
         var form = await _context.Forms
                                  .FirstOrDefaultAsync(f => f.Id == formId);
         if (form != null)
@@ -155,6 +155,7 @@ public class FormService : IFormService
 
         await _context.SaveChangesAsync();
     }
+
 
 
 

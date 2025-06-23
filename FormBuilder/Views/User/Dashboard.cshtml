@@ -16,7 +16,7 @@
     <title>User Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body class="bg-gray-50 min-h-screen">
 
@@ -40,19 +40,11 @@
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-        <!-- Tab Navigation -->
+        <!-- Tabs -->
         <div class="mb-8 border-b border-gray-200">
             <nav class="flex space-x-8" aria-label="Tabs">
-                <button id="templates-tab"
-                        class="tab-button active py-2 px-1 border-b-2 font-medium text-sm text-blue-600 border-blue-500 focus:outline-none"
-                        onclick="switchTab('templates')">
-                    My Templates
-                </button>
-                <button id="forms-tab"
-                        class="tab-button py-2 px-1 border-b-2 font-medium text-sm text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300 focus:outline-none"
-                        onclick="switchTab('forms')">
-                    My Filled Forms
-                </button>
+                <button id="templates-tab" class="tab-button active py-2 px-1 border-b-2 font-medium text-sm text-blue-600 border-blue-500" onclick="switchTab('templates')">My Templates</button>
+                <button id="forms-tab" class="tab-button py-2 px-1 border-b-2 font-medium text-sm text-gray-500 border-transparent hover:text-gray-700 hover:border-gray-300" onclick="switchTab('forms')">My Filled Forms</button>
             </nav>
         </div>
 
@@ -67,20 +59,20 @@
                         </button>
                     </a>
                 </div>
+
+                <!-- Toolbar -->
+                <div class="px-6 py-4 border-t border-gray-200 flex justify-between items-center bg-gray-50">
+                    <button id="deleteSelectedTemplates" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">Delete Selected</button>
+                </div>
+
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200" id="templates-table" data-sort-direction="desc">
+                    <table class="min-w-full divide-y divide-gray-200" id="templates-table">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="sortable px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable('templates-table', 0)">
-                                    Template Name <span class="ml-1 text-gray-400">↕</span>
-                                </th>
-                                <th class="sortable px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable('templates-table', 1)">
-                                    Tags <span class="ml-1 text-gray-400">↕</span>
-                                </th>
-                                <th class="sortable px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onclick="sortTable('templates-table', 2)">
-                                    Created Date <span class="ml-1 text-gray-400">↕</span>
-                                </th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Template Name</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tags</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Select</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -88,9 +80,9 @@
                             {
                                 foreach (var userTemplate in UserTemplates)
                                 {
-                                    <tr class="hover:bg-gray-50">
+                                    <tr class="hover:bg-gray-50 cursor-pointer" onclick="window.location.href='@Url.Action("Details", "Template", new { userTemplate.Id })'">
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium text-gray-900">@userTemplate.Title</div>
+                                            <div class="text-sm font-medium text-blue-700 hover:underline">@userTemplate.Title</div>
                                             <div class="text-sm text-gray-500">@Html.Raw(userTemplate.Description)</div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -101,26 +93,9 @@
                                                 }
                                             </div>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            @userTemplate.CreatedAt.ToString("yyyy-MM-dd")
-                                        </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                            <a asp-controller="Forms" asp-action="Create" asp-route-TemplateId="@userTemplate.Id"
-                                               class="inline-block bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md text-sm font-medium transition">
-                                                Fill New Form
-                                            </a>
-                                            <a asp-controller="Template" asp-action="Edit" asp-route-templateId="@userTemplate.Id"
-                                               class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm font-medium transition">
-                                                Edit
-                                            </a>
-                                            <form asp-action="Delete" asp-controller="Template" method="post">
-                                                <input hidden value="@userTemplate.Id" name="templateId" />
-                                                <button type="submit" 
-                                                        class="inline-block bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md text-sm font-medium transition">
-                                                    Delete
-                                                </button>
-                                            </form>
-                                         
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">@userTemplate.CreatedAt.ToString("yyyy-MM-dd")</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <input type="checkbox" class="template-checkbox" value="@userTemplate.Id" onclick="event.stopPropagation();">
                                         </td>
                                     </tr>
                                 }
@@ -140,14 +115,20 @@
         <!-- Forms Tab -->
         <div id="forms-content" class="tab-content hidden">
             <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+
+                <!-- Toolbar -->
+                <div class="px-6 py-4 border-t border-gray-200 flex justify-between items-center bg-gray-50">
+                    <button id="deleteSelectedForms" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">Delete Selected</button>
+                </div>
+
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200" id="forms-table" data-sort-direction="desc">
+                    <table class="min-w-full divide-y divide-gray-200" id="forms-table">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="sortable px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Form Title</th>
-                                <th class="sortable px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Template Used</th>
-                                <th class="sortable px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted Date</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Form Title</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Template Used</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Submitted</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Select</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -157,22 +138,15 @@
                                 {
                                     if (item.Template != null)
                                     {
-                                        <tr class="hover:bg-gray-50">
+                                        <tr class="hover:bg-gray-50 cursor-pointer" onclick="window.location.href='@Url.Action("Details", "Forms", new { formId = item.Id })'">
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <div class="text-sm font-medium text-gray-900">@item.Template.Title</div>
+                                                <div class="text-sm font-medium text-blue-700 hover:underline">@item.Template.Title</div>
                                                 <div class="text-sm text-gray-500">@item.Template.Description</div>
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">@item.Template.Title</td>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">@item.Template.Title</td>
                                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">@item.SubmittedAt.ToString("yyyy-MM-dd")</td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                                <a class="text-blue-600 hover:text-blue-900 transition" asp-action="Edit" asp-controller="Forms" asp-route-FormId="@item.Id" asp-route-templateId="@item.TemplateId">Edit</a>
-                                                <a class="text-green-600 hover:text-green-900 transition" asp-controller="Forms" asp-action="Details" asp-route-formId="@item.Id">View</a>
-                                                <a class="text-purple-600 hover:text-purple-900 transition" href="#">Download</a>
-
-                                                <form asp-action="Delete" asp-controller="Forms" method="post">
-                                                <input hidden value="@item.Id" name="formId" />
-                                                <button  class="text-red-600 hover:text-red-900 transition">Delete</button>
-                                                </form>
+                                            <td class="px-6 py-4 whitespace-nowrap">
+                                                <input type="checkbox" class="form-checkbox" value="@item.Id" onclick="event.stopPropagation();">
                                             </td>
                                         </tr>
                                     }
@@ -189,7 +163,6 @@
                 </div>
             </div>
         </div>
-
     </main>
 
     <script>
@@ -206,30 +179,65 @@
             activeTab.classList.remove('text-gray-500', 'border-transparent');
         }
 
-        function sortTable(tableId, columnIndex) {
-            const table = document.getElementById(tableId);
-            const rows = Array.from(table.tBodies[0].rows);
-            const isAscending = table.getAttribute('data-sort-direction') !== 'asc';
-            table.setAttribute('data-sort-direction', isAscending ? 'asc' : 'desc');
+        $(document).ready(function () {
+            $('#deleteSelectedTemplates').click(function () {
+                var selected = $('.template-checkbox:checked').map(function () {
+                    return $(this).val();
+                }).get();
 
-            rows.sort((a, b) => {
-                const aText = a.cells[columnIndex]?.textContent.trim();
-                const bText = b.cells[columnIndex]?.textContent.trim();
-
-                if (!aText || !bText) return 0;
-                if (Date.parse(aText) && Date.parse(bText)) {
-                    return isAscending ? new Date(aText) - new Date(bText) : new Date(bText) - new Date(aText);
+                if (selected.length === 0) {
+                    alert('Please select at least one template to delete.');
+                    return;
                 }
-                return isAscending ? aText.localeCompare(bText) : bText.localeCompare(aText);
+
+                if (!confirm('Delete selected templates?')) return;
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/Template/Delete',
+                    data: $.param({ templateIds: selected }),
+                    contentType: 'application/x-www-form-urlencoded',
+                    success: function () {
+                        selected.forEach(function (id) {
+                            $('.template-checkbox[value="' + id + '"]').closest('tr').remove();
+                        });
+                        alert('Selected templates deleted successfully.');
+                    },
+                    error: function () {
+                        alert('Failed to delete templates.');
+                    }
+                });
             });
 
-            rows.forEach(row => table.tBodies[0].appendChild(row));
-        }
+            $('#deleteSelectedForms').click(function () {
+                var selected = $('.form-checkbox:checked').map(function () {
+                    return $(this).val();
+                }).get();
 
+                if (selected.length === 0) {
+                    alert('Please select at least one form to delete.');
+                    return;
+                }
 
+                if (!confirm('Delete selected forms?')) return;
 
-
-        
+                $.ajax({
+                    type: 'POST',
+                    url: '/Forms/DeleteMultiple',
+                    data: $.param({ formIds: selected }),
+                    contentType: 'application/x-www-form-urlencoded',
+                    success: function () {
+                        selected.forEach(function (id) {
+                            $('.form-checkbox[value="' + id + '"]').closest('tr').remove();
+                        });
+                        alert('Selected forms deleted successfully.');
+                    },
+                    error: function () {
+                        alert('Failed to delete forms.');
+                    }
+                });
+            });
+        });
 
         switchTab('templates');
     </script>

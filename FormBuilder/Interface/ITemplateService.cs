@@ -22,7 +22,7 @@ namespace FormBuilder.Interface
 
         Task<List<FormTemplate>> SearchTemplatesAsync(string query);
 
-        Task DeleteTemplateAsync(int templateId);
+        Task DeleteTemplatesAsync(List<int> templateIds);
 
 
 

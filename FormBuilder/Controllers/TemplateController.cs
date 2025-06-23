@@ -120,11 +120,15 @@ namespace FormBuilder.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete(int templateId)
+        public async Task<IActionResult> Delete([FromForm] List<int> templateIds)
         {
-            await _templateService.DeleteTemplateAsync(templateId);
-            return RedirectToAction("User", "Dashboard");
+            if (templateIds == null || !templateIds.Any())
+                return BadRequest("No templates selected.");
+
+            await _templateService.DeleteTemplatesAsync(templateIds);
+            return Ok();
         }
+
 
 
     }

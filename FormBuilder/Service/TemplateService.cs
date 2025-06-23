@@ -91,7 +91,7 @@ namespace FormBuilder.Service
 
             if (loggedInUser is null) return new List<FormTemplate>();
 
-            return await _context.FormTemplates.Where(f => f.UserId == loggedInUser.Id).ToListAsync();
+            return await _context.FormTemplates.Where(f => f.UserId == loggedInUser.Id && f.UserId != null).ToListAsync();
 
         }
 
@@ -160,46 +160,47 @@ namespace FormBuilder.Service
                     t.Comments.Any(c => c.Text.ToLower().Contains(query)))
                 .ToList();
         }
-        public async Task DeleteTemplateAsync(int templateId)
+        public async Task DeleteTemplatesAsync(List<int> templateIds)
         {
-            var user = await _authService.GetLoggedInUserAsync();
 
+            // Get all forms linked to these templates
             var forms = await _context.Forms
-                                      .Where(f => f.TemplateId == templateId)
+                                      .Where(f => templateIds.Contains(f.TemplateId))
                                       .ToListAsync();
 
             var formIds = forms.Select(f => f.Id).ToList();
 
-            // Delete Comments linked to the template
+            // Delete comments linked to templates
             var templateComments = await _context.Comments
-                                                 .Where(c => c.TemplateId == templateId)
+                                                 .Where(c => c.TemplateId != null && templateIds.Contains(c.TemplateId.Value))
                                                  .ToListAsync();
             _context.Comments.RemoveRange(templateComments);
 
-            // Delete Comments linked to the forms
+            // Delete comments linked to forms (that belong to these templates)
             var formComments = await _context.Comments
                                              .Where(c => c.FormId != null && formIds.Contains(c.FormId.Value))
                                              .ToListAsync();
             _context.Comments.RemoveRange(formComments);
 
+            // Delete answers linked to forms (that belong to these templates)
             var answers = await _context.Answers
-                                        .Where(a => formIds.Contains(a.form.Id))
+                .Include(x => x.form)
+                                        .Where(a => a.form.Id != null && formIds.Contains(a.form.Id))
                                         .ToListAsync();
             _context.Answers.RemoveRange(answers);
 
-            // Delete the forms
+            // Delete the forms themselves
             _context.Forms.RemoveRange(forms);
 
-            // Delete the template itself
-            var template = await _context.FormTemplates
-                                         .FirstOrDefaultAsync(t => t.Id == templateId);
-            if (template != null)
-            {
-                _context.FormTemplates.Remove(template);
-            }
+            // Delete the templates
+            var templates = await _context.FormTemplates
+                                          .Where(t => templateIds.Contains(t.Id))
+                                          .ToListAsync();
+            _context.FormTemplates.RemoveRange(templates);
 
             await _context.SaveChangesAsync();
         }
+
 
 
 
