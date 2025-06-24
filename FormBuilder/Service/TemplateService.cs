@@ -29,8 +29,87 @@ namespace FormBuilder.Service
 
         public async Task<List<FormTemplate>> GetFormTemplates()
         {
-            return await _context.FormTemplates.Include(x => x.User).ToListAsync();
+            var templates = await _context.FormTemplates
+                .Include(x => x.User)
+                .Include(x => x.Tags)
+                .Include(x => x.Comments)
+                .ToListAsync();
+
+            var filledCounts = await _context.Answers
+                .GroupBy(a => a.TemplateId)
+                .Select(g => new
+                {
+                    TemplateId = g.Key,
+                    Count = g.Select(a => a.UserId).Distinct().Count()
+                })
+                .ToListAsync();
+
+            // Map counts back to the templates
+            foreach (var template in templates)
+            {
+                var countEntry = filledCounts.FirstOrDefault(c => c.TemplateId == template.Id);
+                template.FilledFormsCount = countEntry?.Count ?? 0;
+            }
+
+            return templates;
         }
+        public async Task<List<FormTemplate>> GetPopularTemplates(int count)
+        {
+            var filledCounts = await _context.Answers
+                .GroupBy(a => a.TemplateId)
+                .Select(g => new
+                {
+                    TemplateId = g.Key,
+                    Count = g.Select(a => a.UserId).Distinct().Count()
+                })
+                .ToListAsync();
+
+            var templates = await _context.FormTemplates
+                .Include(t => t.User)
+                .Include(t => t.Tags)
+                .Include(t => t.Comments)
+                .ToListAsync();
+
+            foreach (var template in templates)
+            {
+                var match = filledCounts.FirstOrDefault(f => f.TemplateId == template.Id);
+                template.FilledFormsCount = match?.Count ?? 0;
+            }
+
+            return templates
+                .OrderByDescending(t => t.FilledFormsCount)
+                .Take(count)
+                .ToList();
+        }
+        public async Task<List<FormTemplate>> GetLatestTemplates()
+        {
+            var templates = await _context.FormTemplates
+                .Include(t => t.User)
+                .Include(t => t.Tags)
+                .Include(t => t.Comments)
+                .OrderByDescending(t => t.CreatedAt)
+                .Take(10) 
+                .ToListAsync();
+
+            // Populate FilledFormsCount
+            var filledCounts = await _context.Answers
+                .GroupBy(a => a.TemplateId)
+                .Select(g => new
+                {
+                    TemplateId = g.Key,
+                    Count = g.Select(a => a.UserId).Distinct().Count()
+                })
+                .ToListAsync();
+
+            foreach (var template in templates)
+            {
+                var count = filledCounts.FirstOrDefault(f => f.TemplateId == template.Id);
+                template.FilledFormsCount = count?.Count ?? 0;
+            }
+
+            return templates;
+        }
+
 
         public async Task<List<Tag>> GetAutoCompleteTags(string keyWord)
         {
@@ -46,33 +125,58 @@ namespace FormBuilder.Service
 
         public async Task<FormTemplate> CreateTemplateAsync(FormTemplate template, List<string> selectedTagNames, IFormFile? imageFile)
         {
-            var LoggedInUser = await _authService.GetLoggedInUserAsync();
-        
+            var loggedInUser = await _authService.GetLoggedInUserAsync();
+
             var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
             template.Description = Markdown.ToHtml(template.Description ?? "", pipeline);
 
             selectedTagNames ??= new List<string>();
 
-            List<string> existingTags = await _context.Tags
-                .Where(t => selectedTagNames.Contains(
-                    EF.Functions.Collate(t.Name, "SQL_Latin1_General_CP1_CI_AS")
-                ))
-                .Select(t => t.Name)
+            var distinctTagNames = selectedTagNames
+                .Where(t => !string.IsNullOrWhiteSpace(t))
+                .Select(t => t.Trim())
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            var existingTags = await _context.Tags
+                .Where(t => distinctTagNames.Contains(t.Name))
                 .ToListAsync();
 
-            template.SavedTags = existingTags;
-            template.User = LoggedInUser;
-            template.UserId = LoggedInUser.Id;
-            if (template.AssignedUsers != null)
+            var existingTagNames = existingTags.Select(t => t.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+            var newTags = distinctTagNames
+                .Where(name => !existingTagNames.Contains(name))
+                .Select(name => new Tag { Name = name })
+                .ToList();
+
+            if (newTags.Any())
             {
-                template.AssignedUsers = template.AssignedUsers.Distinct().ToList();
+                _context.Tags.AddRange(newTags);
+                await _context.SaveChangesAsync();
             }
 
+            // Combine tags
+            var allTags = existingTags.Concat(newTags).ToList();
+
+            if (template.Tags == null)
+                template.Tags = new List<Tag>();
+
+            template.Tags.Clear();
+            foreach (var tag in allTags)
+                template.Tags.Add(tag);
+
+            template.SavedTags = allTags.Select(t => t.Name).ToList();
+
+            template.User = loggedInUser;
+            template.UserId = loggedInUser.Id;
+
+            if (template.AssignedUsers != null)
+                template.AssignedUsers = template.AssignedUsers.Distinct().ToList();
 
             if (imageFile != null && imageFile.Length > 0)
             {
                 string imageUrl = await _cloudinaryService.UploadImageAsync(imageFile);
-                template.ImageUrl = imageUrl;  
+                template.ImageUrl = imageUrl;
             }
 
             template.CreatedAt = DateTime.UtcNow;
@@ -83,9 +187,11 @@ namespace FormBuilder.Service
             return template;
         }
 
+
+
+
         public async Task UpdateTemplateAsync(FormTemplate template, List<string> selectedTagNames, IFormFile imageFile)
         {
-            // Load the existing template with its related entities
             var existingTemplate = await _context.FormTemplates
                 .Include(t => t.Questions)
                 .FirstOrDefaultAsync(t => t.Id == template.Id);
@@ -234,7 +340,7 @@ namespace FormBuilder.Service
                     t.Comments.Any(c => c.Text.ToLower().Contains(query)))
                 .ToList();
         }
-        public async Task DeleteTemplatesAsync(List<int> templateIds)
+        public async Task DeleteTemplatesAsync(List<int?> templateIds)
         {
 
             var forms = await _context.Forms
@@ -249,16 +355,14 @@ namespace FormBuilder.Service
                                                  .ToListAsync();
             _context.Comments.RemoveRange(templateComments);
 
-            // Delete comments linked to forms (that belong to these templates)
             var formComments = await _context.Comments
                                              .Where(c => c.FormId != null && formIds.Contains(c.FormId.Value))
                                              .ToListAsync();
             _context.Comments.RemoveRange(formComments);
 
-            // Delete answers linked to forms (that belong to these templates)
             var answers = await _context.Answers
-                .Include(x => x.form)
-                                        .Where(a => a.form.Id != null && formIds.Contains(a.form.Id))
+                .Include(x => x.Form)
+                                        .Where(a => a.Form.Id != null && formIds.Contains(a.Form.Id))
                                         .ToListAsync();
             _context.Answers.RemoveRange(answers);
 

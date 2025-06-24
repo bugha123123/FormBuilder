@@ -53,22 +53,6 @@ namespace FormBuilder.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Tags",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    TemplateId = table.Column<int>(type: "int", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Tags", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -188,6 +172,7 @@ namespace FormBuilder.Migrations
                     CommentId = table.Column<int>(type: "int", nullable: false),
                     AssignedUsers = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SavedTags = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FilledFormsCount = table.Column<int>(type: "int", nullable: false),
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -206,7 +191,7 @@ namespace FormBuilder.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    TemplateId = table.Column<int>(type: "int", nullable: false),
+                    TemplateId = table.Column<int>(type: "int", nullable: true),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     SubmittedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     FilledCount = table.Column<int>(type: "int", nullable: false)
@@ -223,8 +208,7 @@ namespace FormBuilder.Migrations
                         name: "FK_Forms_FormTemplates_TemplateId",
                         column: x => x.TemplateId,
                         principalTable: "FormTemplates",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -250,12 +234,35 @@ namespace FormBuilder.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Tags",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    TemplateId = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    FormTemplateId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tags", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Tags_FormTemplates_FormTemplateId",
+                        column: x => x.FormTemplateId,
+                        principalTable: "FormTemplates",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Answers",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FormId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     QuestionId = table.Column<int>(type: "int", nullable: false),
                     TemplateId = table.Column<int>(type: "int", nullable: false),
                     Response = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -264,6 +271,12 @@ namespace FormBuilder.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Answers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Answers_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Answers_FormTemplates_TemplateId",
                         column: x => x.TemplateId,
@@ -347,41 +360,16 @@ namespace FormBuilder.Migrations
                 });
 
             migrationBuilder.InsertData(
-                table: "FormTemplates",
-                columns: new[] { "Id", "AssignedUsers", "CommentId", "CreatedAt", "Description", "ImageUrl", "SavedTags", "Title", "UserId", "isPublic" },
-                values: new object[,]
-                {
-                    { 1, null, 0, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Basic job application form.", null, null, "JobApplication", null, false },
-                    { 2, null, 0, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Template for event sign-ups.", null, null, "EventRegistration", null, false },
-                    { 3, null, 0, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Collect feedback from customers.", null, null, "FeedbackSurvey", null, false }
-                });
-
-            migrationBuilder.InsertData(
                 table: "Tags",
-                columns: new[] { "Id", "CreatedAt", "Name", "TemplateId", "UpdatedAt" },
+                columns: new[] { "Id", "CreatedAt", "FormTemplateId", "Name", "TemplateId", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2025, 6, 22, 0, 29, 8, 814, DateTimeKind.Local).AddTicks(2660), "HR", 1, null },
-                    { 2, new DateTime(2025, 6, 22, 0, 29, 8, 814, DateTimeKind.Local).AddTicks(2671), "Recruitment", 1, null },
-                    { 3, new DateTime(2025, 6, 22, 0, 29, 8, 814, DateTimeKind.Local).AddTicks(2673), "Event", 2, null },
-                    { 4, new DateTime(2025, 6, 22, 0, 29, 8, 814, DateTimeKind.Local).AddTicks(2674), "Signup", 2, null },
-                    { 5, new DateTime(2025, 6, 22, 0, 29, 8, 814, DateTimeKind.Local).AddTicks(2675), "Customer", 3, null },
-                    { 6, new DateTime(2025, 6, 22, 0, 29, 8, 814, DateTimeKind.Local).AddTicks(2676), "Survey", 3, null }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Questions",
-                columns: new[] { "Id", "OptionsJson", "TemplateId", "Text", "Type" },
-                values: new object[,]
-                {
-                    { 1, null, 1, "Full Name", 0 },
-                    { 2, null, 1, "Email Address", 0 },
-                    { 3, null, 1, "Position Applying For", 5 },
-                    { 4, null, 2, "Attendee Name", 0 },
-                    { 5, null, 2, "Email", 0 },
-                    { 6, null, 2, "Select Sessions", 5 },
-                    { 7, null, 3, "Overall Satisfaction", 5 },
-                    { 8, null, 3, "Comments", 1 }
+                    { 1, new DateTime(2025, 6, 24, 22, 14, 1, 870, DateTimeKind.Local).AddTicks(6470), null, "HR", 0, null },
+                    { 2, new DateTime(2025, 6, 24, 22, 14, 1, 870, DateTimeKind.Local).AddTicks(6482), null, "Recruitment", 0, null },
+                    { 3, new DateTime(2025, 6, 24, 22, 14, 1, 870, DateTimeKind.Local).AddTicks(6484), null, "Event", 0, null },
+                    { 4, new DateTime(2025, 6, 24, 22, 14, 1, 870, DateTimeKind.Local).AddTicks(6485), null, "Signup", 0, null },
+                    { 5, new DateTime(2025, 6, 24, 22, 14, 1, 870, DateTimeKind.Local).AddTicks(6486), null, "Customer", 0, null },
+                    { 6, new DateTime(2025, 6, 24, 22, 14, 1, 870, DateTimeKind.Local).AddTicks(6487), null, "Survey", 0, null }
                 });
 
             migrationBuilder.CreateIndex(
@@ -393,6 +381,11 @@ namespace FormBuilder.Migrations
                 name: "IX_Answers_TemplateId",
                 table: "Answers",
                 column: "TemplateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Answers_UserId",
+                table: "Answers",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -482,6 +475,11 @@ namespace FormBuilder.Migrations
                 name: "IX_Questions_TemplateId",
                 table: "Questions",
                 column: "TemplateId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tags_FormTemplateId",
+                table: "Tags",
+                column: "FormTemplateId");
         }
 
         /// <inheritdoc />

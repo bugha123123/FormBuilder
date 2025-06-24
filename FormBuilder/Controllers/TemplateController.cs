@@ -120,7 +120,7 @@ namespace FormBuilder.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete([FromForm] List<int> templateIds)
+        public async Task<IActionResult> Delete([FromForm] List<int?> templateIds)
         {
             if (templateIds == null || !templateIds.Any())
                 return BadRequest("No templates selected.");

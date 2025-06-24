@@ -2,6 +2,8 @@
 @inject ITemplateService _templateService;
 @{
     var formTemplates = await _templateService.GetFormTemplates();
+    var popularTemplates = await _templateService.GetPopularTemplates(5);
+    var latestTemplates = await _templateService.GetLatestTemplates();
 
     var allTags = formTemplates
                   .SelectMany(t => t.SavedTags ?? Enumerable.Empty<string>())
@@ -17,10 +19,11 @@
         <p class="mt-2 text-gray-600 dark:text-gray-300 max-w-xl mx-auto">Choose from our featured customizable form templates to get started quickly.</p>
     </header>
 
-    <section aria-labelledby="featured-templates-heading" class="mb-16">
+    <!-- Latest Templates Gallery -->
+    <section aria-labelledby="latest-templates-heading" class="mb-16">
         <div class="flex justify-between items-center mb-8">
-            <h2 id="featured-templates-heading" class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                Featured Templates
+            <h2 id="latest-templates-heading" class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                Latest Templates
             </h2>
             <a href="/Template/All"
                class="inline-block bg-primary hover:bg-secondary text-white font-semibold py-2 px-4 rounded-md shadow-md transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-primary/50">
@@ -28,61 +31,113 @@
             </a>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            @foreach (var template in formTemplates.Take(3))
-            {
-                var secureImageUrl = template.ImageUrl?.Replace("/upload/", "/upload/c_fill,w_400,h_200/");
-                <article class="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col overflow-hidden">
-                    <div class="aspect-w-16 aspect-h-9">
-                        <a asp-action="Details" asp-controller="Template" asp-route-id="@template.Id">
-                            <img src="@(template.ImageUrl != null
-                ? template.ImageUrl.Replace("/upload/", "/upload/c_fill,w_400,h_200/")
-                : "/placeholder.svg?height=200&width=400")"
-                                 alt="@($"{template.Title} preview")"
-                                 class="object-cover rounded-t-lg w-full h-full" />
-                       </a>
-
-
-                    </div>
-                    <div class="p-6 flex flex-col flex-grow">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">@template.Title</h3>
-                         <div class="flex flex-wrap gap-2 mb-6">
-                            @if (template.SavedTags != null)
-                            {
-                            @foreach (var tag in template.SavedTags ?? null)
-                            {
-                                <span class="bg-cyan-100 text-cyan-800 text-xs font-medium px-2 py-1 rounded-full">@tag</span>
-                            }
-                            }
+        @if (latestTemplates != null && latestTemplates.Any())
+        {
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                @foreach (var template in latestTemplates)
+                {
+                    <article class="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col overflow-hidden">
+                        <div class="aspect-w-16 aspect-h-9">
+                            <a asp-action="Details" asp-controller="Template" asp-route-id="@template.Id">
+                                <img src="@(template.ImageUrl != null
+                                    ? template.ImageUrl.Replace("/upload/", "/upload/c_fill,w_400,h_200/")
+                                    : "/placeholder.svg?height=200&width=400")"
+                                     alt="@($"{template.Title} preview")"
+                                     class="object-cover rounded-t-lg w-full h-full" />
+                            </a>
                         </div>
-                        <a asp-controller="Forms" asp-action="Create" asp-route-TemplateId="@template.Id">
-                            <button type="button" class="mt-auto w-full bg-primary hover:bg-secondary focus:ring-4 focus:ring-primary/50 text-white py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none">
-                                Use template
-                            </button>
-                      </a>
-                    </div>
-                </article>
-            }
-        </div>
-
-
+                        <div class="p-6 flex flex-col flex-grow">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">@template.Title</h3>
+                            <p class="text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">@template.Description</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">By: @(template.User.Email?.Substring(0, 7) ?? "Anonymous")</p>
+                            <div class="flex flex-wrap gap-2 mb-6">
+                                @if (template.SavedTags != null)
+                                {
+                                    @foreach (var tag in template.SavedTags)
+                                    {
+                                        <span class="bg-cyan-100 text-cyan-800 text-xs font-medium px-2 py-1 rounded-full">@tag</span>
+                                    }
+                                }
+                            </div>
+                            <a asp-controller="Forms" asp-action="Create" asp-route-TemplateId="@template.Id">
+                                <button type="button" class="mt-auto w-full bg-primary hover:bg-secondary focus:ring-4 focus:ring-primary/50 text-white py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none">
+                                    Use template
+                                </button>
+                            </a>
+                        </div>
+                    </article>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-gray-500 dark:text-gray-400 italic">No latest templates available at the moment.</p>
+        }
     </section>
 
+    <!-- Popular Templates Table -->
+    <section aria-labelledby="popular-templates-heading" class="mb-16">
+        <h2 id="popular-templates-heading" class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-6">
+            Top 5 Most Popular Templates
+        </h2>
+
+        @if (popularTemplates != null && popularTemplates.Any())
+        {
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow-md">
+                    <thead>
+                        <tr class="bg-gray-100 dark:bg-gray-700">
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Title</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Author</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Filled Forms</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                        @foreach (var template in popularTemplates)
+                        {
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-600">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">@template.Title</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">@(template.User.Email?.Substring(0, 6) ?? "Anonymous")</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">@template.FilledFormsCount</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                    <a asp-controller="Forms" asp-action="Create" asp-route-TemplateId="@template.Id"
+                                       class="text-primary hover:text-secondary font-medium">Use Template</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="text-gray-500 dark:text-gray-400 italic">No popular templates found.</p>
+        }
+    </section>
+
+    <!-- Tag Cloud -->
     <section aria-labelledby="tag-cloud-heading" class="mb-16">
         <h2 id="tag-cloud-heading" class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-6">
             Tag Cloud
         </h2>
-        <div class="flex flex-wrap gap-3">
-            @foreach (var tag in allTags)
-            {
-                <a asp-action="Search" asp-controller="Template" asp-route-Tag="@tag"
-                   class="bg-indigo-100 text-indigo-800 text-sm font-medium px-3 py-1 rounded-full hover:bg-indigo-200 transition-colors cursor-pointer">
-                    @tag
-                </a>
-            }
-        </div>
+
+        @if (allTags != null && allTags.Any())
+        {
+            <div class="flex flex-wrap gap-3">
+                @foreach (var tag in allTags)
+                {
+                    <a asp-action="Search" asp-controller="Template" asp-route-Tag="@tag"
+                       class="bg-indigo-100 text-indigo-800 text-sm font-medium px-3 py-1 rounded-full hover:bg-indigo-200 transition-colors cursor-pointer">
+                        @tag
+                    </a>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-gray-500 dark:text-gray-400 italic">No tags available yet.</p>
+        }
     </section>
-
-
 
 </main>

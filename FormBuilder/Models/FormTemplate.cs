@@ -18,14 +18,15 @@ namespace FormBuilder.Models
 
         public List<Comment> Comments { get; set; }
 
-        
+        public ICollection<Tag> Tags { get; set; } = new List<Tag>();
+
 
         public int CommentId { get; set; }
         public  List<string>? AssignedUsers { get; set; }
 
         public virtual List<string>? SavedTags { get; set; }
 
-
+        public int FilledFormsCount { get; set; }
 
 
 

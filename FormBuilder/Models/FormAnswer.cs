@@ -7,16 +7,19 @@ namespace FormBuilder.Models
     {
         public int Id { get; set; }
 
-        public Form form { get; set; }
+        public int FormId { get; set; }
+        public Form Form { get; set; }
+
+        public string UserId { get; set; }
+        public User User { get; set; }
 
         public int QuestionId { get; set; }
 
         public int TemplateId { get; set; }
-
-        public FormTemplate formTemplate { get; set; }
+        public FormTemplate FormTemplate { get; set; }
 
         public string Response { get; set; }
-
-        public QuestionType QuestionType { get; set; } 
+        public QuestionType QuestionType { get; set; }
     }
+
 }

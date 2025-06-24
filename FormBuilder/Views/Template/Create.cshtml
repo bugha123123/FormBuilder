@@ -321,9 +321,9 @@
         $('#hidden-users').val(assignedUsers.map(u => u.Email).join(','));
     }
 
-    // Tags functionality
+      // Tags functionality
     $('#tag-input').on('input', function () {
-        const query = $(this).val();
+        const query = $(this).val().trim();
         const suggestions = $('#tag-suggestions');
 
         if (query.length < 1) {
@@ -347,6 +347,21 @@
                 suggestions.addClass('hidden');
             }
         });
+    });
+
+    // Add tag on Enter keypress
+    $('#tag-input').on('keypress', function (e) {
+        if (e.which === 13) { // Enter key
+            e.preventDefault();
+            const tag = $(this).val().trim();
+
+            if (tag && !selectedTags.includes(tag)) {
+                selectedTags.push(tag);
+                renderTags();
+                $(this).val('');
+                $('#tag-suggestions').addClass('hidden').empty(); 
+            }
+        }
     });
 
     $(document).on('click', '.tag-suggestion', function () {

@@ -59,14 +59,17 @@ public class FormService : IFormService
         form.Template = template;
         form.User = user;
         form.FilledCount += 1;
+        template.FilledFormsCount = form.FilledCount;
         if (form.Answers != null)
         {
             foreach (var answer in form.Answers)
             {
                 var question = template.Questions.FirstOrDefault(q => q.Id == answer.QuestionId);
                 answer.QuestionType = question != null ? question.Type : QuestionType.ShortText;
-                answer.form = form;
+                answer.Form = form;
                 answer.TemplateId = template.Id;
+                answer.UserId = user.Id;
+                answer.User = user;
             }
         }
 
@@ -115,10 +118,10 @@ public class FormService : IFormService
         {
             var newAnswer = new FormAnswer
             {
-                form = existingForm,
+                Form = existingForm,
                 QuestionId = updatedAnswer.QuestionId,
                 TemplateId = Template.Id,  
-                formTemplate = Template, 
+                FormTemplate = Template, 
                 Response = updatedAnswer.Response,
                 QuestionType = updatedAnswer.QuestionType
             };
@@ -140,8 +143,8 @@ public class FormService : IFormService
 
         // Delete Answers linked to this form
         var answers = await _context.Answers
-            .Include(x => x.form)
-                                    .Where(a => a.form.Id == formId)
+            .Include(x => x.Form)
+                                    .Where(a => a.Form.Id == formId)
                                     .ToListAsync();
         _context.Answers.RemoveRange(answers);
 

@@ -33,13 +33,13 @@ namespace FormBuilder.Data
             builder.Seed();
 
             builder.Entity<FormAnswer>()
-       .HasOne(fa => fa.form)
+       .HasOne(fa => fa.Form)
        .WithMany(f => f.Answers)
        .HasForeignKey("FormId")
        .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<FormAnswer>()
-                .HasOne(fa => fa.formTemplate)
+                .HasOne(fa => fa.FormTemplate)
                 .WithMany() 
                 .HasForeignKey("TemplateId")
                 .OnDelete(DeleteBehavior.Restrict);

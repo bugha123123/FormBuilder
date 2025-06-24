@@ -22,10 +22,13 @@ namespace FormBuilder.Interface
 
         Task<List<FormTemplate>> SearchTemplatesAsync(string query);
 
-        Task DeleteTemplatesAsync(List<int> templateIds);
+        Task DeleteTemplatesAsync(List<int?> templateIds);
 
         Task UpdateTemplateAsync(FormTemplate template, List<string> selectedTagNames, IFormFile imageFile);
 
+        Task<List<FormTemplate>> GetPopularTemplates(int count);
+
+        Task<List<FormTemplate>> GetLatestTemplates();
 
 
     }
