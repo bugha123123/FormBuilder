@@ -2,571 +2,754 @@
 @using FormBuilder.Models
 @using FormBuilder.Enums
 @model FormTemplate
-@inject IUserService _userService;
+@inject IUserService _userService
 
-<header class="bg-gradient-to-r from-blue-600 to-blue-700 shadow-lg border-b">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
-            <div class="flex items-center space-x-3">
-                <button type="submit" form="editTemplateForm" class="bg-green-600 text-white px-6 py-2.5 rounded-lg hover:bg-green-700 transition-all duration-200 font-semibold shadow-sm">
-                    <i class="fas fa-save mr-2"></i>Save Changes
-                </button>
-                <a asp-controller="Template" asp-action="Details" asp-route-id="@Model.Id">
-                    <button type="button" class="bg-gray-600 text-white px-6 py-2.5 rounded-lg hover:bg-gray-700 transition-all duration-200 font-semibold shadow-sm">
-                        <i class="fas fa-times mr-2"></i>Cancel
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Template</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet" />
+    <link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+</head>
+<body>
+    <header class="bg-gradient-to-r from-blue-600 to-blue-700 shadow-lg border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <button type="submit" form="editTemplateForm" class="bg-green-600 text-white px-6 py-2.5 rounded-lg hover:bg-green-700 transition-all duration-200 font-semibold shadow-sm">
+                        <i class="fas fa-save mr-2"></i>Save Changes
                     </button>
-                </a>
+                    <a asp-controller="Template" asp-action="Details" asp-route-id="@Model.Id">
+                        <button type="button" class="bg-gray-600 text-white px-6 py-2.5 rounded-lg hover:bg-gray-700 transition-all duration-200 font-semibold shadow-sm">
+                            <i class="fas fa-times mr-2"></i>Cancel
+                        </button>
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
-</header>
+    </header>
 
-<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gray-50 min-h-screen">
-    <form id="editTemplateForm" asp-action="Update" asp-controller="Template" method="post" enctype="multipart/form-data">
-        <input type="hidden" asp-for="Id" />
-        <input type="hidden" asp-for="CreatedAt" />
-        <input type="hidden" asp-for="User.Id" />
-        
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Main Content -->
-            <div class="lg:col-span-2 space-y-8">
-                <!-- Template Header -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div class="p-8">
-                        <div class="flex flex-col lg:flex-row justify-between gap-8">
-                            <div class="flex-1">
-                                <!-- Editable Title -->
-                                <div class="mb-6">
-                                    <label asp-for="Title" class="block text-sm font-medium text-gray-700 mb-2">Template Title</label>
-                                    <input asp-for="Title" class="w-full text-3xl font-bold text-gray-900 border-2 border-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200" placeholder="Enter template title..." />
-                                    <span asp-validation-for="Title" class="text-red-500 text-sm"></span>
-                                </div>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 bg-gray-50 min-h-screen">
+        <div id="formErrors" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6" role="alert"></div>
+        <form id="editTemplateForm" asp-action="Update" asp-controller="Template" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="CreatedAt" />
+            <input type="hidden" asp-for="User.Id" />
+            <input type="hidden" name="TagNames" id="tagNames" value="@string.Join(",", Model.SavedTags ?? new List<string>())" />
 
-                                <!-- Public/Private Toggle -->
-                                <div class="mb-6">
-                                    <label class="flex items-center space-x-3">
-                                        <input asp-for="isPublic" type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
-                                        <span class="text-sm font-medium text-gray-700">Make this template public</span>
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                            <i class="fas fa-info-circle mr-1"></i>Public templates can be used by anyone
-                                        </span>
-                                    </label>
-                                </div>
-                                
-                                <!-- Editable Description -->
-                                <div class="mb-6">
-                                    <label asp-for="Description" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
-                                    <textarea asp-for="Description" rows="4" class="w-full text-gray-700 border-2 border-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 resize-none" placeholder="Describe what this template is for..."></textarea>
-                                    <span asp-validation-for="Description" class="text-red-500 text-sm"></span>
-                                </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Main Content -->
+                <div class="lg:col-span-2 space-y-8">
+                    <!-- Template Header -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div class="p-8">
+                            <div class="flex flex-col lg:flex-row justify-between gap-8">
+                                <div class="flex-1">
+                                    <!-- Editable Title (Dropdown) -->
+                                    <div class="mb-6">
+                                        <label asp-for="Title" class="block text-sm font-medium text-gray-700 mb-2">Template Title</label>
+                                        <select asp-for="Title" class="w-full text-3xl font-bold text-gray-900 border-2 border-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200" required>
+                                            <option value="">Select a title...</option>
+                                            @foreach (var title in Enum.GetValues(typeof(TemplateTitle)))
+                                            {
+                                                <option value="@title" selected="@(Model.Title.ToString() == title.ToString() ? "selected" : null)">@title</option>
+                                            }
+                                        </select>
 
-                                <!-- Template Info (Read-only) -->
-                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
-                                    <div class="flex items-center space-x-2">
-                                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                                            <i class="fas fa-calendar text-blue-600 text-sm"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-gray-500 uppercase tracking-wide">Created</p>
-                                            <p class="text-sm font-semibold text-gray-900">@Model.CreatedAt.ToString("MMM dd, yyyy")</p>
-                                        </div>
+                                        <span asp-validation-for="Title" class="text-red-500 text-sm"></span>
                                     </div>
-                                    <div class="flex items-center space-x-2">
-                                        <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                                            <i class="fas fa-user text-purple-600 text-sm"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-gray-500 uppercase tracking-wide">Author</p>
-                                            <p class="text-sm font-semibold text-gray-900">@Model.User?.UserName?.Substring(0, Math.Min(10, Model.User.UserName.Length))</p>
-                                        </div>
-                                    </div>
-                                    <div class="flex items-center space-x-2">
-                                        <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
-                                            <i class="fas fa-hashtag text-orange-600 text-sm"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-gray-500 uppercase tracking-wide">Template ID</p>
-                                            <p class="text-sm font-semibold text-gray-900">#@Model.Id</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
 
-                            <!-- Image Upload -->
-                            <div class="flex-shrink-0">
-                                <div class="relative group">
-                                    <img id="templateImage" src="@(Model.ImageUrl != null
-                                        ? Model.ImageUrl.Replace("/upload/", "/upload/c_fill,w_400,h_200/")
-                                        : "/placeholder.svg?height=200&width=400")"
-                                         alt="@($"{Model.Title} preview")"
-                                         class="object-cover rounded-xl w-80 h-48 shadow-lg border border-gray-200 group-hover:shadow-xl transition-shadow duration-200" />
-                                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 rounded-xl transition-all duration-200 flex items-center justify-center">
-                                        <label for="imageUpload" class="opacity-0 group-hover:opacity-100 bg-white text-gray-800 px-4 py-2 rounded-lg font-medium cursor-pointer transition-opacity duration-200">
-                                            <i class="fas fa-camera mr-2"></i>Change Image
+                                    <!-- Public/Private Toggle -->
+                                    <div class="mb-6">
+                                        <label class="flex items-center space-x-3">
+                                            <input asp-for="isPublic" type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
+                                            <span class="text-sm font-medium text-gray-700">Make this template public</span>
+                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                <i class="fas fa-info-circle mr-1"></i>Public templates can be used by anyone
+                                            </span>
                                         </label>
                                     </div>
-                                </div>
-                                <input type="file" id="imageUpload" name="ImageFile" accept="image/*" class="hidden" onchange="previewImage(this)" />
-                                <input type="hidden" asp-for="ImageUrl" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Editable Tags -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <div class="flex items-center mb-4">
-                        <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                            <i class="fas fa-tags text-blue-600 text-sm"></i>
-                        </div>
-                        <h3 class="text-lg font-semibold text-gray-900">Tags</h3>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <div class="flex space-x-2">
-                            <input type="text" id="newTag" placeholder="Add a tag..." class="flex-1 border-2 border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                            <button type="button" onclick="addTag()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div id="tagsContainer" class="flex flex-wrap gap-2">
-                        @if (Model.SavedTags != null)
-                        {
-                            @for (int i = 0; i < Model.SavedTags.Count; i++)
-                            {
-                                <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border border-blue-200">
-                                    <input type="hidden" name="SavedTags[@i]" value="@Model.SavedTags[i]" />
-                                    <i class="fas fa-tag mr-2 text-xs"></i>@Model.SavedTags[i]
-                                    <button type="button" onclick="removeTag(this)" class="ml-2 text-blue-500 hover:text-blue-700">
-                                        <i class="fas fa-times text-xs"></i>
-                                    </button>
-                                </span>
-                            }
-                        }
-                    </div>
-                </div>
-
-                <!-- Editable Questions -->
-                <div class="space-y-6">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                                <i class="fas fa-question-circle text-green-600 text-sm"></i>
-                            </div>
-                            <h3 class="text-lg font-semibold text-gray-900">Questions</h3>
-                        </div>
-                        <button type="button" onclick="addQuestion()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors duration-200">
-                            <i class="fas fa-plus mr-2"></i>Add Question
-                        </button>
-                    </div>
-                    
-                    <div id="questionsContainer">
-                        @for (int i = 0; i < Model.Questions.Count; i++)
-                        {
-                            var question = Model.Questions[i];
-                            <div class="question-item bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                                <div class="border-l-4 border-blue-500 p-6">
-                                    <input type="hidden" name="Questions[@i].Id" value="@question.Id" />
-                                    
-                                    <div class="flex items-start justify-between mb-4">
-                                        <div class="flex items-start space-x-3 flex-1">
-                                            <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                                                @(i + 1)
-                                            </div>
-                                            <div class="flex-1">
-                                                <input name="Questions[@i].Text" value="@question.Text" placeholder="Enter question text..." class="w-full text-lg font-semibold text-gray-900 border-2 border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center space-x-2 ml-4">
-                                            <select name="Questions[@i].Type" class="border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" onchange="updateQuestionType(this, @i)">
-                                                <option value="ShortText" selected="@(question.Type == QuestionType.ShortText)">Short Text</option>
-                                                <option value="LongText" selected="@(question.Type == QuestionType.LongText)">Long Text</option>
-                                                <option value="Number" selected="@(question.Type == QuestionType.Number)">Number</option>
-                                                <option value="Checkbox" selected="@(question.Type == QuestionType.Checkbox)">Checkbox</option>
-                                                <option value="Dropdown" selected="@(question.Type == QuestionType.Dropdown)">Dropdown</option>
-                                            </select>
-
-
-
-                                            <button type="button" onclick="removeQuestion(this)" class="text-red-600 hover:text-red-800 p-2">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
+                                    <!-- Editable Description -->
+                                    <div class="mb-6">
+                                        <label asp-for="Description" class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                                        <textarea asp-for="Description" rows="4" class="w-full text-gray-700 border-2 border-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 resize-none" placeholder="Describe what this template is for..."></textarea>
+                                        <span asp-validation-for="Description" class="text-red-500 text-sm"></span>
                                     </div>
 
+                                    <!-- Template Info (Read-only) -->
+                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+                                        <div class="flex items-center space-x-2">
+                                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                                <i class="fas fa-calendar text-blue-600 text-sm"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-gray-500 uppercase tracking-wide">Created</p>
+                                                <p class="text-sm font-semibold text-gray-900">@Model.CreatedAt.ToString("MMM dd, yyyy")</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <div class="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                                                <i class="fas fa-user text-purple-600 text-sm"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-gray-500 uppercase tracking-wide">Author</p>
+                                                <p class="text-sm font-semibold text-gray-900">@Model.User?.UserName?.Substring(0, Math.Min(10, Model.User.UserName.Length))</p>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center">
+                                                <i class="fas fa-hashtag text-orange-600 text-sm"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-gray-500 uppercase tracking-wide">Template ID</p>
+                                                <p class="text-sm font-semibold text-gray-900">#@Model.Id</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
 
-                                    <div class="ml-11 options-container" style="display: @(question.Type == QuestionType.Checkbox || question.Type == QuestionType.Dropdown ? "block" : "none")">
-                                        <div class="mb-2">
-                                            <div class="flex space-x-2">
-                                                <input type="text" placeholder="Add option..." class="flex-1 border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                                                <button type="button" onclick="addOption(this, @i)" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 text-sm">
-                                                    <i class="fas fa-plus"></i>
+                                <!-- Image Upload -->
+                                <div class="flex-shrink-0">
+                                    <div class="relative group">
+                                        <img id="templateImage" src="@(Model.ImageUrl != null
+                                        ? Model.ImageUrl.Replace("/upload/", "/upload/c_fill,w_400,h_200/")
+                                        : "/placeholder.svg?height=200&width=400")"
+                                             alt="@($"{Model.Title} preview")"
+                                             class="object-cover rounded-xl w-80 h-48 shadow-lg border border-gray-200 group-hover:shadow-xl transition-shadow duration-200" />
+                                        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 rounded-xl transition-all duration-200 flex items-center justify-center">
+                                            <label for="imageUpload" class="opacity-0 group-hover:opacity-100 bg-white text-gray-800 px-4 py-2 rounded-lg font-medium cursor-pointer transition-opacity duration-200">
+                                                <i class="fas fa-camera mr-2"></i>Change Image
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <input type="file" id="imageUpload" name="ImageFile" accept="image/*" class="hidden" onchange="previewImage(this)" />
+                                    <input type="hidden" asp-for="ImageUrl" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Editable Tags -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                                <i class="fas fa-tags text-blue-600 text-sm"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900">Tags</h3>
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="flex space-x-2">
+                                <div class="relative w-full">
+                                    <input type="text" id="newTag" placeholder="Add a tag..." class="w-full border-2 border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" autocomplete="off" />
+                                    <ul id="tag-suggestions" class="absolute z-50 w-full bg-white border-2 border-gray-200 rounded-lg max-h-40 overflow-auto mt-2 shadow-xl hidden"></ul>
+                                </div>
+                                <button type="button" onclick="addTag()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="tagsContainer" class="flex flex-wrap gap-2">
+                            @if (Model.SavedTags != null)
+                            {
+                                @foreach (var tag in Model.SavedTags)
+                                {
+                                    <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border border-blue-200">
+                                        <i class="fas fa-tag mr-2 text-xs"></i>@tag
+                                        <button type="button" onclick="removeTag(this)" class="ml-2 text-blue-500 hover:text-blue-700">
+                                            <i class="fas fa-times text-xs"></i>
+                                        </button>
+                                    </span>
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Editable Questions -->
+                    <div class="space-y-6">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-question-circle text-green-600 text-sm"></i>
+                                </div>
+                                <h3 class="text-lg font-semibold text-gray-900">Questions</h3>
+                            </div>
+                            <button type="button" onclick="addQuestion()" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors duration-200">
+                                <i class="fas fa-plus mr-2"></i>Add Question
+                            </button>
+                        </div>
+
+                        <div id="questionsContainer">
+                            @for (int i = 0; i < Model.Questions.Count; i++)
+                            {
+                                var question = Model.Questions[i];
+                                <div class="question-item bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                                    <div class="border-l-4 border-blue-500 p-6">
+                                        <input type="hidden" name="Questions[@i].Id" value="@question.Id" />
+
+                                        <div class="flex items-start justify-between mb-4">
+                                            <div class="flex items-start space-x-3 flex-1">
+                                                <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                                                    @(i + 1)
+                                                </div>
+                                                <div class="flex-1">
+                                                    <input name="Questions[@i].Text" value="@question.Text" placeholder="Enter question text..." class="w-full text-lg font-semibold text-gray-900 border-2 border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required />
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center space-x-2 ml-4">
+                                                <select name="Questions[@i].Type" class="border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" onchange="updateQuestionType(this, @i)">
+                                                    <option value="ShortText" selected="@(question.Type == QuestionType.ShortText)">Short Text</option>
+                                                    <option value="LongText" selected="@(question.Type == QuestionType.LongText)">Long Text</option>
+                                                    <option value="Number" selected="@(question.Type == QuestionType.Number)">Number</option>
+                                                    <option value="Checkbox" selected="@(question.Type == QuestionType.Checkbox)">Checkbox</option>
+                                                    <option value="Dropdown" selected="@(question.Type == QuestionType.Dropdown)">Dropdown</option>
+                                                </select>
+                                                <button type="button" onclick="removeQuestion(this)" class="text-red-600 hover:text-red-800 p-2">
+                                                    <i class="fas fa-trash"></i>
                                                 </button>
                                             </div>
                                         </div>
-                                        <div class="space-y-2">
-                                            @{
-                                                var options = question.Options ?? new List<string>();
-                                            }
-                                            @for (int j = 0; j < options.Count; j++)
-                                            {
-                                                <div class="flex items-center space-x-2">
-                                                    <input name="Questions[@i].Options[@j]" value="@options[j]" class="flex-1 border border-gray-200 rounded px-3 py-1 text-sm" />
-                                                    <button type="button" onclick="removeOption(this)" class="text-red-600 hover:text-red-800 p-1">
-                                                        <i class="fas fa-times text-xs"></i>
+
+                                        <div class="ml-11 options-container" style="display: @(question.Type == QuestionType.Checkbox || question.Type == QuestionType.Dropdown ? "block" : "none")">
+                                            <div class="mb-2">
+                                                <div class="flex space-x-2">
+                                                    <input type="text" placeholder="Add option..." class="flex-1 border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                                                    <button type="button" onclick="addOption(this, @i)" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 text-sm">
+                                                        <i class="fas fa-plus"></i>
                                                     </button>
                                                 </div>
-                                            }
+                                            </div>
+                                            <div class="space-y-2">
+                                                @{
+                                                    var options = question.Options ?? new List<string>();
+                                                }
+                                                @for (int j = 0; j < options.Count; j++)
+                                                {
+                                                    <div class="flex items-center space-x-2">
+                                                        <input name="Questions[@i].Options[@j]" value="@options[j]" class="flex-1 border border-gray-200 rounded px-3 py-1 text-sm" required="@(question.Type == QuestionType.Checkbox || question.Type == QuestionType.Dropdown)" />
+                                                        <button type="button" onclick="removeOption(this)" class="text-red-600 hover:text-red-800 p-1">
+                                                            <i class="fas fa-times text-xs"></i>
+                                                        </button>
+                                                    </div>
+                                                }
+                                            </div>
                                         </div>
                                     </div>
-
-                                </div>
-                            </div>
-                        }
-                    </div>
-                </div>
-            </div>
-
-            <!-- Sidebar -->
-            <div class="space-y-6">
-                <!-- Template Stats (Read-only) -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
-                        <div class="flex items-center">
-                            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
-                                <i class="fas fa-chart-bar text-white text-sm"></i>
-                            </div>
-                            <h3 class="text-lg font-semibold text-gray-900">Template Statistics</h3>
-                        </div>
-                    </div>
-                    <div class="p-6 space-y-4">
-                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                            <div class="flex items-center space-x-2">
-                                <i class="fas fa-question-circle text-blue-600"></i>
-                                <span class="text-gray-700 font-medium">Total Questions</span>
-                            </div>
-                            <span id="questionCount" class="font-bold text-gray-900 text-lg">@Model.Questions.Count()</span>
-                        </div>
-                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                            <div class="flex items-center space-x-2">
-                                <i class="fas fa-play-circle text-green-600"></i>
-                                <span class="text-gray-700 font-medium">Times Used</span>
-                            </div>
-                            <span class="font-bold text-gray-900 text-lg">...</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Assigned Users -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div class="bg-gradient-to-r from-purple-50 to-pink-50 px-6 py-4 border-b border-gray-200">
-                        <div class="flex items-center">
-                            <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center mr-3">
-                                <i class="fas fa-users text-white text-sm"></i>
-                            </div>
-                            <h3 class="text-lg font-semibold text-gray-900">Assigned Users</h3>
-                        </div>
-                    </div>
-                    <div class="p-6 space-y-3">
-                        @if (Model.AssignedUsers != null && Model.AssignedUsers.Any())
-                        {
-                            foreach (var user in Model.AssignedUsers)
-                            {
-                                <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                                    <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-sm">
-                                        @user?.Substring(0, 1).ToUpper()
-                                    </div>
-                                    <div class="flex-1">
-                                        <span class="text-sm font-medium text-gray-800">@user</span>
-                                        <p class="text-xs text-gray-500">Active User</p>
-                                    </div>
-                                    <button type="button" onclick="removeUser('@user')" class="text-red-600 hover:text-red-800 p-1">
-                                        <i class="fas fa-times"></i>
-                                    </button>
                                 </div>
                             }
-                        }
-                        else
-                        {
-                            <div class="text-center py-8">
-                                <i class="fas fa-user-plus text-gray-300 text-3xl mb-2"></i>
-                                <p class="text-sm text-gray-500">No assigned users yet.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar -->
+                <div class="space-y-6">
+                    <!-- Template Stats (Read-only) -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-chart-bar text-white text-sm"></i>
+                                </div>
+                                <h3 class="text-lg font-semibold text-gray-900">Template Statistics</h3>
                             </div>
-                        }
-
-                        <button type="button" onclick="openUserModal()" class="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 rounded-lg hover:from-blue-100 hover:to-indigo-100 font-medium transition-all duration-200 border border-blue-200">
-                            <i class="fas fa-plus mr-2"></i>Add more users
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Save Actions -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div class="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-4 border-b border-gray-200">
-                        <div class="flex items-center">
-                            <div class="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center mr-3">
-                                <i class="fas fa-save text-white text-sm"></i>
+                        </div>
+                        <div class="p-6 space-y-4">
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fas fa-question-circle text-blue-600"></i>
+                                    <span class="text-gray-700 font-medium">Total Questions</span>
+                                </div>
+                                <span id="questionCount" class="font-bold text-gray-900 text-lg">@Model.Questions.Count()</span>
                             </div>
-                            <h3 class="text-lg font-semibold text-gray-900">Save Changes</h3>
+                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                                <div class="flex items-center space-x-2">
+                                    <i class="fas fa-play-circle text-green-600"></i>
+                                    <span class="text-gray-700 font-medium">Times Used</span>
+                                </div>
+                                <span class="font-bold text-gray-900 text-lg">...</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="p-6 space-y-3">
-                        <button type="submit" form="editTemplateForm" class="w-full flex items-center justify-center px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 font-medium shadow-sm">
-                            <i class="fas fa-save mr-3"></i>Save Template
-                        </button>
-                        <a asp-controller="Template" asp-action="Details" asp-route-id="@Model.Id" class="w-full flex items-center justify-center px-4 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all duration-200 font-medium shadow-sm">
-                            <i class="fas fa-times mr-3"></i>Cancel Changes
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </form>
 
-    <!-- User Modal (same as before) -->
-    <div id="userModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden backdrop-blur-sm">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
-            <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
-                <h2 class="text-xl font-semibold text-white">Add Users to Template</h2>
-                <p class="text-blue-100 text-sm mt-1">Select users to assign to this template</p>
-            </div>
-            
-            <form asp-action="AssignUser" asp-controller="Template" method="post" class="p-6">
-                <input name="TemplateId" value="@Model.Id" hidden />
-
-                <div class="mb-6">
-                    <label for="userDropdown" class="block text-sm font-medium text-gray-700 mb-2">
-                        <i class="fas fa-user mr-2 text-blue-600"></i>Select User
-                    </label>
-                    <select name="email" id="userDropdown" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200" onchange="checkUserSelected()">
-                        <option value="" disabled selected>Choose a user to assign...</option>
-                        @foreach (var user in await _userService.GetUsers(Model.Id))
-                        {
-                            <option value="@user.Email">@user.Email</option>
-                        }
-                    </select>
-                </div>
-
-                <div class="flex justify-end space-x-3">
-                    <button onclick="closeUserModal()" class="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium transition-colors duration-200" type="button">
-                        Cancel
-                    </button>
-                    <button id="addUserBtn" class="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all duration-200 shadow-sm" type="submit" disabled>
-                        <i class="fas fa-plus mr-2"></i>Add User
-                    </button>
-                </div>
-            </form>
-
-            <button onclick="closeUserModal()" class="absolute top-4 right-4 text-white hover:text-gray-200 text-xl transition-colors duration-200">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    </div>
-</main>
-
-<script>
-    let questionIndex = @Model.Questions.Count;
-
-    // Image preview
-    function previewImage(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('templateImage').src = e.target.result;
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    // Tag management
-    function addTag() {
-        const input = document.getElementById('newTag');
-        const tag = input.value.trim();
-        if (tag) {
-            const container = document.getElementById('tagsContainer');
-            const tagCount = container.children.length;
-            
-            const tagElement = document.createElement('span');
-            tagElement.className = 'inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border border-blue-200';
-            tagElement.innerHTML = `
-                <input type="hidden" name="SavedTags[${tagCount}]" value="${tag}" />
-                <i class="fas fa-tag mr-2 text-xs"></i>${tag}
-                <button type="button" onclick="removeTag(this)" class="ml-2 text-blue-500 hover:text-blue-700">
-                    <i class="fas fa-times text-xs"></i>
-                </button>
-            `;
-            
-            container.appendChild(tagElement);
-            input.value = '';
-        }
-    }
-
-    function removeTag(button) {
-        button.closest('span').remove();
-        reindexTags();
-    }
-
-    function reindexTags() {
-        const tags = document.querySelectorAll('#tagsContainer input[type="hidden"]');
-        tags.forEach((tag, index) => {
-            tag.name = `SavedTags[${index}]`;
-        });
-    }
-
-    // Question management
-    function addQuestion() {
-        const container = document.getElementById('questionsContainer');
-        const questionElement = document.createElement('div');
-        questionElement.className = 'question-item bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden';
-        questionElement.innerHTML = `
-            <div class="border-l-4 border-blue-500 p-6">
-                <input type="hidden" name="Questions[${questionIndex}].Id" value="" />
-                
-                <div class="flex items-start justify-between mb-4">
-                    <div class="flex items-start space-x-3 flex-1">
-                        <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                            ${questionIndex + 1}
+                    <!-- Assigned Users -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div class="bg-gradient-to-r from-purple-50 to-pink-50 px-6 py-4 border-b border-gray-200">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-users text-white text-sm"></i>
+                                </div>
+                                <h3 class="text-lg font-semibold text-gray-900">Assigned Users</h3>
+                            </div>
                         </div>
-                        <div class="flex-1">
-                            <input name="Questions[${questionIndex}].Text" placeholder="Enter question text..." class="w-full text-lg font-semibold text-gray-900 border-2 border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-2 ml-4">
-                        <select name="Questions[${questionIndex}].Type" class="border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" onchange="updateQuestionType(this, ${questionIndex})">
-                            <option value="ShortText">Short Text</option>
-                            <option value="LongText">Long Text</option>
-                            <option value="Number">Number</option>
-                            <option value="Checkbox">Checkbox</option>
-                            <option value="Dropdown">Dropdown</option>
-                        </select>
-                        <button type="button" onclick="removeQuestion(this)" class="text-red-600 hover:text-red-800 p-2">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="ml-11 options-container" style="display: none">
-                    <div class="mb-2">
-                        <div class="flex space-x-2">
-                            <input type="text" placeholder="Add option..." class="flex-1 border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                            <button type="button" onclick="addOption(this, ${questionIndex})" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 text-sm">
-                                <i class="fas fa-plus"></i>
+                        <div class="p-6 space-y-3" id="usersContainer">
+                            @if (Model.AssignedUsers != null && Model.AssignedUsers.Any())
+                            {
+                                @for (int i = 0; i < Model.AssignedUsers.Count; i++)
+                                {
+                                    <div class="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
+                                        <input type="hidden" name="AssignedUsers[@i]" value="@Model.AssignedUsers[i]" />
+                                        <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-sm">
+                                            @Model.AssignedUsers[i]?.Substring(0, 1).ToUpper()
+                                        </div>
+                                        <div class="flex-1">
+                                            <span class="text-sm font-medium text-gray-800">@Model.AssignedUsers[i]</span>
+                                            <p class="text-xs text-gray-500">Active User</p>
+                                        </div>
+                                        <button type="button" onclick="removeUser(this)" class="text-red-600 hover:text-red-700 p-1">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="text-center py-8">
+                                    <i class="fas fa-user-plus text-gray-300 text-3xl mb-2"></i>
+                                    <p class="text-sm text-gray-500 font-medium">No assigned users yet.</p>
+                                </div>
+                            }
+                            <button type="button" onclick="openUserModal()" class="w-full flex items-center justify-center px-4 py-3 bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 rounded-lg hover:from-blue-100 hover:to-indigo-100 font-medium transition-all duration-200 border border-blue-200">
+                                <i class="fas fa-plus mr-2"></i>Add more users
                             </button>
                         </div>
                     </div>
-                    <div class="space-y-2"></div>
+
+                    <!-- Save Actions -->
+                    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                        <div class="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-4 border-b border-gray-200">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center mr-3">
+                                    <i class="fas fa-save text-white text-sm"></i>
+                                </div>
+                                <h3 class="text-lg font-semibold text-gray-900">Save Changes</h3>
+                            </div>
+                        </div>
+                        <div class="p-6 space-y-3">
+                            <button type="submit" form="editTemplateForm" class="w-full flex items-center justify-center px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all duration-200 font-medium shadow-sm">
+                                <i class="fas fa-save mr-3"></i>Save Template
+                            </button>
+                            <a asp-controller="Template" asp-action="Details" asp-route-id="@Model.Id" class="w-full flex items-center justify-center px-4 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all duration-200 font-medium shadow-sm">
+                                <i class="fas fa-times mr-3"></i>Cancel Changes
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
-        `;
-        
-        container.appendChild(questionElement);
-        questionIndex++;
-        updateQuestionCount();
-    }
+        </form>
 
-    function removeQuestion(button) {
-        button.closest('.question-item').remove();
-        reindexQuestions();
-        updateQuestionCount();
-    }
+        <!-- User Modal -->
+        <div id="userModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-lg shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+                <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
+                    <h2 class="text-xl font-bold text-white">Add Users to Template</h2>
+                    <p class="text-blue-100 text-sm mt-1">Select users to assign to this template</p>
+                </div>
+                <div class="p-6">
+                    <div class="mb-6">
+                        <label for="userDropdown" class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-user mr-2 text-blue-600"></i>Select User
+                        </label>
+                        <div class="relative">
+                            <input type="text" id="userDropdown" placeholder="Search for a user..." class="w-full px-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-white" autocomplete="off" />
+                            <i class="fas fa-search absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <ul id="user-suggestions" class="absolute z-50 w-full bg-white border-2 border-gray-200 rounded-xl max-h-40 overflow-auto mt-2 shadow-xl hidden"></ul>
+                        </div>
+                    </div>
+                    <div class="flex justify-end space-x-3">
+                        <button onclick="closeUserModal()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-medium transition-all duration-200" type="button">
+                            Cancel
+                        </button>
+                        <button id="addUserBtn" onclick="addUser()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed font-medium transition-all duration-200 shadow-sm" type="button" disabled>
+                            <i class="fas fa-plus mr-2"></i>Add User
+                        </button>
+                    </div>
+                </div>
+                <button onclick="closeUserModal()" class="absolute top-4 right-4 text-blue-100 hover:text-white transition-colors text-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </main>
 
-    function reindexQuestions() {
-        const questions = document.querySelectorAll('.question-item');
-        questions.forEach((question, index) => {
-            // Update question number display
-            const numberDisplay = question.querySelector('.w-8.h-8.bg-blue-600');
-            if (numberDisplay) numberDisplay.textContent = index + 1;
-            
-            // Update all input names
-            const inputs = question.querySelectorAll('input, select');
-            inputs.forEach(input => {
-                if (input.name.includes('Questions[')) {
-                    input.name = input.name.replace(/Questions\[\d+\]/, `Questions[${index}]`);
+    <script>
+        let questionIndex = @Model.Questions.Count;
+        let userIndex = @(Model.AssignedUsers != null ? Model.AssignedUsers.Count : 0);
+
+        // Form validation
+        $("#editTemplateForm").validate({
+            errorClass: "text-red-500 text-sm mt-1",
+            errorElement: "span",
+            highlight: function(element) {
+                $(element).addClass("border-red-500").removeClass("border-gray-200");
+            },
+            unhighlight: function(element) {
+                $(element).removeClass("border-red-500").addClass("border-gray-200");
+            },
+            submitHandler: function(form) {
+                $("#formErrors").addClass("hidden").empty();
+                var formData = new FormData(form);
+                // Log form data for debugging
+                for (var pair of formData.entries()) {
+                    console.log(pair[0] + ': ' + pair[1]);
+                }
+                $.ajax({
+                    url: form.action,
+                    type: form.method,
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        console.log("Form submitted successfully:", response);
+                        window.location.href = '@Url.Action("Details", "Template", new { id = Model.Id })';
+                    },
+                    error: function(xhr) {
+                        console.error("Form submission error:", xhr);
+                        let errors = xhr.responseJSON || ["An error occurred while saving the template."];
+                        $("#formErrors").removeClass("hidden").html(
+                            "<ul>" + Object.values(errors).map(e => `<li>${e}</li>`).join("") + "</ul>"
+                        );
+                    }
+                });
+            }
+        });
+
+        // Image preview
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('templateImage').src = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Tag management
+        function addTag() {
+            const input = document.getElementById('newTag');
+            const tag = input.value.trim();
+            if (tag && !Array.from(document.querySelectorAll('#tagsContainer span')).some(t => t.textContent.includes(tag))) {
+                const container = document.getElementById('tagsContainer');
+                const tagElement = document.createElement('span');
+                tagElement.className = 'inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border border-blue-200';
+                tagElement.innerHTML = `
+                    <i class="fas fa-tag mr-2 text-xs"></i>${tag}
+                    <button type="button" onclick="removeTag(this)" class="ml-2 text-blue-500 hover:text-blue-700">
+                        <i class="fas fa-times text-xs"></i>
+                    </button>
+                `;
+                container.appendChild(tagElement);
+                updateTagNames();
+                input.value = '';
+                $('#tag-suggestions').addClass('hidden').empty();
+            }
+        }
+
+        function removeTag(button) {
+            button.closest('span').remove();
+            updateTagNames();
+        }
+
+        function updateTagNames() {
+            const tags = Array.from(document.querySelectorAll('#tagsContainer span')).map(span => span.textContent.split('×')[0].trim());
+            document.getElementById('tagNames').value = tags.join(',');
+        }
+
+        // Question management
+        function addQuestion() {
+            const container = document.getElementById('questionsContainer');
+            const questionElement = document.createElement('div');
+            questionElement.className = 'question-item bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden';
+            questionElement.innerHTML = `
+                <div class="border-l-4 border-blue-500 p-6">
+                    <input type="hidden" name="Questions[${questionIndex}].Id" value="" />
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-start space-x-3 flex-1">
+                            <div class="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                                ${questionIndex + 1}
+                            </div>
+                            <div class="flex-1">
+                                <input name="Questions[${questionIndex}].Text" placeholder="Enter question text..." class="w-full text-lg font-semibold text-gray-900 border-2 border-gray-200 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required />
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2 ml-4">
+                            <select name="Questions[${questionIndex}].Type" class="border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" onchange="updateQuestionType(this, ${questionIndex})">
+                                <option value="ShortText">Short Text</option>
+                                <option value="LongText">Long Text</option>
+                                <option value="Number">Number</option>
+                                <option value="Checkbox">Checkbox</option>
+                                <option value="Dropdown">Dropdown</option>
+                            </select>
+                            <button type="button" onclick="removeQuestion(this)" class="text-red-600 hover:text-red-800 p-2">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="ml-11 options-container" style="display: none">
+                        <div class="mb-2">
+                            <div class="flex space-x-2">
+                                <input type="text" placeholder="Add option..." class="flex-1 border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
+                                <button type="button" onclick="addOption(this, ${questionIndex})" class="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 text-sm">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="space-y-2"></div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(questionElement);
+            questionIndex++;
+            updateQuestionCount();
+        }
+
+        function removeQuestion(button) {
+            button.closest('.question-item').remove();
+            reindexQuestions();
+            updateQuestionCount();
+        }
+
+        function reindexQuestions() {
+            const questions = document.querySelectorAll('.question-item');
+            questions.forEach((question, index) => {
+                const numberDisplay = question.querySelector('.w-8.h-8.bg-blue-600');
+                if (numberDisplay) numberDisplay.textContent = index + 1;
+                const inputs = question.querySelectorAll('input, select');
+                inputs.forEach(input => {
+                    if (input.name.includes('Questions[')) {
+                        input.name = input.name.replace(/Questions\[\d+\]/, `Questions[${index}]`);
+                    }
+                });
+            });
+            questionIndex = questions.length;
+        }
+
+        function updateQuestionType(select, index) {
+            const optionsContainer = select.closest('.question-item').querySelector('.options-container');
+            const questionType = select.value;
+            optionsContainer.style.display = (questionType === 'Checkbox' || questionType === 'Dropdown') ? 'block' : 'none';
+            const optionInputs = optionsContainer.querySelectorAll('input[name*="Options"]');
+            optionInputs.forEach(input => input.required = (questionType === 'Checkbox' || questionType === 'Dropdown'));
+        }
+
+        function addOption(button, questionIndex) {
+            const input = button.previousElementSibling;
+            const option = input.value.trim();
+            if (option) {
+                const optionsContainer = button.closest('.options-container').querySelector('.space-y-2');
+                const optionCount = optionsContainer.children.length;
+                const optionElement = document.createElement('div');
+                optionElement.className = 'flex items-center space-x-2';
+                optionElement.innerHTML = `
+                    <input name="Questions[${questionIndex}].Options[${optionCount}]" value="${option}" class="flex-1 border border-gray-200 rounded px-3 py-1 text-sm" required />
+                    <button type="button" onclick="removeOption(this)" class="text-red-600 hover:text-red-800 p-1">
+                        <i class="fas fa-times text-xs"></i>
+                    </button>
+                `;
+                optionsContainer.appendChild(optionElement);
+                input.value = '';
+            }
+        }
+
+        function removeOption(button) {
+            const optionsContainer = button.closest('.space-y-2');
+            button.closest('div').remove();
+            const options = optionsContainer.querySelectorAll('input');
+            options.forEach((option, index) => {
+                option.name = option.name.replace(/\.Options\[\d+\]/, `.Options[${index}]`);
+            });
+        }
+
+        function updateQuestionCount() {
+            const count = document.querySelectorAll('.question-item').length;
+            document.getElementById('questionCount').textContent = count;
+        }
+
+        // User management
+        function addUser() {
+            const email = $('#addUserBtn').data('selected-email') || document.getElementById('userDropdown').value.trim();
+            if (email && !Array.from(document.querySelectorAll('#usersContainer input')).some(u => u.value === email)) {
+                const container = document.getElementById('usersContainer');
+                const userCount = container.querySelectorAll('input[name^="AssignedUsers"]').length;
+                const userElement = document.createElement('div');
+                userElement.className = 'flex items-center space-x-2 p-3 bg-gray-50 rounded-lg';
+                userElement.innerHTML = `
+                    <input type="hidden" name="AssignedUsers[${userCount}]" value="${email}" />
+                    <div class="w-10 h-10 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                        ${email.substring(0, 1).toUpperCase()}
+                    </div>
+                    <div class="flex-1">
+                        <span class="text-sm font-medium text-gray-800">${email}</span>
+                        <p class="text-xs text-gray-500">Active User</p>
+                    </div>
+                    <button type="button" onclick="removeUser(this)" class="text-red-600 hover:text-red-700 p-1">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                const noUsersMessage = container.querySelector('.text-center');
+                if (noUsersMessage) noUsersMessage.remove();
+                container.insertBefore(userElement, container.lastElementChild);
+                closeUserModal();
+            }
+        }
+
+        function removeUser(button) {
+            button.closest('div').remove();
+            reindexUsers();
+            const container = document.getElementById('usersContainer');
+            if (!container.querySelectorAll('input[name^="AssignedUsers"]').length) {
+                const noUsersMessage = document.createElement('div');
+                noUsersMessage.className = 'text-center py-8';
+                noUsersMessage.innerHTML = `
+                    <i class="fas fa-user-plus text-gray-300 text-3xl mb-2"></i>
+                    <p class="text-sm text-gray-500 font-medium">No assigned users yet.</p>
+                `;
+                container.insertBefore(noUsersMessage, container.lastElementChild);
+            }
+        }
+
+        function reindexUsers() {
+            const users = document.querySelectorAll('#usersContainer input[type="hidden"]');
+            users.forEach((user, index) => {
+                user.name = `AssignedUsers[${index}]`;
+            });
+        }
+
+        // User modal functions
+        function openUserModal() {
+            document.getElementById('userModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            document.getElementById('userDropdown').focus();
+        }
+
+        function closeUserModal() {
+            document.getElementById('userModal').classList.add('hidden');
+            document.body.style.overflow = '';
+            document.getElementById('userDropdown').value = '';
+            $('#addUserBtn').data('selected-email', '').prop('disabled', true);
+            $('#user-suggestions').addClass('hidden').empty();
+        }
+
+        // Autocomplete for tags
+        $(function() {
+            $("#newTag").on('input', function() {
+                const query = this.value.trim();
+                const suggestions = $('#tag-suggestions');
+                if (query.length < 1) {
+                    suggestions.addClass('hidden').empty();
+                    return;
+                }
+                $.ajax({
+                    url: '@Url.Action("AutoCompleteTags", "Template")',
+                    dataType: 'json',
+                    data: { keyword: query },
+                    success: function(data) {
+                        suggestions.empty();
+                        if (data.length > 0) {
+                            suggestions.removeClass('hidden');
+                            data.forEach(tag => {
+                                suggestions.append(`
+                                    <li class="px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm text-gray-800 tag-suggestion border-b border-gray-200 last:border-b-0" data-value="${tag}">
+                                        <i class="fas fa-tag mr-2 text-blue-500"></i>${tag}
+                                    </li>
+                                `);
+                            });
+                        } else {
+                            suggestions.addClass('hidden');
+                        }
+                    }
+                });
+            });
+
+            $(document).on('click', '.tag-suggestion', function() {
+                $('#newTag').val($(this).data('value'));
+                addTag();
+            });
+        });
+
+        // Autocomplete for users
+        $(function() {
+            $("#userDropdown").on('input', function() {
+                const query = this.value.trim();
+                const suggestions = $('#user-suggestions');
+                const addButton = $('#addUserBtn');
+                if (query.length < 1) {
+                    suggestions.addClass('hidden').empty();
+                    addButton.prop('disabled', true).data('selected-email', '');
+                    return;
+                }
+                $.ajax({
+                    url: '@Url.Action("AutoCompleteUsers", "User")',
+                    dataType: 'json',
+                    data: { keyword: query },
+                    success: function(data) {
+                        suggestions.empty();
+                        if (data.length > 0) {
+                            suggestions.removeClass('hidden');
+                            data.forEach(user => {
+                                suggestions.append(`
+                                    <li class="px-4 py-3 hover:bg-indigo-50 cursor-pointer user-suggestion border-b border-gray-200 last:border-b-0 transition-all duration-200"
+                                        data-username="${user.UserName}" data-email="${user.Email}">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full flex items-center justify-center mr-2">
+                                                <span class="text-white text-xs font-medium">${user.UserName.substring(0, 2).toUpperCase()}</span>
+                                            </div>
+                                            <div>
+                                                <div class="text-sm font-medium text-gray-800">${user.UserName}</div>
+                                                <div class="text-xs text-gray-600">${user.Email}</div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                `);
+                            });
+                        } else {
+                            suggestions.addClass('hidden');
+                        }
+                    }
+                });
+            });
+
+            $(document).on('click', '.user-suggestion', function() {
+                const email = $(this).data('email');
+                const username = $(this).data('username');
+                $('#userDropdown').val(`${username} (${email})`);
+                $('#addUserBtn').data('selected-email', email).prop('disabled', false);
+                $('#user-suggestions').addClass('hidden').empty();
+            });
+
+            // Hide suggestions when clicking outside
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('#userDropdown, #user-suggestions').length) {
+                    $('#user-suggestions').addClass('hidden').empty();
+                }
+                if (!$(e.target).closest('#newTag, #tag-suggestions').length) {
+                    $('#tag-suggestions').addClass('hidden').empty();
                 }
             });
         });
-        questionIndex = questions.length;
-    }
 
-    function updateQuestionType(select, index) {
-        const optionsContainer = select.closest('.question-item').querySelector('.options-container');
-        const questionType = select.value;
-        
-        if (questionType === 'Checkbox' || questionType === 'Dropdown') {
-            optionsContainer.style.display = 'block';
-        } else {
-            optionsContainer.style.display = 'none';
-        }
-    }
-
-    function addOption(button, questionIndex) {
-        const input = button.previousElementSibling;
-        const option = input.value.trim();
-        if (option) {
-            const optionsContainer = button.closest('.options-container').querySelector('.space-y-2');
-            const optionCount = optionsContainer.children.length;
-            
-            const optionElement = document.createElement('div');
-            optionElement.className = 'flex items-center space-x-2';
-            optionElement.innerHTML = `
-                <input name="Questions[${questionIndex}].Options[${optionCount}]" value="${option}" class="flex-1 border border-gray-200 rounded px-3 py-1 text-sm" />
-                <button type="button" onclick="removeOption(this)" class="text-red-600 hover:text-red-800 p-1">
-                    <i class="fas fa-times text-xs"></i>
-                </button>
-            `;
-            
-            optionsContainer.appendChild(optionElement);
-            input.value = '';
-        }
-    }
-
-    function removeOption(button) {
-        const optionsContainer = button.closest('.space-y-2');
-        button.closest('div').remove();
-        
-        // Reindex options
-        const options = optionsContainer.querySelectorAll('input');
-        options.forEach((option, index) => {
-            option.name = option.name.replace(/\.Options\[\d+\]/, `.Options[${index}]`);
+        // Enter key for adding tags
+        document.getElementById('newTag').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addTag();
+            }
         });
-    }
 
-    function updateQuestionCount() {
-        const count = document.querySelectorAll('.question-item').length;
-        document.getElementById('questionCount').textContent = count;
-    }
-
-    // User modal functions (same as before)
-    function openUserModal() {
-        document.getElementById('userModal').classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeUserModal() {
-        document.getElementById('userModal').classList.add('hidden');
-        document.body.style.overflow = 'auto';
-        document.getElementById('userDropdown').value = '';
-        document.getElementById('addUserBtn').disabled = true;
-    }
-
-    function checkUserSelected() {
-        const dropdown = document.getElementById('userDropdown');
-        const addButton = document.getElementById('addUserBtn');
-        addButton.disabled = !dropdown.value;
-    }
-
-    function removeUser(email) {
-        // This would need to be implemented with a form submission or AJAX call
-        console.log('Remove user:', email);
-    }
-
-    // Enter key for adding tags
-    document.getElementById('newTag').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            addTag();
-        }
-    });
-</script>
+        // Initialize form
+        $(document).ready(function() {
+            updateQuestionCount();
+        });
+    </script>
+</body>
+</html>

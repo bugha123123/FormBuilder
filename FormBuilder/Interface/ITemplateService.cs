@@ -24,6 +24,8 @@ namespace FormBuilder.Interface
 
         Task DeleteTemplatesAsync(List<int> templateIds);
 
+        Task UpdateTemplateAsync(FormTemplate template, List<string> selectedTagNames, IFormFile imageFile);
+
 
 
     }

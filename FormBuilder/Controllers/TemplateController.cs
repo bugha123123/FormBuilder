@@ -128,7 +128,27 @@ namespace FormBuilder.Controllers
             await _templateService.DeleteTemplatesAsync(templateIds);
             return Ok();
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Update(FormTemplate template, string TagNames, IFormFile ImageFile)
+        {
+        
 
+            try
+            {
+                var selectedTagNames = string.IsNullOrWhiteSpace(TagNames)
+                    ? new List<string>()
+                    : TagNames.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(t => t.Trim()).ToList();
+
+                await _templateService.UpdateTemplateAsync(template, selectedTagNames, ImageFile);
+                return RedirectToAction("Details", new { id = template.Id });
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"An error occurred: {ex.Message}");
+                return View("Edit", template);
+            }
+        }
 
 
     }

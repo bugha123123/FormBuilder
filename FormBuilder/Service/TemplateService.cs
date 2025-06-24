@@ -1,4 +1,6 @@
 ﻿using Azure.Storage.Blobs;
+using CloudinaryDotNet.Actions;
+using CloudinaryDotNet;
 using FormBuilder.Data;
 using FormBuilder.Enums;
 using FormBuilder.Interface;
@@ -45,7 +47,7 @@ namespace FormBuilder.Service
         public async Task<FormTemplate> CreateTemplateAsync(FormTemplate template, List<string> selectedTagNames, IFormFile? imageFile)
         {
             var LoggedInUser = await _authService.GetLoggedInUserAsync();
-            // Process markdown description
+        
             var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
             template.Description = Markdown.ToHtml(template.Description ?? "", pipeline);
 
@@ -80,6 +82,78 @@ namespace FormBuilder.Service
 
             return template;
         }
+
+        public async Task UpdateTemplateAsync(FormTemplate template, List<string> selectedTagNames, IFormFile imageFile)
+        {
+            // Load the existing template with its related entities
+            var existingTemplate = await _context.FormTemplates
+                .Include(t => t.Questions)
+                .FirstOrDefaultAsync(t => t.Id == template.Id);
+
+            if (existingTemplate == null)
+                throw new Exception("Template not found.");
+
+            // Update basic fields
+            existingTemplate.Title = template.Title;
+            var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+            existingTemplate.Description = Markdown.ToHtml(template.Description ?? "", pipeline);
+            existingTemplate.isPublic = template.isPublic;
+
+            // Upload image if provided
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                var imageUrl = await _cloudinaryService.UploadImageAsync(imageFile);
+                existingTemplate.ImageUrl = imageUrl;
+            }
+
+            // Update SavedTags (List<string>)
+            selectedTagNames ??= new List<string>();
+            existingTemplate.SavedTags = selectedTagNames
+                .Where(t => !string.IsNullOrWhiteSpace(t))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            // Remove existing Questions and replace with new ones
+            if (existingTemplate.Questions != null && existingTemplate.Questions.Any())
+            {
+                _context.Questions.RemoveRange(existingTemplate.Questions);
+            }
+
+            existingTemplate.Questions = new List<Question>();
+
+            if (template.Questions != null)
+            {
+                foreach (var question in template.Questions)
+                {
+                    var newQuestion = new Question
+                    {
+                        Text = question.Text,
+                        Type = question.Type,
+                        Options = question.Options != null ? new List<string>(question.Options) : new List<string>()
+                    };
+
+                    existingTemplate.Questions.Add(newQuestion);
+                }
+            }
+
+            // Update AssignedUsers (List<string> of emails)
+            template.AssignedUsers ??= new List<string>();
+
+            existingTemplate.AssignedUsers = template.AssignedUsers
+                .Where(email => !string.IsNullOrWhiteSpace(email))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            // Update owner
+            var loggedInUser = await _authService.GetLoggedInUserAsync();
+            existingTemplate.User = loggedInUser;
+            existingTemplate.UserId = loggedInUser.Id;
+
+            // No need to call _context.FormTemplates.Update(...) since EF tracks the entity already
+
+            await _context.SaveChangesAsync();
+        }
+
 
 
 
@@ -163,7 +237,6 @@ namespace FormBuilder.Service
         public async Task DeleteTemplatesAsync(List<int> templateIds)
         {
 
-            // Get all forms linked to these templates
             var forms = await _context.Forms
                                       .Where(f => templateIds.Contains(f.TemplateId))
                                       .ToListAsync();
@@ -189,10 +262,8 @@ namespace FormBuilder.Service
                                         .ToListAsync();
             _context.Answers.RemoveRange(answers);
 
-            // Delete the forms themselves
             _context.Forms.RemoveRange(forms);
 
-            // Delete the templates
             var templates = await _context.FormTemplates
                                           .Where(t => templateIds.Contains(t.Id))
                                           .ToListAsync();
