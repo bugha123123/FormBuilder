@@ -279,11 +279,16 @@ namespace FormBuilder.Service
         {
             return await _context.Tags.ToListAsync();
         }
-
         public async Task<FormTemplate> GetTemplateById(int id)
         {
-            return await _context.FormTemplates.Include(x => x.User).Include(x => x.Questions).Include(x => x.Comments).FirstOrDefaultAsync(t => t.Id == id);
+            return await _context.FormTemplates
+                .Include(x => x.User)
+                .Include(x => x.Questions)
+                .Include(x => x.Comments)
+                .Include(x => x.Answers)
+                .FirstOrDefaultAsync(t => t.Id == id);
         }
+
 
         public async Task<List<FormTemplate>> SearchTemplates(string tag)
         {
@@ -322,59 +327,75 @@ namespace FormBuilder.Service
 
         public async Task<List<FormTemplate>> SearchTemplatesAsync(string query)
         {
-            if (string.IsNullOrWhiteSpace(query)) return new List<FormTemplate>();
+            if (string.IsNullOrWhiteSpace(query))
+                return new List<FormTemplate>();
 
             query = query.ToLower();
 
             var templates = await _context.FormTemplates
                 .Include(t => t.Questions)
                 .Include(t => t.Comments)
-                .Where(x => x.isPublic)
+                .Where(t => t.isPublic)
                 .ToListAsync();
 
-            return templates
-                .Where(t =>
-                    t.Title.ToString().ToLower().Contains(query) ||
-                    t.Description.ToLower().Contains(query) ||
-                    t.Questions.Any(q => q.Text.ToLower().Contains(query)) ||
-                    t.Comments.Any(c => c.Text.ToLower().Contains(query)))
-                .ToList();
+           
+            var filtered = templates.Where(t =>
+                (t.Title != null && t.Title.ToString().ToLower().Contains(query)) ||
+                (t.Description != null && t.Description.ToLower().Contains(query)) ||
+                (t.Questions != null && t.Questions.Any(q => q.Text != null && q.Text.ToLower().Contains(query))) ||
+                (t.Comments != null && t.Comments.Any(c => c.Text != null && c.Text.ToLower().Contains(query))) ||
+                (t.Tags != null && t.SavedTags.Any(tag => tag != null && tag.ToLower().Contains(query)))
+            ).ToList();
+
+            return filtered;
         }
+
         public async Task DeleteTemplatesAsync(List<int?> templateIds)
         {
+            var nonNullTemplateIds = templateIds.Where(id => id.HasValue).Select(id => id.Value).ToList();
 
-            var forms = await _context.Forms
-                                      .Where(f => templateIds.Contains(f.TemplateId))
-                                      .ToListAsync();
+            // Delete Tags linked to templates first
+            var tagsToDelete = await _context.Tags
+                .Where(t => t.TemplateId != null && nonNullTemplateIds.Contains(t.TemplateId))
+                .ToListAsync();
+            _context.Tags.RemoveRange(tagsToDelete);
 
-            var formIds = forms.Select(f => f.Id).ToList();
-
-            // Delete comments linked to templates
+            // Delete Comments linked to templates
             var templateComments = await _context.Comments
-                                                 .Where(c => c.TemplateId != null && templateIds.Contains(c.TemplateId.Value))
-                                                 .ToListAsync();
+                .Where(c => c.TemplateId != null && nonNullTemplateIds.Contains(c.TemplateId.Value))
+                .ToListAsync();
             _context.Comments.RemoveRange(templateComments);
 
+            // Get forms linked to these templates
+            var forms = await _context.Forms
+                .Where(f => f.TemplateId != null && nonNullTemplateIds.Contains(f.TemplateId.Value))
+                .ToListAsync();
+            var formIds = forms.Select(f => f.Id).ToList();
+
+            // Delete Comments linked to those forms
             var formComments = await _context.Comments
-                                             .Where(c => c.FormId != null && formIds.Contains(c.FormId.Value))
-                                             .ToListAsync();
+                .Where(c => c.FormId != null && formIds.Contains(c.FormId.Value))
+                .ToListAsync();
             _context.Comments.RemoveRange(formComments);
 
+            // Delete Answers linked to those forms
             var answers = await _context.Answers
-                .Include(x => x.Form)
-                                        .Where(a => a.Form.Id != null && formIds.Contains(a.Form.Id))
-                                        .ToListAsync();
+                .Where(a => a.FormId != null && formIds.Contains(a.FormId))
+                .ToListAsync();
             _context.Answers.RemoveRange(answers);
 
+            // Delete forms
             _context.Forms.RemoveRange(forms);
 
+            // Delete templates
             var templates = await _context.FormTemplates
-                                          .Where(t => templateIds.Contains(t.Id))
-                                          .ToListAsync();
+                .Where(t => nonNullTemplateIds.Contains(t.Id))
+                .ToListAsync();
             _context.FormTemplates.RemoveRange(templates);
 
             await _context.SaveChangesAsync();
         }
+
 
 
 

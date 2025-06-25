@@ -88,7 +88,7 @@ public class FormsController : Controller
 
     }
     [HttpPost]
-    public async Task<IActionResult> DeleteMultiple([FromForm] List<int> formIds)
+    public async Task<IActionResult> DeleteMultipleForms([FromForm] List<int> formIds)
     {
         if (formIds == null || !formIds.Any())
             return BadRequest("No forms selected.");
@@ -98,8 +98,7 @@ public class FormsController : Controller
             await _formService.DeleteFormAsync(id);
         }
 
-        return Ok();
+        return RedirectToAction("Dashboard","User" ); 
     }
-
 
 }

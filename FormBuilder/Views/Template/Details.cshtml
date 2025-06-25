@@ -7,12 +7,15 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
             <div class="flex items-center space-x-3">
-                <a asp-action="Edit" asp-controller="Template" asp-route-templateId="@Model.Id">
-                    <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                        <i class="fas fa-edit mr-2"></i>Edit Template
-                    </button>
-                </a>
-            
+            @if (Model.User.UserName == User.Identity.Name)
+                {
+                    <a asp-action="Edit" asp-controller="Template" asp-route-templateId="@Model.Id">
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-edit mr-2"></i>Edit Template
+                        </button>
+                    </a>
+
+                }
                 <a asp-controller="Forms" asp-action="Create" asp-route-TemplateId="@Model.Id">
                     <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
                         <i class="fas fa-play mr-2"></i>Use Template
@@ -169,11 +172,13 @@
                     {
                         <p class="text-sm text-gray-500">No assigned users.</p>
                     }
-
+                       @if (Model.User.UserName == User.Identity.Name)
+                        {
                     <button onclick="openUserModal()" class="w-full text-left text-sm text-blue-600 hover:text-blue-800 font-medium mt-2">
 
                         <i class="fas fa-plus mr-1"></i>Add more users
                     </button>
+                        }
                 </div>
             </div>
 
@@ -216,9 +221,11 @@
                 <div class="flex justify-end space-x-2">
                     <button onclick="closeUserModal()" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" type="button">Cancel</button>
 
-                    <button id="addUserBtn" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed" type="submit" disabled>
-                        Add
-                    </button>
+                 
+                        <button id="addUserBtn" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed" type="submit" disabled>
+                            Add
+                        </button>
+                    
                 </div>
             </form>
 

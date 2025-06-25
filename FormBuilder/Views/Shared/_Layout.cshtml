@@ -21,6 +21,19 @@
         html, body {
             transition: background-color 0.3s ease, color 0.3s ease;
         }
+        /* Fix scrollbar for dark mode inside dropdown */
+        #search-results::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #search-results::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #search-results::-webkit-scrollbar-thumb {
+            background-color: #a78bfa; /* purple-400 */
+            border-radius: 4px;
+        }
     </style>
 </head>
 
@@ -47,14 +60,20 @@
                     <!-- Search Bar -->
                     @if (User.Identity.IsAuthenticated)
                     {
-                        <div class="hidden md:block relative">
-                            <form method="get" class="relative">
-                                <div class="relative">
-                                    <input type="text" name="query" placeholder="Search templates..."
-                                           class="pl-10 pr-4 py-2.5 w-80 rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 text-sm" />
-                                    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                                        <i class="fas fa-search text-gray-400 dark:text-gray-300"></i>
-                                    </div>
+                        <div class="hidden md:block relative" style="width: 320px;">
+                            <form method="get" class="relative w-full" autocomplete="off">
+                                <input type="text"
+                                       name="query"
+                                       placeholder="Search templates..."
+                                       class="pl-10 pr-4 py-2.5 w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 text-sm" />
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                    <i class="fas fa-search text-gray-400 dark:text-gray-300"></i>
+                                </div>
+
+                                <!-- Search Results Dropdown -->
+                                <div id="search-results"
+                                     class="hidden absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-900 border-2 border-purple-600 dark:border-purple-400 rounded-xl shadow-lg max-h-80 overflow-y-auto z-50 text-sm">
+                                    <!-- Search results appended here dynamically -->
                                 </div>
                             </form>
                         </div>
@@ -104,13 +123,6 @@
             </div>
         </div>
     </nav>
-
-    <!-- Search Results Dropdown -->
-    <div id="search-results-wrapper" class="relative z-50 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div id="search-results" class="hidden absolute left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl max-h-80 overflow-y-auto ml-32">
-            <!-- Search results will be inserted here -->
-        </div>
-    </div>
 
     <!-- Main Content -->
     <div class="flex-1">
@@ -181,7 +193,7 @@
     <!-- Theme Toggle Script -->
     <script>
         const themeToggle = document.getElementById('theme-toggle');
-        const body = document.body;  // use body instead of html
+        const body = document.body;
         const moonIcon = document.getElementById('moon-icon');
         const sunIcon = document.getElementById('sun-icon');
 
@@ -211,10 +223,8 @@
             }
         });
 
-
         $(document).ready(function () {
             const $input = $('input[name="query"]');
-            const $resultsWrapper = $('#search-results-wrapper');
             const $resultsBox = $('#search-results');
             let timeout;
 
@@ -229,8 +239,8 @@
                     }
 
                     $.ajax({
-                        url: '/Template/SearchTemplates',
-                        data: { query },
+                        url: `/Template/SearchTemplates?query=${encodeURIComponent(query)}`,
+                        type: 'GET',
                         success: function (results) {
                             $resultsBox.empty().show();
 
@@ -248,7 +258,7 @@
 
                             results.forEach((r, index) => {
                                 $resultsBox.append(`
-                                    <a href="${r.link}" class="block px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-700 ${index !== results.length - 1 ? 'border-b border-gray-200 dark:border-gray-700' : ''} transition-colors duration-200 group">
+                                    <a href="${r.link}" class="block px-6 py-3 hover:bg-purple-100 dark:hover:bg-purple-900 border-b border-gray-200 dark:border-gray-700 transition-colors duration-200 group rounded-t-lg last:border-b-0">
                                         <div class="flex items-center space-x-3">
                                             <div class="w-8 h-8 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center group-hover:bg-purple-200 dark:group-hover:bg-purple-800 transition-colors">
                                                 <i class="fas fa-file-alt text-purple-600 dark:text-purple-400 text-sm"></i>
@@ -276,12 +286,14 @@
                 }, 300);
             });
 
+            // Hide dropdown when clicking outside
             $(document).click(function (e) {
                 if (!$(e.target).closest('#search-results, input[name="query"]').length) {
                     $resultsBox.hide();
                 }
             });
 
+            // Show dropdown if input focused and has 2+ chars
             $input.on('focus', function () {
                 if ($(this).val().trim().length >= 2) {
                     $resultsBox.show();

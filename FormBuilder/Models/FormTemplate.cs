@@ -20,7 +20,7 @@ namespace FormBuilder.Models
 
         public ICollection<Tag> Tags { get; set; } = new List<Tag>();
 
-
+        public ICollection<FormAnswer> Answers { get; set; } = new List<FormAnswer>();
         public int CommentId { get; set; }
         public  List<string>? AssignedUsers { get; set; }
 

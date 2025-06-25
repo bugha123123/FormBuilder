@@ -15,12 +15,29 @@
                     <p class="text-gray-600">Choose from our collection of professional templates</p>
                 </div>
                 <div class="flex items-center space-x-3">
-                    <a asp-action="Create" asp-controller="Template">
-                        <button class="inline-flex items-center px-4 py-2 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors">
-                            <i class="fas fa-plus mr-2"></i>
-                            Create Template
-                        </button>
-                    </a>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <div class="flex items-center space-x-3">
+                            <a asp-action="Create" asp-controller="Template">
+                                <button class="inline-flex items-center px-4 py-2 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors">
+                                    <i class="fas fa-plus mr-2"></i>
+                                    Create Template
+                                </button>
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="flex items-center space-x-3">
+                            <a asp-action="signin" asp-controller="Auth">
+                                <button class="inline-flex items-center px-4 py-2 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors">
+                                    <i class="fas fa-plus mr-2"></i>
+                                    Create Template
+                                </button>
+                            </a>
+                        </div>
+                    }
+
                 </div>
             </div>
         </div>

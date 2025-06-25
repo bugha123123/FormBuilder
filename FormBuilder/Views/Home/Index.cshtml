@@ -75,68 +75,119 @@
         }
     </section>
 
-    <!-- Popular Templates Table -->
+    <!-- Popular Templates Cards -->
     <section aria-labelledby="popular-templates-heading" class="mb-16">
-        <h2 id="popular-templates-heading" class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-6">
-            Top 5 Most Popular Templates
-        </h2>
+        <div class="flex justify-between items-center mb-8">
+            <h2 id="popular-templates-heading" class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                Top 5 Most Popular Templates
+            </h2>
+            <div class="flex items-center text-sm text-gray-500 dark:text-gray-400">
+                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                </svg>
+                Ranked by usage
+            </div>
+        </div>
 
         @if (popularTemplates != null && popularTemplates.Any())
         {
-            <div class="overflow-x-auto">
-                <table class="min-w-full bg-white dark:bg-gray-800 rounded-lg shadow-md">
-                    <thead>
-                        <tr class="bg-gray-100 dark:bg-gray-700">
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Title</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Author</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Filled Forms</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                        @foreach (var template in popularTemplates)
-                        {
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-600">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">@template.Title</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">@(template.User.Email?.Substring(0, 6) ?? "Anonymous")</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">@template.FilledFormsCount</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+            <div class="space-y-4">
+                @{int rank = 1;}
+                @foreach (var template in popularTemplates)
+                {
+                    <article class="bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200 dark:border-gray-700 hover:border-primary/30">
+                        <div class="p-6">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-4 flex-1">
+                                    <!-- Rank Badge -->
+                                    <div class="flex-shrink-0">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center text-white font-bold text-sm">
+                                            #@rank
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Template Info -->
+                                    <div class="flex-1 min-w-0">
+                                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1 truncate">
+                                            @template.Title
+                                        </h3>
+                                        <div class="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                                            <span class="flex items-center">
+                                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                                                </svg>
+                                                By: @(template.User.Email?.Substring(0, 6) ?? "Anonymous")
+                                            </span>
+                                            <span class="flex items-center">
+                                                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" clip-rule="evenodd"/>
+                                                </svg>
+                                                @template.FilledFormsCount forms filled
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Action Button -->
+                                <div class="flex-shrink-0 ml-4">
                                     <a asp-controller="Forms" asp-action="Create" asp-route-TemplateId="@template.Id"
-                                       class="text-primary hover:text-secondary font-medium">Use Template</a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+                                       class="inline-flex items-center px-4 py-2 bg-primary hover:bg-secondary text-white text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-primary/50">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                        </svg>
+                                        Use Template
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                    {rank++;}
+                }
             </div>
         }
         else
         {
-            <p class="text-gray-500 dark:text-gray-400 italic">No popular templates found.</p>
+            <div class="text-center py-12">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">No popular templates found</h3>
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Get started by creating your first template.</p>
+            </div>
         }
     </section>
 
     <!-- Tag Cloud -->
     <section aria-labelledby="tag-cloud-heading" class="mb-16">
         <h2 id="tag-cloud-heading" class="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-6">
-            Tag Cloud
+            Browse by Category
         </h2>
 
         @if (allTags != null && allTags.Any())
         {
-            <div class="flex flex-wrap gap-3">
-                @foreach (var tag in allTags)
-                {
-                    <a asp-action="Search" asp-controller="Template" asp-route-Tag="@tag"
-                       class="bg-indigo-100 text-indigo-800 text-sm font-medium px-3 py-1 rounded-full hover:bg-indigo-200 transition-colors cursor-pointer">
-                        @tag
-                    </a>
-                }
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+                <div class="flex flex-wrap gap-3">
+                    @foreach (var tag in allTags)
+                    {
+                        <a asp-action="Search" asp-controller="Template" asp-route-Tag="@tag"
+                           class="inline-flex items-center bg-gradient-to-r from-indigo-100 to-purple-100 dark:from-indigo-900 dark:to-purple-900 text-indigo-800 dark:text-indigo-200 text-sm font-medium px-4 py-2 rounded-full hover:from-indigo-200 hover:to-purple-200 dark:hover:from-indigo-800 dark:hover:to-purple-800 transition-all duration-200 cursor-pointer shadow-sm hover:shadow-md">
+                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>
+                            </svg>
+                            @tag
+                        </a>
+                    }
+                </div>
             </div>
         }
         else
         {
-            <p class="text-gray-500 dark:text-gray-400 italic">No tags available yet.</p>
+            <div class="text-center py-8 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+                <svg class="mx-auto h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                </svg>
+                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400 italic">No tags available yet.</p>
+            </div>
         }
     </section>
 
