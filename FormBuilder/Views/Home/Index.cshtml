@@ -1,7 +1,7 @@
 ﻿@using FormBuilder.Interface
 @inject ITemplateService _templateService;
 @{
-    var formTemplates = await _templateService.GetFormTemplates();
+    var formTemplates = await _templateService.GetFormTemplatesAsync();
     var popularTemplates = await _templateService.GetPopularTemplates(5);
     var latestTemplates = await _templateService.GetLatestTemplates();
 

@@ -34,13 +34,13 @@ namespace FormBuilder.Controllers
 
             return View();
         }
-
         [HttpGet]
-        public async Task<IActionResult> All()
+        public async Task<IActionResult> All(string search, string tag, string sort)
         {
-            var result = await _templateService.GetFormTemplates();
+            var result = await _templateService.GetFormTemplatesAsync(search, tag, sort);
             return View(result);
         }
+
         [HttpGet]
         public async Task<IActionResult> Edit(int templateId)
         {

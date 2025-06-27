@@ -27,32 +27,45 @@ namespace FormBuilder.Service
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<List<FormTemplate>> GetFormTemplates()
+        public async Task<List<FormTemplate>> GetFormTemplatesAsync(string search = null, string tag = null, string sort = null)
         {
-            var templates = await _context.FormTemplates
-                .Include(x => x.User)
-                .Include(x => x.Tags)
-                .Include(x => x.Comments)
-                .ToListAsync();
+            var query = _context.FormTemplates
+                .Include(f => f.Tags)
+                .Include(f => f.User)
+                .Include(f => f.Comments)
+                .AsQueryable();
 
-            var filledCounts = await _context.Answers
-                .GroupBy(a => a.TemplateId)
-                .Select(g => new
-                {
-                    TemplateId = g.Key,
-                    Count = g.Select(a => a.UserId).Distinct().Count()
-                })
-                .ToListAsync();
-
-            // Map counts back to the templates
-            foreach (var template in templates)
+            if (!string.IsNullOrEmpty(search))
             {
-                var countEntry = filledCounts.FirstOrDefault(c => c.TemplateId == template.Id);
-                template.FilledFormsCount = countEntry?.Count ?? 0;
+                query = query.Where(f => f.Description.Contains(search)
+                                    || f.Tags.Any(t => t.Name.Contains(search)));
             }
 
-            return templates;
+            // Get results from DB
+            var results = await query.ToListAsync();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                results = results.Where(f => f.Title.ToString().Contains(search)).ToList();
+            }
+            if (!string.IsNullOrEmpty(tag) && tag != "All")
+            {
+                results = results.Where(f => f.Title.ToString() == tag).ToList();
+            }
+
+
+            results = sort switch
+            {
+                "Newest" => results.OrderByDescending(f => f.CreatedAt).ToList(),
+                "Name" => results.OrderBy(f => f.Title.ToString()).ToList(),
+                "Popular" => results.OrderByDescending(f => f.FilledFormsCount).ToList(),
+                _ => results
+            };
+
+            return results;
         }
+
+
         public async Task<List<FormTemplate>> GetPopularTemplates(int count)
         {
             var filledCounts = await _context.Answers
@@ -349,30 +362,27 @@ namespace FormBuilder.Service
 
             return filtered;
         }
-
         public async Task DeleteTemplatesAsync(List<int?> templateIds)
         {
             var nonNullTemplateIds = templateIds.Where(id => id.HasValue).Select(id => id.Value).ToList();
 
-            // Delete Tags linked to templates first
             var tagsToDelete = await _context.Tags
                 .Where(t => t.TemplateId != null && nonNullTemplateIds.Contains(t.TemplateId))
                 .ToListAsync();
             _context.Tags.RemoveRange(tagsToDelete);
 
-            // Delete Comments linked to templates
+            // Delete Comments linked directly to templates
             var templateComments = await _context.Comments
                 .Where(c => c.TemplateId != null && nonNullTemplateIds.Contains(c.TemplateId.Value))
                 .ToListAsync();
             _context.Comments.RemoveRange(templateComments);
 
-            // Get forms linked to these templates
+            // Get Forms linked to these templates
             var forms = await _context.Forms
                 .Where(f => f.TemplateId != null && nonNullTemplateIds.Contains(f.TemplateId.Value))
                 .ToListAsync();
             var formIds = forms.Select(f => f.Id).ToList();
 
-            // Delete Comments linked to those forms
             var formComments = await _context.Comments
                 .Where(c => c.FormId != null && formIds.Contains(c.FormId.Value))
                 .ToListAsync();
@@ -384,10 +394,10 @@ namespace FormBuilder.Service
                 .ToListAsync();
             _context.Answers.RemoveRange(answers);
 
-            // Delete forms
+            // Delete the forms
             _context.Forms.RemoveRange(forms);
 
-            // Delete templates
+            // Delete the templates
             var templates = await _context.FormTemplates
                 .Where(t => nonNullTemplateIds.Contains(t.Id))
                 .ToListAsync();
@@ -396,9 +406,6 @@ namespace FormBuilder.Service
             await _context.SaveChangesAsync();
         }
 
-
-
-
-
+        
     }
 }

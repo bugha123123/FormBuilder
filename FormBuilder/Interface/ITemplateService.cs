@@ -4,7 +4,7 @@ namespace FormBuilder.Interface
 {
     public interface ITemplateService
     {
-        Task<List<FormTemplate>> GetFormTemplates();
+        Task<List<FormTemplate>> GetFormTemplatesAsync(string search = null, string tag = null, string sort = null);
 
         Task<List<Tag>> GetAutoCompleteTags(string kewWord);
 

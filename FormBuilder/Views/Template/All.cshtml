@@ -1,8 +1,13 @@
-﻿@using FormBuilder.Interface
-@inject ITemplateService _templateService;
+﻿@using FormBuilder.Enums
+@using FormBuilder.Interface
+@inject ITemplateService _templateService
 
 @{
-    var result = await _templateService.GetFormTemplates();
+    var result = await _templateService.GetFormTemplatesAsync(
+        Context.Request.Query["search"],
+        Context.Request.Query["tag"],
+        Context.Request.Query["sort"]
+    );
 }
 
 <div class="min-h-screen bg-gray-50">
@@ -17,67 +22,69 @@
                 <div class="flex items-center space-x-3">
                     @if (User.Identity.IsAuthenticated)
                     {
-                        <div class="flex items-center space-x-3">
-                            <a asp-action="Create" asp-controller="Template">
-                                <button class="inline-flex items-center px-4 py-2 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors">
-                                    <i class="fas fa-plus mr-2"></i>
-                                    Create Template
-                                </button>
-                            </a>
-                        </div>
+                        <a asp-action="Create" asp-controller="Template">
+                            <button class="inline-flex items-center px-4 py-2 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors">
+                                <i class="fas fa-plus mr-2"></i>
+                                Create Template
+                            </button>
+                        </a>
                     }
                     else
                     {
-                        <div class="flex items-center space-x-3">
-                            <a asp-action="signin" asp-controller="Auth">
-                                <button class="inline-flex items-center px-4 py-2 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors">
-                                    <i class="fas fa-plus mr-2"></i>
-                                    Create Template
-                                </button>
-                            </a>
-                        </div>
+                        <a asp-action="signin" asp-controller="Auth">
+                            <button class="inline-flex items-center px-4 py-2 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors">
+                                <i class="fas fa-plus mr-2"></i>
+                                Create Template
+                            </button>
+                        </a>
                     }
-
                 </div>
             </div>
         </div>
     </div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Search and Filter Bar -->
-        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
-            <div class="flex flex-col sm:flex-row gap-4">
-                <div class="flex-1">
-                    <div class="relative">
-                        <input type="text" placeholder="Search templates..."
-                               class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
-                        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                    </div>
+        <form method="get" class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-8">
+            <div class="flex flex-col sm:flex-row gap-4 items-center">
+                <div class="flex-1 relative">
+                    <input type="text" name="search" value="@Context.Request.Query["search"]" placeholder="Search templates..."
+                           class="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all" />
+                    <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                 </div>
-                <div class="flex gap-3">
-                    <select class="px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
-                        <option>All Categories</option>
-                        <option>Contact Forms</option>
-                        <option>Survey Forms</option>
-                        <option>Registration Forms</option>
-                        <option>Feedback Forms</option>
+                <div class="flex gap-3 items-center">
+                    <select name="tag" class="px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <option value="All" selected="@(Context.Request.Query["tag"] == "All")">All Categories</option>
+
+                        @foreach (TemplateTitle title in Enum.GetValues(typeof(TemplateTitle)))
+                        {
+                            var titleName = title.ToString();
+                            <option value="@titleName" selected="@(Context.Request.Query["tag"] == titleName)">
+                                @titleName
+                            </option>
+                        }
                     </select>
-                    <select class="px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all">
-                        <option>Sort by: Popular</option>
-                        <option>Sort by: Newest</option>
-                        <option>Sort by: Name</option>
-                        <option>Sort by: Rating</option>
+
+
+                    <select name="sort" class="px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <option value="Popular" selected="@(Context.Request.Query["sort"] == "Popular")">Sort by: Popular</option>
+                        <option value="Newest" selected="@(Context.Request.Query["sort"] == "Newest")">Sort by: Newest</option>
+                        <option value="Name" selected="@(Context.Request.Query["sort"] == "Name")">Sort by: Name</option>
                     </select>
+
+                    <button type="submit" class="px-4 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all">
+                        <i class="fas fa-search mr-2"></i>
+                        Search
+                    </button>
                 </div>
             </div>
-        </div>
+        </form>
+
 
         <!-- Templates Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             @foreach (var item in result)
             {
                 <div class="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all duration-200 overflow-hidden">
-                    <!-- Template Image -->
                     <div class="relative h-48">
                         <a asp-action="Details" asp-controller="Template" asp-route-id="@item.Id" class="block w-full h-full">
                             <img src="@(item.ImageUrl != null ? item.ImageUrl.Replace("/upload/", "/upload/c_fill,w_400,h_200/") : "/placeholder.svg?height=200&width=400")"
@@ -86,12 +93,9 @@
                         </a>
                     </div>
 
-                    <!-- Template Content -->
                     <div class="p-6">
-                        <!-- Template Title -->
                         <h3 class="text-lg font-semibold text-gray-900 mb-3 line-clamp-2">@item.Title</h3>
 
-                        <!-- Author Info -->
                         <div class="flex items-center mb-4">
                             <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center mr-3">
                                 <span class="text-white text-sm font-medium">
@@ -101,13 +105,11 @@
                             <span class="text-sm text-gray-600">by @(item.User?.UserName ?? "Unknown")</span>
                         </div>
 
-                        <!-- Description -->
                         @if (!string.IsNullOrEmpty(item.Description))
                         {
                             <p class="text-sm text-gray-600 mb-4 line-clamp-2">@item.Description</p>
                         }
 
-                        <!-- Tags -->
                         @if (item.SavedTags != null && item.SavedTags.Any())
                         {
                             <div class="flex flex-wrap gap-2 mb-4">
@@ -124,7 +126,6 @@
                             </div>
                         }
 
-                        <!-- Actions -->
                         <div class="pt-4 border-t border-gray-100">
                             <a asp-controller="Forms" asp-action="Create" asp-route-TemplateId="@item.Id"
                                class="w-full inline-flex items-center justify-center px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors">
