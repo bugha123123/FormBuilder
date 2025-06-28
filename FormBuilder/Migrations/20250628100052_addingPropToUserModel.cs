@@ -6,128 +6,109 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FormBuilder.Migrations
 {
     /// <inheritdoc />
-    public partial class ashgdawdwadawdawd : Migration
+    public partial class addingPropToUserModel : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
-                name: "FormTemplateId",
-                table: "Answers",
-                type: "int",
-                nullable: true);
+            migrationBuilder.AddColumn<DateTime>(
+                name: "JoinedAt",
+                table: "AspNetUsers",
+                type: "datetime2",
+                nullable: false,
+                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
 
             migrationBuilder.UpdateData(
                 table: "Tags",
                 keyColumn: "Id",
                 keyValue: 1,
                 column: "CreatedAt",
-                value: new DateTime(2025, 6, 25, 22, 56, 7, 613, DateTimeKind.Local).AddTicks(8867));
+                value: new DateTime(2025, 6, 28, 14, 0, 52, 114, DateTimeKind.Local).AddTicks(971));
 
             migrationBuilder.UpdateData(
                 table: "Tags",
                 keyColumn: "Id",
                 keyValue: 2,
                 column: "CreatedAt",
-                value: new DateTime(2025, 6, 25, 22, 56, 7, 613, DateTimeKind.Local).AddTicks(8877));
+                value: new DateTime(2025, 6, 28, 14, 0, 52, 114, DateTimeKind.Local).AddTicks(985));
 
             migrationBuilder.UpdateData(
                 table: "Tags",
                 keyColumn: "Id",
                 keyValue: 3,
                 column: "CreatedAt",
-                value: new DateTime(2025, 6, 25, 22, 56, 7, 613, DateTimeKind.Local).AddTicks(8878));
+                value: new DateTime(2025, 6, 28, 14, 0, 52, 114, DateTimeKind.Local).AddTicks(986));
 
             migrationBuilder.UpdateData(
                 table: "Tags",
                 keyColumn: "Id",
                 keyValue: 4,
                 column: "CreatedAt",
-                value: new DateTime(2025, 6, 25, 22, 56, 7, 613, DateTimeKind.Local).AddTicks(8879));
+                value: new DateTime(2025, 6, 28, 14, 0, 52, 114, DateTimeKind.Local).AddTicks(987));
 
             migrationBuilder.UpdateData(
                 table: "Tags",
                 keyColumn: "Id",
                 keyValue: 5,
                 column: "CreatedAt",
-                value: new DateTime(2025, 6, 25, 22, 56, 7, 613, DateTimeKind.Local).AddTicks(8880));
+                value: new DateTime(2025, 6, 28, 14, 0, 52, 114, DateTimeKind.Local).AddTicks(988));
 
             migrationBuilder.UpdateData(
                 table: "Tags",
                 keyColumn: "Id",
                 keyValue: 6,
                 column: "CreatedAt",
-                value: new DateTime(2025, 6, 25, 22, 56, 7, 613, DateTimeKind.Local).AddTicks(8881));
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Answers_FormTemplateId",
-                table: "Answers",
-                column: "FormTemplateId");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Answers_FormTemplates_FormTemplateId",
-                table: "Answers",
-                column: "FormTemplateId",
-                principalTable: "FormTemplates",
-                principalColumn: "Id");
+                value: new DateTime(2025, 6, 28, 14, 0, 52, 114, DateTimeKind.Local).AddTicks(989));
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Answers_FormTemplates_FormTemplateId",
-                table: "Answers");
-
-            migrationBuilder.DropIndex(
-                name: "IX_Answers_FormTemplateId",
-                table: "Answers");
-
             migrationBuilder.DropColumn(
-                name: "FormTemplateId",
-                table: "Answers");
+                name: "JoinedAt",
+                table: "AspNetUsers");
 
             migrationBuilder.UpdateData(
                 table: "Tags",
                 keyColumn: "Id",
                 keyValue: 1,
                 column: "CreatedAt",
-                value: new DateTime(2025, 6, 25, 22, 45, 4, 182, DateTimeKind.Local).AddTicks(2137));
+                value: new DateTime(2025, 6, 28, 13, 30, 17, 498, DateTimeKind.Local).AddTicks(7024));
 
             migrationBuilder.UpdateData(
                 table: "Tags",
                 keyColumn: "Id",
                 keyValue: 2,
                 column: "CreatedAt",
-                value: new DateTime(2025, 6, 25, 22, 45, 4, 182, DateTimeKind.Local).AddTicks(2146));
+                value: new DateTime(2025, 6, 28, 13, 30, 17, 498, DateTimeKind.Local).AddTicks(7035));
 
             migrationBuilder.UpdateData(
                 table: "Tags",
                 keyColumn: "Id",
                 keyValue: 3,
                 column: "CreatedAt",
-                value: new DateTime(2025, 6, 25, 22, 45, 4, 182, DateTimeKind.Local).AddTicks(2147));
+                value: new DateTime(2025, 6, 28, 13, 30, 17, 498, DateTimeKind.Local).AddTicks(7036));
 
             migrationBuilder.UpdateData(
                 table: "Tags",
                 keyColumn: "Id",
                 keyValue: 4,
                 column: "CreatedAt",
-                value: new DateTime(2025, 6, 25, 22, 45, 4, 182, DateTimeKind.Local).AddTicks(2148));
+                value: new DateTime(2025, 6, 28, 13, 30, 17, 498, DateTimeKind.Local).AddTicks(7038));
 
             migrationBuilder.UpdateData(
                 table: "Tags",
                 keyColumn: "Id",
                 keyValue: 5,
                 column: "CreatedAt",
-                value: new DateTime(2025, 6, 25, 22, 45, 4, 182, DateTimeKind.Local).AddTicks(2149));
+                value: new DateTime(2025, 6, 28, 13, 30, 17, 498, DateTimeKind.Local).AddTicks(7039));
 
             migrationBuilder.UpdateData(
                 table: "Tags",
                 keyColumn: "Id",
                 keyValue: 6,
                 column: "CreatedAt",
-                value: new DateTime(2025, 6, 25, 22, 45, 4, 182, DateTimeKind.Local).AddTicks(2150));
+                value: new DateTime(2025, 6, 28, 13, 30, 17, 498, DateTimeKind.Local).AddTicks(7040));
         }
     }
 }

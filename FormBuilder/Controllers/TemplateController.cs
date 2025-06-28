@@ -60,7 +60,7 @@ namespace FormBuilder.Controllers
 
             if (template.UserId == user.Id ||
                 template.AssignedUsers.Contains(user.Email) ||
-                template.isPublic)
+                template.isPublic || User.IsInRole("Admin"))
             {
                 return View(template);
             }

@@ -54,7 +54,7 @@ public class FormsController : Controller
         var result = await _formService.GetFormById(formId);
         var user = await _authService.GetLoggedInUserAsync();
 
-        if (result.UserId == user.Id || result.Template.AssignedUsers.Contains(user.Email) || !result.Template.isPublic)
+        if (result.UserId == user.Id || result.Template.AssignedUsers.Contains(user.Email) || !result.Template.isPublic || User.IsInRole("Admin"))
         {
 
             return View(result);

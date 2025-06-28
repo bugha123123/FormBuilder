@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FormBuilder.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250625185608_ashgdawdwadawdawd")]
-    partial class ashgdawdwadawdawd
+    [Migration("20250628101528_removingProp")]
+    partial class removingProp
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -269,9 +269,6 @@ namespace FormBuilder.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int>("TemplateId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
@@ -285,44 +282,38 @@ namespace FormBuilder.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 6, 25, 22, 56, 7, 613, DateTimeKind.Local).AddTicks(8867),
-                            Name = "HR",
-                            TemplateId = 0
+                            CreatedAt = new DateTime(2025, 6, 28, 14, 15, 28, 367, DateTimeKind.Local).AddTicks(8779),
+                            Name = "HR"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 6, 25, 22, 56, 7, 613, DateTimeKind.Local).AddTicks(8877),
-                            Name = "Recruitment",
-                            TemplateId = 0
+                            CreatedAt = new DateTime(2025, 6, 28, 14, 15, 28, 367, DateTimeKind.Local).AddTicks(8790),
+                            Name = "Recruitment"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2025, 6, 25, 22, 56, 7, 613, DateTimeKind.Local).AddTicks(8878),
-                            Name = "Event",
-                            TemplateId = 0
+                            CreatedAt = new DateTime(2025, 6, 28, 14, 15, 28, 367, DateTimeKind.Local).AddTicks(8792),
+                            Name = "Event"
                         },
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2025, 6, 25, 22, 56, 7, 613, DateTimeKind.Local).AddTicks(8879),
-                            Name = "Signup",
-                            TemplateId = 0
+                            CreatedAt = new DateTime(2025, 6, 28, 14, 15, 28, 367, DateTimeKind.Local).AddTicks(8793),
+                            Name = "Signup"
                         },
                         new
                         {
                             Id = 5,
-                            CreatedAt = new DateTime(2025, 6, 25, 22, 56, 7, 613, DateTimeKind.Local).AddTicks(8880),
-                            Name = "Customer",
-                            TemplateId = 0
+                            CreatedAt = new DateTime(2025, 6, 28, 14, 15, 28, 367, DateTimeKind.Local).AddTicks(8794),
+                            Name = "Customer"
                         },
                         new
                         {
                             Id = 6,
-                            CreatedAt = new DateTime(2025, 6, 25, 22, 56, 7, 613, DateTimeKind.Local).AddTicks(8881),
-                            Name = "Survey",
-                            TemplateId = 0
+                            CreatedAt = new DateTime(2025, 6, 28, 14, 15, 28, 367, DateTimeKind.Local).AddTicks(8795),
+                            Name = "Survey"
                         });
                 });
 
@@ -344,6 +335,9 @@ namespace FormBuilder.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime>("JoinedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");

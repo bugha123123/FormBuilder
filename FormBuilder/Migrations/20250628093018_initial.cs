@@ -266,7 +266,8 @@ namespace FormBuilder.Migrations
                     QuestionId = table.Column<int>(type: "int", nullable: false),
                     TemplateId = table.Column<int>(type: "int", nullable: false),
                     Response = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    QuestionType = table.Column<int>(type: "int", nullable: false)
+                    QuestionType = table.Column<int>(type: "int", nullable: false),
+                    FormTemplateId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -277,6 +278,11 @@ namespace FormBuilder.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Answers_FormTemplates_FormTemplateId",
+                        column: x => x.FormTemplateId,
+                        principalTable: "FormTemplates",
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Answers_FormTemplates_TemplateId",
                         column: x => x.TemplateId,
@@ -364,18 +370,23 @@ namespace FormBuilder.Migrations
                 columns: new[] { "Id", "CreatedAt", "FormTemplateId", "Name", "TemplateId", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2025, 6, 25, 22, 45, 4, 182, DateTimeKind.Local).AddTicks(2137), null, "HR", 0, null },
-                    { 2, new DateTime(2025, 6, 25, 22, 45, 4, 182, DateTimeKind.Local).AddTicks(2146), null, "Recruitment", 0, null },
-                    { 3, new DateTime(2025, 6, 25, 22, 45, 4, 182, DateTimeKind.Local).AddTicks(2147), null, "Event", 0, null },
-                    { 4, new DateTime(2025, 6, 25, 22, 45, 4, 182, DateTimeKind.Local).AddTicks(2148), null, "Signup", 0, null },
-                    { 5, new DateTime(2025, 6, 25, 22, 45, 4, 182, DateTimeKind.Local).AddTicks(2149), null, "Customer", 0, null },
-                    { 6, new DateTime(2025, 6, 25, 22, 45, 4, 182, DateTimeKind.Local).AddTicks(2150), null, "Survey", 0, null }
+                    { 1, new DateTime(2025, 6, 28, 13, 30, 17, 498, DateTimeKind.Local).AddTicks(7024), null, "HR", 0, null },
+                    { 2, new DateTime(2025, 6, 28, 13, 30, 17, 498, DateTimeKind.Local).AddTicks(7035), null, "Recruitment", 0, null },
+                    { 3, new DateTime(2025, 6, 28, 13, 30, 17, 498, DateTimeKind.Local).AddTicks(7036), null, "Event", 0, null },
+                    { 4, new DateTime(2025, 6, 28, 13, 30, 17, 498, DateTimeKind.Local).AddTicks(7038), null, "Signup", 0, null },
+                    { 5, new DateTime(2025, 6, 28, 13, 30, 17, 498, DateTimeKind.Local).AddTicks(7039), null, "Customer", 0, null },
+                    { 6, new DateTime(2025, 6, 28, 13, 30, 17, 498, DateTimeKind.Local).AddTicks(7040), null, "Survey", 0, null }
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Answers_FormId",
                 table: "Answers",
                 column: "FormId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Answers_FormTemplateId",
+                table: "Answers",
+                column: "FormTemplateId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Answers_TemplateId",

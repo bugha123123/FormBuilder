@@ -1,0 +1,257 @@
+﻿@using FormBuilder.Interface
+
+@{
+    ViewData["Title"] = "Admin Panel - User Management";
+}
+@inject IAdminService _adminservice;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Admin Panel – User Management</h1>
+            <p class="text-gray-600">Manage users, roles, and permissions</p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <span id="selectionCount" class="text-sm text-gray-600">0 users selected</span>
+                        <button id="selectAll" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                            Select All
+                        </button>
+                        <button id="clearSelection" class="text-sm text-gray-600 hover:text-gray-800 font-medium">
+                            Clear Selection
+                        </button>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2">
+                        <button id="viewUserBtn" class="px-3 py-2 bg-purple-600 text-white text-sm font-medium rounded-md hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            View
+                        </button>
+                        <button id="addAdminBtn" class="px-3 py-2 bg-purple-600 text-white text-sm font-medium rounded-md hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            Add to Admins
+                        </button>
+                        <button id="removeAdminBtn" class="px-3 py-2 bg-yellow-600 text-white text-sm font-medium rounded-md hover:bg-yellow-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            Remove from Admins
+                        </button>
+                        <button id="blockBtn" class="px-3 py-2 bg-orange-600 text-white text-sm font-medium rounded-md hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            Block
+                        </button>
+                        <button id="unblockBtn" class="px-3 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            Unblock
+                        </button>
+                        <button id="deleteBtn" class="px-3 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left">
+                                <input type="checkbox" id="masterCheckbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @foreach (var user in await _adminservice.GetAllUsersAsync())
+                        {
+                            var roles = await Context.RequestServices.GetRequiredService<Microsoft.AspNetCore.Identity.UserManager<FormBuilder.Models.User>>()
+                            .GetRolesAsync(user);
+
+                            bool isAdmin = roles.Contains("Admin");
+
+                            <tr class="hover:bg-gray-50 transition-colors" data-userid="@user.Id">
+                                <td class="px-6 py-4">
+                                    <input type="checkbox" class="user-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium">
+                                            @user.UserName.Substring(0, Math.Min(2, user.UserName.Length)).ToUpper()
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900">@user.UserName</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm text-gray-900">@user.Email</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @if (isAdmin)
+                                    {
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">Admin</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">User</span>
+                                    }
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @if (user.LockoutEnd.HasValue && user.LockoutEnd > DateTimeOffset.UtcNow)
+                                    {
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Blocked</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Active</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+               const masterCheckbox = document.getElementById('masterCheckbox');
+        const selectionCount = document.getElementById('selectionCount');
+        const selectAllBtn = document.getElementById('selectAll');
+        const clearSelectionBtn = document.getElementById('clearSelection');
+
+        const addAdminBtn = document.getElementById('addAdminBtn');
+        const removeAdminBtn = document.getElementById('removeAdminBtn');
+        const blockBtn = document.getElementById('blockBtn');
+        const unblockBtn = document.getElementById('unblockBtn');
+        const deleteBtn = document.getElementById('deleteBtn');
+        const viewUserBtn = document.getElementById('viewUserBtn');
+
+        function getUserCheckboxes() {
+            return document.querySelectorAll('.user-checkbox');
+        }
+
+        function updateUI() {
+            const userCheckboxes = getUserCheckboxes(); // fresh list every time
+            const checkedBoxes = document.querySelectorAll('.user-checkbox:checked');
+            const count = checkedBoxes.length;
+
+            selectionCount.textContent = `${count} user${count !== 1 ? 's' : ''} selected`;
+
+            if (count === 0) {
+                masterCheckbox.indeterminate = false;
+                masterCheckbox.checked = false;
+            } else if (count === userCheckboxes.length) {
+                masterCheckbox.indeterminate = false;
+                masterCheckbox.checked = true;
+            } else {
+                masterCheckbox.indeterminate = true;
+                masterCheckbox.checked = false;
+            }
+
+            // Enable/disable action buttons
+            [addAdminBtn, removeAdminBtn, blockBtn, unblockBtn, deleteBtn].forEach(btn => {
+                btn.disabled = count === 0;
+            });
+
+            // Enable View button only if exactly 1 user is selected
+            viewUserBtn.disabled = (count !== 1);
+        }
+
+        // Attach event listeners dynamically
+        function attachCheckboxListeners() {
+            const userCheckboxes = getUserCheckboxes();
+
+            userCheckboxes.forEach(chk => {
+                chk.addEventListener('change', updateUI);
+            });
+        }
+
+        masterCheckbox.addEventListener('change', () => {
+            const userCheckboxes = getUserCheckboxes();
+            userCheckboxes.forEach(chk => chk.checked = masterCheckbox.checked);
+            updateUI();
+        });
+
+        selectAllBtn.addEventListener('click', () => {
+            const userCheckboxes = getUserCheckboxes();
+            userCheckboxes.forEach(chk => chk.checked = true);
+            updateUI();
+        });
+
+        clearSelectionBtn.addEventListener('click', () => {
+            const userCheckboxes = getUserCheckboxes();
+            userCheckboxes.forEach(chk => chk.checked = false);
+            updateUI();
+        });
+
+        addAdminBtn.addEventListener('click', () => postAction('/admin/add-admins'));
+        removeAdminBtn.addEventListener('click', () => postAction('/admin/remove-admins'));
+        blockBtn.addEventListener('click', () => postAction('/admin/block-users'));
+        unblockBtn.addEventListener('click', () => postAction('/admin/unblock-users'));
+        deleteBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to delete selected users?')) {
+                postAction('/admin/delete-users');
+            }
+        });
+
+        viewUserBtn.addEventListener('click', () => {
+            const checkedBoxes = Array.from(document.querySelectorAll('.user-checkbox:checked'));
+
+            if (checkedBoxes.length === 0) {
+                alert('Please select one user to view.');
+                return;
+            }
+
+            if (checkedBoxes.length > 1) {
+                alert('You can only view one user at a time. Selecting the first one.');
+                // Uncheck all except the first checked checkbox
+                checkedBoxes.slice(1).forEach(chk => chk.checked = false);
+                updateUI();
+            }
+
+            const userId = checkedBoxes[0].closest('tr').dataset.userid;
+
+            window.location.href = `/admin/users`;
+        });
+
+        function postAction(url) {
+            const checkedRows = Array.from(document.querySelectorAll('.user-checkbox:checked'))
+                .map(chk => chk.closest('tr').dataset.userid);
+
+            if (checkedRows.length === 0) {
+                alert('No users selected.');
+                return;
+            }
+
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(checkedRows)
+            }).then(response => {
+                if (response.ok) {
+                    alert('Action completed successfully.');
+                    location.reload();
+                } else {
+                    alert('Something went wrong.');
+                }
+            });
+        }
+
+        // Initial setup
+        attachCheckboxListeners();
+        updateUI();
+
+
+
+    </script>
+</body>
+</html>

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FormBuilder.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250625184504_initial")]
-    partial class initial
+    [Migration("20250628100052_addingPropToUserModel")]
+    partial class addingPropToUserModel
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -107,6 +107,9 @@ namespace FormBuilder.Migrations
                     b.Property<int>("FormId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("FormTemplateId")
+                        .HasColumnType("int");
+
                     b.Property<int>("QuestionId")
                         .HasColumnType("int");
 
@@ -127,6 +130,8 @@ namespace FormBuilder.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("FormId");
+
+                    b.HasIndex("FormTemplateId");
 
                     b.HasIndex("TemplateId");
 
@@ -280,42 +285,42 @@ namespace FormBuilder.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 6, 25, 22, 45, 4, 182, DateTimeKind.Local).AddTicks(2137),
+                            CreatedAt = new DateTime(2025, 6, 28, 14, 0, 52, 114, DateTimeKind.Local).AddTicks(971),
                             Name = "HR",
                             TemplateId = 0
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 6, 25, 22, 45, 4, 182, DateTimeKind.Local).AddTicks(2146),
+                            CreatedAt = new DateTime(2025, 6, 28, 14, 0, 52, 114, DateTimeKind.Local).AddTicks(985),
                             Name = "Recruitment",
                             TemplateId = 0
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2025, 6, 25, 22, 45, 4, 182, DateTimeKind.Local).AddTicks(2147),
+                            CreatedAt = new DateTime(2025, 6, 28, 14, 0, 52, 114, DateTimeKind.Local).AddTicks(986),
                             Name = "Event",
                             TemplateId = 0
                         },
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2025, 6, 25, 22, 45, 4, 182, DateTimeKind.Local).AddTicks(2148),
+                            CreatedAt = new DateTime(2025, 6, 28, 14, 0, 52, 114, DateTimeKind.Local).AddTicks(987),
                             Name = "Signup",
                             TemplateId = 0
                         },
                         new
                         {
                             Id = 5,
-                            CreatedAt = new DateTime(2025, 6, 25, 22, 45, 4, 182, DateTimeKind.Local).AddTicks(2149),
+                            CreatedAt = new DateTime(2025, 6, 28, 14, 0, 52, 114, DateTimeKind.Local).AddTicks(988),
                             Name = "Customer",
                             TemplateId = 0
                         },
                         new
                         {
                             Id = 6,
-                            CreatedAt = new DateTime(2025, 6, 25, 22, 45, 4, 182, DateTimeKind.Local).AddTicks(2150),
+                            CreatedAt = new DateTime(2025, 6, 28, 14, 0, 52, 114, DateTimeKind.Local).AddTicks(989),
                             Name = "Survey",
                             TemplateId = 0
                         });
@@ -339,6 +344,9 @@ namespace FormBuilder.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime>("JoinedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -565,6 +573,10 @@ namespace FormBuilder.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("FormBuilder.Models.FormTemplate", null)
+                        .WithMany("Answers")
+                        .HasForeignKey("FormTemplateId");
+
                     b.HasOne("FormBuilder.Models.FormTemplate", "FormTemplate")
                         .WithMany()
                         .HasForeignKey("TemplateId")
@@ -692,6 +704,8 @@ namespace FormBuilder.Migrations
 
             modelBuilder.Entity("FormBuilder.Models.FormTemplate", b =>
                 {
+                    b.Navigation("Answers");
+
                     b.Navigation("Comments");
 
                     b.Navigation("Questions");

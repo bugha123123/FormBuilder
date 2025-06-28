@@ -16,7 +16,6 @@ namespace FormBuilder.Service
             _signInManager = signInManager;
             _httpContextAccessor = httpContextAccessor;
         }
-
         public async Task<bool> RegisterAsync(RegisterViewModel model)
         {
             var user = new User
@@ -28,12 +27,15 @@ namespace FormBuilder.Service
             var result = await _userManager.CreateAsync(user, model.Password);
             if (result.Succeeded)
             {
+                await _userManager.AddToRoleAsync(user, "User");
+
                 await _signInManager.SignInAsync(user, isPersistent: false);
                 return true;
             }
 
             return false;
         }
+
 
         public async Task<bool> LoginAsync(LoginViewModel model)
         {

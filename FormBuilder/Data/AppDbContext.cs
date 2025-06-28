@@ -24,25 +24,27 @@ namespace FormBuilder.Data
 
         public DbSet<Like> Likes { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(builder);
-            builder.Entity<FormTemplate>()
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<FormTemplate>()
               .Property(e => e.Title)
               .HasConversion<string>();
-            builder.Seed();
+            modelBuilder.Seed();
 
-            builder.Entity<FormAnswer>()
+            modelBuilder.Entity<FormAnswer>()
        .HasOne(fa => fa.Form)
        .WithMany(f => f.Answers)
        .HasForeignKey("FormId")
        .OnDelete(DeleteBehavior.Restrict);
 
-            builder.Entity<FormAnswer>()
+            modelBuilder.Entity<FormAnswer>()
                 .HasOne(fa => fa.FormTemplate)
                 .WithMany() 
                 .HasForeignKey("TemplateId")
                 .OnDelete(DeleteBehavior.Restrict);
+
+
 
 
 

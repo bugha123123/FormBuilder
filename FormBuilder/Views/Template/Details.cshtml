@@ -3,11 +3,12 @@
 @using FormBuilder.Enums
 @model FormTemplate
 @inject IUserService _userService;
+
 <header class="bg-white shadow-sm border-b">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
             <div class="flex items-center space-x-3">
-            @if (Model.User.UserName == User.Identity.Name)
+            @if (Model.User.UserName == User.Identity.Name || User.IsInRole("Admin") )
                 {
                     <a asp-action="Edit" asp-controller="Template" asp-route-templateId="@Model.Id">
                         <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
