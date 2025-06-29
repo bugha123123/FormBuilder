@@ -196,7 +196,8 @@ namespace FormBuilder.Migrations
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     SubmittedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     FilledCount = table.Column<int>(type: "int", nullable: false),
-                    IsCompleted = table.Column<bool>(type: "bit", nullable: false)
+                    IsCompleted = table.Column<bool>(type: "bit", nullable: false),
+                    FilledByUserId = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -364,12 +365,12 @@ namespace FormBuilder.Migrations
                 columns: new[] { "Id", "CreatedAt", "FormTemplateId", "Name", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2025, 6, 30, 0, 29, 45, 756, DateTimeKind.Local).AddTicks(7967), null, "HR", null },
-                    { 2, new DateTime(2025, 6, 30, 0, 29, 45, 756, DateTimeKind.Local).AddTicks(7980), null, "Recruitment", null },
-                    { 3, new DateTime(2025, 6, 30, 0, 29, 45, 756, DateTimeKind.Local).AddTicks(7981), null, "Event", null },
-                    { 4, new DateTime(2025, 6, 30, 0, 29, 45, 756, DateTimeKind.Local).AddTicks(7982), null, "Signup", null },
-                    { 5, new DateTime(2025, 6, 30, 0, 29, 45, 756, DateTimeKind.Local).AddTicks(7983), null, "Customer", null },
-                    { 6, new DateTime(2025, 6, 30, 0, 29, 45, 756, DateTimeKind.Local).AddTicks(7984), null, "Survey", null }
+                    { 1, new DateTime(2025, 6, 30, 1, 1, 28, 660, DateTimeKind.Local).AddTicks(9638), null, "HR", null },
+                    { 2, new DateTime(2025, 6, 30, 1, 1, 28, 660, DateTimeKind.Local).AddTicks(9652), null, "Recruitment", null },
+                    { 3, new DateTime(2025, 6, 30, 1, 1, 28, 660, DateTimeKind.Local).AddTicks(9654), null, "Event", null },
+                    { 4, new DateTime(2025, 6, 30, 1, 1, 28, 660, DateTimeKind.Local).AddTicks(9655), null, "Signup", null },
+                    { 5, new DateTime(2025, 6, 30, 1, 1, 28, 660, DateTimeKind.Local).AddTicks(9656), null, "Customer", null },
+                    { 6, new DateTime(2025, 6, 30, 1, 1, 28, 660, DateTimeKind.Local).AddTicks(9657), null, "Survey", null }
                 });
 
             migrationBuilder.CreateIndex(

@@ -21,6 +21,8 @@ namespace FormBuilder.Models
 
         public bool IsCompleted { get; set; } = false;
 
+        public string FilledByUserId { get; set; }
+
 
     }
 }

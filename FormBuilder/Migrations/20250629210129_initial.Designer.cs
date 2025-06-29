@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FormBuilder.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250629202946_initial")]
+    [Migration("20250629210129_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -74,6 +74,10 @@ namespace FormBuilder.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("FilledByUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("FilledCount")
                         .HasColumnType("int");
@@ -274,37 +278,37 @@ namespace FormBuilder.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 6, 30, 0, 29, 45, 756, DateTimeKind.Local).AddTicks(7967),
+                            CreatedAt = new DateTime(2025, 6, 30, 1, 1, 28, 660, DateTimeKind.Local).AddTicks(9638),
                             Name = "HR"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 6, 30, 0, 29, 45, 756, DateTimeKind.Local).AddTicks(7980),
+                            CreatedAt = new DateTime(2025, 6, 30, 1, 1, 28, 660, DateTimeKind.Local).AddTicks(9652),
                             Name = "Recruitment"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2025, 6, 30, 0, 29, 45, 756, DateTimeKind.Local).AddTicks(7981),
+                            CreatedAt = new DateTime(2025, 6, 30, 1, 1, 28, 660, DateTimeKind.Local).AddTicks(9654),
                             Name = "Event"
                         },
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2025, 6, 30, 0, 29, 45, 756, DateTimeKind.Local).AddTicks(7982),
+                            CreatedAt = new DateTime(2025, 6, 30, 1, 1, 28, 660, DateTimeKind.Local).AddTicks(9655),
                             Name = "Signup"
                         },
                         new
                         {
                             Id = 5,
-                            CreatedAt = new DateTime(2025, 6, 30, 0, 29, 45, 756, DateTimeKind.Local).AddTicks(7983),
+                            CreatedAt = new DateTime(2025, 6, 30, 1, 1, 28, 660, DateTimeKind.Local).AddTicks(9656),
                             Name = "Customer"
                         },
                         new
                         {
                             Id = 6,
-                            CreatedAt = new DateTime(2025, 6, 30, 0, 29, 45, 756, DateTimeKind.Local).AddTicks(7984),
+                            CreatedAt = new DateTime(2025, 6, 30, 1, 1, 28, 660, DateTimeKind.Local).AddTicks(9657),
                             Name = "Survey"
                         });
                 });

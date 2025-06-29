@@ -61,6 +61,7 @@ public class FormService : IFormService
         form.FilledCount += 1;
         template.FilledFormsCount = form.FilledCount;
         form.IsCompleted = true;
+        form.FilledByUserId = user.Id;
         if (form.Answers != null)
         {
             foreach (var answer in form.Answers)
@@ -92,10 +93,13 @@ public class FormService : IFormService
     {
         var user = await _authService.GetLoggedInUserAsync();
 
-        return await _context.Forms.Where(x => x.UserId == user.Id).ToListAsync();
+        return await _context.Forms
+      .Include(f => f.Template)
+      .Where(f => f.FilledByUserId == user.Id)
+      .ToListAsync();
 
-        
     }
+
 
     public async Task<Form> GetFormById(int formId)
     {
