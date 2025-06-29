@@ -26,7 +26,7 @@
                 Latest Templates
             </h2>
             <a href="/Template/All"
-               class="inline-block bg-primary hover:bg-secondary text-white font-semibold py-2 px-4 rounded-md shadow-md transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-primary/50">
+            class="inline-block bg-primary hover:bg-secondary text-white font-semibold py-2 px-4 rounded-md shadow-md transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-primary/50">
                 See More Templates
             </a>
         </div>
@@ -42,8 +42,8 @@
                                 <img src="@(template.ImageUrl != null
                                     ? template.ImageUrl.Replace("/upload/", "/upload/c_fill,w_400,h_200/")
                                     : "/placeholder.svg?height=200&width=400")"
-                                     alt="@($"{template.Title} preview")"
-                                     class="object-cover rounded-t-lg w-full h-full" />
+                                alt="@($"{template.Title} preview")"
+                                class="object-cover rounded-t-lg w-full h-full" />
                             </a>
                         </div>
                         <div class="p-6 flex flex-col flex-grow">
@@ -68,8 +68,8 @@
                                 </a>
                             }
 
-                        
 
+                        </div>
                     </article>
                 }
             </div>
@@ -110,7 +110,7 @@
                                             #@rank
                                         </div>
                                     </div>
-                                    
+
                                     <!-- Template Info -->
                                     <div class="flex-1 min-w-0">
                                         <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1 truncate">
@@ -132,17 +132,19 @@
                                         </div>
                                     </div>
                                 </div>
-                                
-                                <!-- Action Button -->
-                                <div class="flex-shrink-0 ml-4">
-                                    <a asp-controller="Forms" asp-action="Create" asp-route-TemplateId="@template.Id"
-                                       class="inline-flex items-center px-4 py-2 bg-primary hover:bg-secondary text-white text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-primary/50">
-                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                                        </svg>
-                                        Use Template
-                                    </a>
-                                </div>
+
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <div class="flex-shrink-0 ml-4">
+                                        <a asp-controller="Forms" asp-action="Create" asp-route-TemplateId="@template.Id"
+                                        class="inline-flex items-center px-4 py-2 bg-primary hover:bg-secondary text-white text-sm font-medium rounded-md transition-colors duration-200 focus:outline-none focus:ring-4 focus:ring-primary/50">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                                            </svg>
+                                            Use Template
+                                        </a>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </article>

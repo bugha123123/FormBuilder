@@ -38,7 +38,7 @@
                                 </label>
                                 <div class="relative">
                                     <select asp-for="Title" asp-items="Html.GetEnumSelectList<TemplateTitle>()"
-                                            class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white">
+                                    class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white">
                                         <option value="">-- Select Template Title --</option>
                                     </select>
                                     <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
@@ -53,7 +53,7 @@
                                 </label>
                                 <div class="relative">
                                     <select asp-for="TopicId" asp-items="ViewBag.Topics"
-                                            class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white">
+                                    class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white">
                                         <option value="">Select a category</option>
                                     </select>
                                     <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none"></i>
@@ -69,8 +69,8 @@
                                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                     <div>
                                         <textarea asp-for="Description" id="markdown-input" rows="8"
-                                                  placeholder="Enter description (Markdown supported)"
-                                                  class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white"></textarea>
+                                        placeholder="Enter description (Markdown supported)"
+                                        class="w-full px-4 py-4 border-2 border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition-all duration-200 bg-gray-50 hover:bg-white"></textarea>
                                         <div class="flex items-center mt-2 text-sm text-gray-500">
                                             <i class="fab fa-markdown mr-2 text-blue-500"></i>
                                             Markdown supported
@@ -98,7 +98,7 @@
                                     <p class="text-green-100 mt-1">Build your form with custom questions</p>
                                 </div>
                                 <button type="button" id="add-question"
-                                        class="bg-white text-green-600 px-6 py-3 rounded-xl font-semibold hover:bg-green-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
+                                class="bg-white text-green-600 px-6 py-3 rounded-xl font-semibold hover:bg-green-50 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
                                     <i class="fas fa-plus mr-2"></i>
                                     Add Question
                                 </button>
@@ -182,8 +182,8 @@
                         <div class="p-6">
                             <div class="relative mb-4">
                                 <input id="tag-input" type="text"
-                                       class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-orange-100 focus:border-orange-500 transition-all duration-200 bg-gray-50 hover:bg-white"
-                                       placeholder="Add tags..." autocomplete="off" />
+                                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-orange-100 focus:border-orange-500 transition-all duration-200 bg-gray-50 hover:bg-white"
+                                placeholder="Add tags..." autocomplete="off" />
                                 <i class="fas fa-tag absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                                 <ul id="tag-suggestions" class="absolute z-50 w-full bg-white border-2 border-gray-200 rounded-xl max-h-40 overflow-auto mt-2 shadow-xl hidden"></ul>
                             </div>
@@ -200,7 +200,7 @@
                                     Assign Users
                                 </h3>
                                 <button type="button" id="toggle-sort"
-                                        class="text-xs px-3 py-2 bg-white bg-opacity-20 text-white rounded-lg hover:bg-opacity-30 transition-all duration-200">
+                                class="text-xs px-3 py-2 bg-white bg-opacity-20 text-white rounded-lg hover:bg-opacity-30 transition-all duration-200">
                                     Sort by Name
                                 </button>
                             </div>
@@ -208,8 +208,8 @@
                         <div class="p-6">
                             <div class="relative mb-4">
                                 <input id="user-autocomplete" type="text"
-                                       class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all duration-200 bg-gray-50 hover:bg-white"
-                                       placeholder="Search users..." autocomplete="off" />
+                                class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition-all duration-200 bg-gray-50 hover:bg-white"
+                                placeholder="Search users..." autocomplete="off" />
                                 <i class="fas fa-search absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
                                 <ul id="user-suggestions" class="absolute z-50 w-full bg-white border-2 border-gray-200 rounded-xl max-h-40 overflow-auto mt-2 shadow-xl hidden"></ul>
                             </div>
@@ -217,12 +217,25 @@
                         </div>
                     </div>
 
-                    <!-- Submit Button -->
-                    <button type="submit"
-                            class="w-full py-4 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-200 text-lg">
-                        <i class="fas fa-rocket mr-3"></i>
-                        Create Template
-                    </button>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <button type="submit"
+                        class="w-full py-4 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-200 text-lg">
+                            <i class="fas fa-rocket mr-3"></i>
+                            Create Template
+                        </button>
+                    }
+                    else
+                    {
+                     <a asp-action="signup" asp-controller="Auth">
+                            <button type="submit"
+                                    class="w-full py-4 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold rounded-2xl shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-200 text-lg">
+                                <i class="fas fa-rocket mr-3"></i>
+                                Create Template
+                            </button>
+                     </a>
+                    }
+
                 </div>
             </div>
 
