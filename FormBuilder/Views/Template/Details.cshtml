@@ -3,26 +3,33 @@
 @using FormBuilder.Enums
 @model FormTemplate
 @inject IUserService _userService;
+@inject ICommentService _commentService;
+@inject ITemplateService _templateService;
+@{
 
+    var comments = await _commentService.GetComments(
+        formId: null,
+        templateId: Model.Id,
+        commentTargetType: CommentTargetType.Template
+    ) ?? new List<Comment>();
+}
 <header class="bg-white shadow-sm border-b">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16">
             <div class="flex items-center space-x-3">
-            @if (Model.User.UserName == User.Identity.Name || User.IsInRole("Admin") )
+                @if (Model.User.UserName == User.Identity.Name || User.IsInRole("Admin"))
                 {
                     <a asp-action="Edit" asp-controller="Template" asp-route-templateId="@Model.Id">
                         <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
                             <i class="fas fa-edit mr-2"></i>Edit Template
                         </button>
                     </a>
-
                 }
                 <a asp-controller="Forms" asp-action="Create" asp-route-TemplateId="@Model.Id">
                     <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
                         <i class="fas fa-play mr-2"></i>Use Template
                     </button>
                 </a>
-               
             </div>
         </div>
     </div>
@@ -38,10 +45,34 @@
                     <div class="flex-1">
                         <div class="flex items-center space-x-3 mb-2">
                             <h1 class="text-2xl font-bold text-gray-900">@Model.Title</h1>
+
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                 <i class="fas fa-globe mr-1"></i>@(Model.isPublic ? "Public" : "Private")
                             </span>
                         </div>
+                        <div class="mb-4">
+                            @if (await _templateService.IsTemplateLikedByUser(Model.Id))
+                            {
+                                <form asp-action="UnlikeTemplate" method="post">
+                                    <input type="hidden" name="id" value="@Model.Id" />
+                                    <button type="submit" class="flex items-center space-x-2 text-red-600 hover:text-red-800 transition">
+                                        <i class="fas fa-heart"></i>
+                                        <span>Unlike</span>
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form asp-action="LikeTemplate" method="post">
+                                    <input type="hidden" name="id" value="@Model.Id" />
+                                    <button type="submit" class="flex items-center space-x-2 text-gray-600 hover:text-red-600 transition">
+                                        <i class="far fa-heart"></i>
+                                        <span>Like</span>
+                                    </button>
+                                </form>
+                            }
+                        </div>
+
                         <p class="text-gray-600 text-lg mb-4">@Html.Raw(Model.Description)</p>
 
                         <div class="flex items-center space-x-6 text-sm text-gray-500">
@@ -61,9 +92,7 @@
                     </div>
 
                     <div class="flex-shrink-0">
-                        <img src="@(Model.ImageUrl != null
-                            ? Model.ImageUrl.Replace("/upload/", "/upload/c_fill,w_400,h_200/")
-                            : "/placeholder.svg?height=200&width=400")"
+                        <img src="@(Model.ImageUrl != null ? Model.ImageUrl.Replace("/upload/", "/upload/c_fill,w_400,h_200/") : "/placeholder.svg?height=200&width=400")"
                              alt="@($"{Model.Title} preview")"
                              class="object-cover rounded-lg w-80 h-40" />
                     </div>
@@ -96,8 +125,6 @@
                         {
                             case QuestionType.ShortText:
                             case QuestionType.LongText:
-                                break;
-
                             case QuestionType.Number:
                                 break;
 
@@ -120,10 +147,60 @@
                                     }
                                 </select>
                                 break;
-
-                        
                         }
                     </div>
+                }
+            </div>
+
+            <!-- Add Comment Section -->
+            <div class="mt-8 max-w-4xl">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div class="p-6">
+                        <h4 class="text-lg font-semibold text-slate-900 mb-4 flex items-center">
+                            <svg class="w-5 h-5 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Add a Comment
+                        </h4>
+
+                        <form asp-action="AddTemplateComment" asp-controller="Comment" method="post" class="space-y-4">
+                            <input type="hidden" name="templateId" value="@Model.Id" />
+                            <textarea name="Text" rows="4" required
+                                      class="w-full border border-slate-300 rounded-xl px-4 py-3 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 text-slate-900 resize-none"
+                                      placeholder="Share your thoughts or feedback..."></textarea>
+
+                            <div>
+                                <button type="submit"
+                                        class="px-6 py-2 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition-all duration-200 shadow-sm">
+                                    Post Comment
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comments Section -->
+            <div class="bg-white rounded-lg shadow-sm border p-6">
+                <h3 class="text-lg font-semibold text-gray-900 mb-4">Comments</h3>
+
+                @if (comments != null && comments.Any())
+                {
+                    <div class="space-y-4">
+                        @foreach (var comment in comments.OrderByDescending(c => c.PostedAt))
+                        {
+                            <div class="border border-slate-200 rounded-xl p-4">
+                                <p class="text-gray-800 mb-1">@comment.Text</p>
+                                <div class="text-xs text-gray-500">
+                                    Posted by <span class="font-medium">@comment.user?.UserName</span> on @(comment.PostedAt.ToString("yyyy-MM-dd HH:mm"))
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p class="text-gray-500 text-sm">No comments yet. Be the first to comment!</p>
                 }
             </div>
         </div>
@@ -140,16 +217,36 @@
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-gray-600">Times Used</span>
-                        <span class="font-semibold text-gray-900">...</span>
+                        <span class="font-semibold text-gray-900">
+                            @(ViewData["TimesUsed"] ?? 0)
+                        </span>
                     </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-600">Responses</span>
-                        <span class="font-semibold text-gray-900">...</span>
-                    </div>
+
+          
                     <div class="flex justify-between items-center">
                         <span class="text-gray-600">Completion Rate</span>
-                        <span class="font-semibold text-green-600">...</span>
+                        <span class="font-semibold text-green-600">
+                            @{
+                                var completionRate = ViewData["CompletionRate"];
+                                if (completionRate != null)
+                                {
+                                    <text>@(((double)completionRate * 100).ToString("0.##"))%</text>
+                                }
+                                else
+                                {
+                                    <text>0%</text>
+                                }
+                            }
+                        </span>
                     </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Average Likes</span>
+                        <span class="font-semibold text-gray-900">
+                            @String.Format("{0:0.##}", ViewData["AverageLikesAcrossTemplates"] ?? 0)
+                        </span>
+                    </div>
+
+
                 </div>
             </div>
 
@@ -173,13 +270,13 @@
                     {
                         <p class="text-sm text-gray-500">No assigned users.</p>
                     }
-                       @if (Model.User.UserName == User.Identity.Name)
-                        {
-                    <button onclick="openUserModal()" class="w-full text-left text-sm text-blue-600 hover:text-blue-800 font-medium mt-2">
 
-                        <i class="fas fa-plus mr-1"></i>Add more users
-                    </button>
-                        }
+                    @if (Model.User.UserName == User.Identity.Name)
+                    {
+                        <button onclick="openUserModal()" class="w-full text-left text-sm text-blue-600 hover:text-blue-800 font-medium mt-2">
+                            <i class="fas fa-plus mr-1"></i>Add more users
+                        </button>
+                    }
                 </div>
             </div>
 
@@ -204,13 +301,11 @@
         </div>
     </div>
 
-
     <div id="userModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
             <h2 class="text-xl font-semibold mb-4">Add Users</h2>
             <form asp-action="AssignUser" asp-controller="Template" method="post">
                 <input name="TemplateId" value="@Model.Id" hidden />
-
                 <select name="email" id="userDropdown" class="w-full border border-gray-300 rounded px-4 py-2 mb-4" onchange="checkUserSelected()">
                     <option value="" disabled selected>Select a user...</option>
                     @foreach (var user in await _userService.GetUsers(Model.Id))
@@ -218,28 +313,18 @@
                         <option value="@user.Email">@user.Email</option>
                     }
                 </select>
-
                 <div class="flex justify-end space-x-2">
                     <button onclick="closeUserModal()" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" type="button">Cancel</button>
-
-                 
-                        <button id="addUserBtn" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed" type="submit" disabled>
-                            Add
-                        </button>
-                    
+                    <button id="addUserBtn" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed" type="submit" disabled>
+                        Add
+                    </button>
                 </div>
             </form>
-
-          
-
-            <button onclick="closeUserModal()" class="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-xl">
-                &times;
-            </button>
+            <button onclick="closeUserModal()" class="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-xl">&times;</button>
         </div>
     </div>
-
-
 </main>
+
 <script>
     function openUserModal() {
         document.getElementById('userModal').classList.remove('hidden');
@@ -249,9 +334,9 @@
         document.getElementById('userModal').classList.add('hidden');
     }
 
-         function checkUserSelected() {
-                    const dropdown = document.getElementById('userDropdown');
-                    const addButton = document.getElementById('addUserBtn');
-                    addButton.disabled = !dropdown.value;
-                }
+    function checkUserSelected() {
+        const dropdown = document.getElementById('userDropdown');
+        const addButton = document.getElementById('addUserBtn');
+        addButton.disabled = !dropdown.value;
+    }
 </script>

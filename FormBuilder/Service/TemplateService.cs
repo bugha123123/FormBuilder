@@ -33,6 +33,7 @@ namespace FormBuilder.Service
                 .Include(f => f.Tags)
                 .Include(f => f.User)
                 .Include(f => f.Comments)
+                .Where(x => !x.isPublic)
                 .AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
@@ -100,11 +101,12 @@ namespace FormBuilder.Service
                 .Include(t => t.User)
                 .Include(t => t.Tags)
                 .Include(t => t.Comments)
+                .Where(x => !x.isPublic)
                 .OrderByDescending(t => t.CreatedAt)
+                
                 .Take(10) 
                 .ToListAsync();
 
-            // Populate FilledFormsCount
             var filledCounts = await _context.Answers
                 .GroupBy(a => a.TemplateId)
                 .Select(g => new
@@ -218,7 +220,6 @@ namespace FormBuilder.Service
             existingTemplate.Description = Markdown.ToHtml(template.Description ?? "", pipeline);
             existingTemplate.isPublic = template.isPublic;
 
-            // Upload image if provided
             if (imageFile != null && imageFile.Length > 0)
             {
                 var imageUrl = await _cloudinaryService.UploadImageAsync(imageFile);
@@ -255,7 +256,6 @@ namespace FormBuilder.Service
                 }
             }
 
-            // Update AssignedUsers (List<string> of emails)
             template.AssignedUsers ??= new List<string>();
 
             existingTemplate.AssignedUsers = template.AssignedUsers
@@ -268,7 +268,6 @@ namespace FormBuilder.Service
             existingTemplate.User = loggedInUser;
             existingTemplate.UserId = loggedInUser.Id;
 
-            // No need to call _context.FormTemplates.Update(...) since EF tracks the entity already
 
             await _context.SaveChangesAsync();
         }
@@ -357,7 +356,7 @@ namespace FormBuilder.Service
                 (t.Description != null && t.Description.ToLower().Contains(query)) ||
                 (t.Questions != null && t.Questions.Any(q => q.Text != null && q.Text.ToLower().Contains(query))) ||
                 (t.Comments != null && t.Comments.Any(c => c.Text != null && c.Text.ToLower().Contains(query))) ||
-                (t.Tags != null && t.SavedTags.Any(tag => tag != null && tag.ToLower().Contains(query)))
+                (t.SavedTags != null && t.SavedTags.Any(tag => tag != null && tag.ToLower().Contains(query)))
             ).ToList();
 
             return filtered;
@@ -405,6 +404,55 @@ namespace FormBuilder.Service
             }
         }
 
+        public async Task<FormTemplate> LikeTemplate(int templateId)
+        {
+            var loggedInUser = await _authService.GetLoggedInUserAsync();
+            var foundTemplate = await GetTemplateById(templateId);
+            if (loggedInUser == null || foundTemplate == null) return null;
+
+            bool alreadyLiked = await IsTemplateLikedByUser(foundTemplate.Id);
+            if (alreadyLiked) return null; 
+
+            var likeToAdd = new Like()
+            {
+                TemplateId = templateId,
+                UserId = loggedInUser.Id,
+                Template = foundTemplate,
+                User = loggedInUser
+            };
+
+            await _context.Likes.AddAsync(likeToAdd);
+            await _context.SaveChangesAsync();
+
+            return foundTemplate;
+        }
+        public async Task<FormTemplate> UnlikeTemplate(int templateId)
+        {
+            var loggedInUser = await _authService.GetLoggedInUserAsync();
+            if (loggedInUser == null)
+                return null;
+
+            var likeToRemove = await _context.Likes
+                .Include(l => l.Template) 
+                .FirstOrDefaultAsync(x => x.UserId == loggedInUser.Id && x.TemplateId == templateId);
+
+            if (likeToRemove == null)
+                return null;
+
+            _context.Likes.Remove(likeToRemove);
+            await _context.SaveChangesAsync();
+
+            return likeToRemove.Template;
+        }
+
+
+        public async Task<bool> IsTemplateLikedByUser(int templateId)
+        {
+            var loggedInUser = await _authService.GetLoggedInUserAsync();
+            if (loggedInUser == null) return false;
+
+            return await _context.Likes.AnyAsync(l => l.TemplateId == templateId && l.UserId == loggedInUser.Id);
+        }
 
 
     }

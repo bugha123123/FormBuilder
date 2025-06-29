@@ -64,6 +64,8 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IFormService, FormService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<ITemplateStatisticsService, TemplateStatisticsService>();
+
 
 var app = builder.Build();
 

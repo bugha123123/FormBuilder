@@ -40,11 +40,11 @@ namespace FormBuilder.Service
             await _context.SaveChangesAsync();
         }
 
-        public async Task AddTemplateComment(Comment comment, int templateId, string Text)
+        public async Task<int> AddTemplateComment(Comment comment, int templateId, string Text)
         {
             var FoundTemplate = await _templateService.GetTemplateById(templateId);
             var LoggedInUser = await _authService.GetLoggedInUserAsync();
-            if (FoundTemplate is null || LoggedInUser is null) return;
+            if (FoundTemplate is null || LoggedInUser is null) return 0;
 
             comment.Text = Text;
             comment.user = LoggedInUser;
@@ -56,6 +56,8 @@ namespace FormBuilder.Service
 
             await _context.Comments.AddAsync(comment);
             await _context.SaveChangesAsync();
+
+            return FoundTemplate.Id;
         }
 
         public async Task<List<Comment>> GetComments(

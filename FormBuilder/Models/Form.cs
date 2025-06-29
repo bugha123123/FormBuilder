@@ -19,5 +19,8 @@ namespace FormBuilder.Models
 
         public  int FilledCount { get; set; }
 
+        public bool IsCompleted { get; set; } = false;
+
+
     }
 }

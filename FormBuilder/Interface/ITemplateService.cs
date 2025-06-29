@@ -1,4 +1,5 @@
 ﻿using FormBuilder.Models;
+using System.Threading.Tasks;
 
 namespace FormBuilder.Interface
 {
@@ -29,6 +30,12 @@ namespace FormBuilder.Interface
         Task<List<FormTemplate>> GetPopularTemplates(int count);
 
         Task<List<FormTemplate>> GetLatestTemplates();
+
+        Task<FormTemplate> LikeTemplate(int templateId);
+
+        Task<FormTemplate> UnlikeTemplate(int templateId);
+        Task<bool> IsTemplateLikedByUser(int templateId);
+
 
 
     }

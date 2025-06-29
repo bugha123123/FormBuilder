@@ -10,25 +10,16 @@ namespace FormBuilder.Models
         [Key]
         public int Id { get; set; }
 
-        // The user who liked
         [Required]
         public string UserId { get; set; }
 
         [ForeignKey(nameof(UserId))]
-        public virtual User User { get; set; } 
+        public virtual User User { get; set; }
 
-        public int? CommentId { get; set; }
+        public FormTemplate Template { get; set; }
 
-        [ForeignKey(nameof(CommentId))]
-        public virtual Comment Comment { get; set; }
+        public int TemplateId { get; set; }
 
-        public int? TemplateId { get; set; }
 
-        [ForeignKey(nameof(TemplateId))]
-        public virtual FormTemplate Template { get; set; }
-
-        public DateTime LikedAt { get; set; } = DateTime.UtcNow;
-
-        public LikeTargetType LikeTargetType { get; set; }
     }
 }

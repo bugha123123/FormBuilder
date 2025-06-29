@@ -15,10 +15,12 @@ namespace FormBuilder.Controllers
     {
         private readonly ITemplateService _templateService;
         private readonly IAuthService _AuthService;
-        public TemplateController(ITemplateService templateService, IAuthService authService)
+        private readonly ITemplateStatisticsService _statisticsService;
+        public TemplateController(ITemplateService templateService, IAuthService authService, ITemplateStatisticsService statisticsService)
         {
             _templateService = templateService;
             _AuthService = authService;
+            _statisticsService = statisticsService;
         }
 
         public async Task<IActionResult> Create()
@@ -58,15 +60,27 @@ namespace FormBuilder.Controllers
 
             var template = await _templateService.GetTemplateById(id);
 
+            if (template == null)
+            {
+                return NotFound();
+            }
+
             if (template.UserId == user.Id ||
                 template.AssignedUsers.Contains(user.Email) ||
                 template.isPublic || User.IsInRole("Admin"))
             {
+                ViewData["IsLikedByUser"] = await _templateService.IsTemplateLikedByUser(id);
+                ViewData["TimesUsed"] = await _statisticsService.GetTimesUsedAsync(id);
+                ViewData["CompletionRate"] = await _statisticsService.GetCompletionRateAsync(id);
+                ViewData["AverageLikesAcrossTemplates"] = await _statisticsService.GetAverageLikesPerTemplateAsync();
+                ViewData["LikesHistogram"] = await _statisticsService.GetLikesHistogramAsync();
+
                 return View(template);
             }
 
             return RedirectToAction("AccessDenied", "Template");
         }
+
 
         public async Task<IActionResult> Search(string Tag)
         {
@@ -149,7 +163,19 @@ namespace FormBuilder.Controllers
                 return View("Edit", template);
             }
         }
+        [HttpPost]
+        public async Task<IActionResult> LikeTemplate(int id)
+        { 
 
+            var result = await _templateService.LikeTemplate(id);
+            return RedirectToAction("Details", "Template", new { id = result.Id });
+        }
+        [HttpPost]
+        public async Task<IActionResult> UnlikeTemplate(int id)
+        {
 
+            var result =  await _templateService.UnlikeTemplate(id);
+            return RedirectToAction("Details", "Template", new { id = result.Id });
+        }
     }
 }

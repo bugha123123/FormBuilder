@@ -21,8 +21,8 @@ namespace FormBuilder.Controllers
 
         public async Task<IActionResult> AddTemplateComment(Comment comment, int templateId, string text)
         {
-            await _commentService.AddTemplateComment(comment, templateId, text);
-            return RedirectToAction("Create", "Forms", new { TemplateId = templateId });
+           var result =  await _commentService.AddTemplateComment(comment, templateId, text);
+            return RedirectToAction("Details", "Template", new {  id = result });
         }
 
     }

@@ -28,9 +28,10 @@ namespace FormBuilder.Models
 
         public int FilledFormsCount { get; set; }
 
-
+        public List<Like> Likes { get; set; }
 
         public string? ImageUrl { get; set; }
+
     }
 
 }

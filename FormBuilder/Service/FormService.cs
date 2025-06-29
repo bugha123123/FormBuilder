@@ -60,6 +60,7 @@ public class FormService : IFormService
         form.User = user;
         form.FilledCount += 1;
         template.FilledFormsCount = form.FilledCount;
+        form.IsCompleted = true;
         if (form.Answers != null)
         {
             foreach (var answer in form.Answers)

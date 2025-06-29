@@ -7,7 +7,7 @@ namespace FormBuilder.Interface
     {
         Task AddFormComment(Comment comment, int formId, string Text);
 
-        Task AddTemplateComment(Comment comment, int templateId, string Text);
+        Task<int> AddTemplateComment(Comment comment, int templateId, string Text);
 
         Task<List<Comment>> GetComments(
         int? formId = null,
