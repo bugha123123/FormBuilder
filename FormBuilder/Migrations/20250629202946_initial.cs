@@ -32,6 +32,7 @@ namespace FormBuilder.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    JoinedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -194,7 +195,8 @@ namespace FormBuilder.Migrations
                     TemplateId = table.Column<int>(type: "int", nullable: true),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     SubmittedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    FilledCount = table.Column<int>(type: "int", nullable: false)
+                    FilledCount = table.Column<int>(type: "int", nullable: false),
+                    IsCompleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -209,6 +211,32 @@ namespace FormBuilder.Migrations
                         column: x => x.TemplateId,
                         principalTable: "FormTemplates",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Likes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    TemplateId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Likes", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Likes_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Likes_FormTemplates_TemplateId",
+                        column: x => x.TemplateId,
+                        principalTable: "FormTemplates",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -240,7 +268,6 @@ namespace FormBuilder.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    TemplateId = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     FormTemplateId = table.Column<int>(type: "int", nullable: true)
@@ -332,50 +359,17 @@ namespace FormBuilder.Migrations
                         principalColumn: "Id");
                 });
 
-            migrationBuilder.CreateTable(
-                name: "Likes",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    CommentId = table.Column<int>(type: "int", nullable: true),
-                    TemplateId = table.Column<int>(type: "int", nullable: true),
-                    LikedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LikeTargetType = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Likes", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Likes_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Likes_Comments_CommentId",
-                        column: x => x.CommentId,
-                        principalTable: "Comments",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Likes_FormTemplates_TemplateId",
-                        column: x => x.TemplateId,
-                        principalTable: "FormTemplates",
-                        principalColumn: "Id");
-                });
-
             migrationBuilder.InsertData(
                 table: "Tags",
-                columns: new[] { "Id", "CreatedAt", "FormTemplateId", "Name", "TemplateId", "UpdatedAt" },
+                columns: new[] { "Id", "CreatedAt", "FormTemplateId", "Name", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2025, 6, 28, 13, 30, 17, 498, DateTimeKind.Local).AddTicks(7024), null, "HR", 0, null },
-                    { 2, new DateTime(2025, 6, 28, 13, 30, 17, 498, DateTimeKind.Local).AddTicks(7035), null, "Recruitment", 0, null },
-                    { 3, new DateTime(2025, 6, 28, 13, 30, 17, 498, DateTimeKind.Local).AddTicks(7036), null, "Event", 0, null },
-                    { 4, new DateTime(2025, 6, 28, 13, 30, 17, 498, DateTimeKind.Local).AddTicks(7038), null, "Signup", 0, null },
-                    { 5, new DateTime(2025, 6, 28, 13, 30, 17, 498, DateTimeKind.Local).AddTicks(7039), null, "Customer", 0, null },
-                    { 6, new DateTime(2025, 6, 28, 13, 30, 17, 498, DateTimeKind.Local).AddTicks(7040), null, "Survey", 0, null }
+                    { 1, new DateTime(2025, 6, 30, 0, 29, 45, 756, DateTimeKind.Local).AddTicks(7967), null, "HR", null },
+                    { 2, new DateTime(2025, 6, 30, 0, 29, 45, 756, DateTimeKind.Local).AddTicks(7980), null, "Recruitment", null },
+                    { 3, new DateTime(2025, 6, 30, 0, 29, 45, 756, DateTimeKind.Local).AddTicks(7981), null, "Event", null },
+                    { 4, new DateTime(2025, 6, 30, 0, 29, 45, 756, DateTimeKind.Local).AddTicks(7982), null, "Signup", null },
+                    { 5, new DateTime(2025, 6, 30, 0, 29, 45, 756, DateTimeKind.Local).AddTicks(7983), null, "Customer", null },
+                    { 6, new DateTime(2025, 6, 30, 0, 29, 45, 756, DateTimeKind.Local).AddTicks(7984), null, "Survey", null }
                 });
 
             migrationBuilder.CreateIndex(
@@ -468,11 +462,6 @@ namespace FormBuilder.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Likes_CommentId",
-                table: "Likes",
-                column: "CommentId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Likes_TemplateId",
                 table: "Likes",
                 column: "TemplateId");
@@ -515,6 +504,9 @@ namespace FormBuilder.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Comments");
+
+            migrationBuilder.DropTable(
                 name: "Likes");
 
             migrationBuilder.DropTable(
@@ -525,9 +517,6 @@ namespace FormBuilder.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
-
-            migrationBuilder.DropTable(
-                name: "Comments");
 
             migrationBuilder.DropTable(
                 name: "Forms");

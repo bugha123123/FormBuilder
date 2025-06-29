@@ -59,12 +59,17 @@
                                     }
                                 }
                             </div>
-                            <a asp-controller="Forms" asp-action="Create" asp-route-TemplateId="@template.Id">
-                                <button type="button" class="mt-auto w-full bg-primary hover:bg-secondary focus:ring-4 focus:ring-primary/50 text-white py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none">
-                                    Use template
-                                </button>
-                            </a>
-                        </div>
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <a asp-controller="Forms" asp-action="Create" asp-route-templateId="@template.Id">
+                                    <button type="button" class="mt-auto w-full bg-primary hover:bg-secondary focus:ring-4 focus:ring-primary/50 text-white py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none">
+                                        Use template
+                                    </button>
+                                </a>
+                            }
+
+                        
+
                     </article>
                 }
             </div>

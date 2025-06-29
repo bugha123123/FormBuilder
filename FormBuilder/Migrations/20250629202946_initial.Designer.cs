@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FormBuilder.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250629193254_addingLike")]
-    partial class addingLike
+    [Migration("20250629202946_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -77,6 +77,9 @@ namespace FormBuilder.Migrations
 
                     b.Property<int>("FilledCount")
                         .HasColumnType("int");
+
+                    b.Property<bool>("IsCompleted")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("SubmittedAt")
                         .HasColumnType("datetime2");
@@ -271,37 +274,37 @@ namespace FormBuilder.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2025, 6, 29, 23, 32, 54, 36, DateTimeKind.Local).AddTicks(2232),
+                            CreatedAt = new DateTime(2025, 6, 30, 0, 29, 45, 756, DateTimeKind.Local).AddTicks(7967),
                             Name = "HR"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2025, 6, 29, 23, 32, 54, 36, DateTimeKind.Local).AddTicks(2243),
+                            CreatedAt = new DateTime(2025, 6, 30, 0, 29, 45, 756, DateTimeKind.Local).AddTicks(7980),
                             Name = "Recruitment"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2025, 6, 29, 23, 32, 54, 36, DateTimeKind.Local).AddTicks(2244),
+                            CreatedAt = new DateTime(2025, 6, 30, 0, 29, 45, 756, DateTimeKind.Local).AddTicks(7981),
                             Name = "Event"
                         },
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2025, 6, 29, 23, 32, 54, 36, DateTimeKind.Local).AddTicks(2245),
+                            CreatedAt = new DateTime(2025, 6, 30, 0, 29, 45, 756, DateTimeKind.Local).AddTicks(7982),
                             Name = "Signup"
                         },
                         new
                         {
                             Id = 5,
-                            CreatedAt = new DateTime(2025, 6, 29, 23, 32, 54, 36, DateTimeKind.Local).AddTicks(2246),
+                            CreatedAt = new DateTime(2025, 6, 30, 0, 29, 45, 756, DateTimeKind.Local).AddTicks(7983),
                             Name = "Customer"
                         },
                         new
                         {
                             Id = 6,
-                            CreatedAt = new DateTime(2025, 6, 29, 23, 32, 54, 36, DateTimeKind.Local).AddTicks(2247),
+                            CreatedAt = new DateTime(2025, 6, 30, 0, 29, 45, 756, DateTimeKind.Local).AddTicks(7984),
                             Name = "Survey"
                         });
                 });
@@ -588,7 +591,7 @@ namespace FormBuilder.Migrations
             modelBuilder.Entity("FormBuilder.Models.Like", b =>
                 {
                     b.HasOne("FormBuilder.Models.FormTemplate", "Template")
-                        .WithMany()
+                        .WithMany("Likes")
                         .HasForeignKey("TemplateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -683,6 +686,8 @@ namespace FormBuilder.Migrations
                     b.Navigation("Answers");
 
                     b.Navigation("Comments");
+
+                    b.Navigation("Likes");
 
                     b.Navigation("Questions");
 

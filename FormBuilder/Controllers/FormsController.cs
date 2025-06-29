@@ -71,7 +71,7 @@ public class FormsController : Controller
         if (result == null)
         {
             TempData["Error"] = "You have already submitted this form.";
-            return RedirectToAction("Create", "Forms", new { TemplateId  = templateId }); 
+            return RedirectToAction("Create", "Forms", new { templateId  = templateId }); 
         }
 
         return RedirectToAction("Details", "Forms", new { formId = result.Id });
