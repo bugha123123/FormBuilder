@@ -32,26 +32,8 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 .AddDefaultTokenProviders();
 
 
-var supportedCultures = new[]
-{
-    new CultureInfo("en"),
-    new CultureInfo("ka")
-};
 
-builder.Services.AddLocalization(o => o.ResourcesPath = "Resources");
 
-builder.Services.Configure<RequestLocalizationOptions>(options =>
-{
-    options.DefaultRequestCulture = new RequestCulture("en");
-    options.SupportedCultures = supportedCultures;
-    options.SupportedUICultures = supportedCultures;
-    options.RequestCultureProviders = new IRequestCultureProvider[]
-    {
-        new CookieRequestCultureProvider(),
-        new QueryStringRequestCultureProvider(),
-        new AcceptLanguageHeaderRequestCultureProvider()
-    };
-});
 
 
 builder.Services.Configure<CloudinarySettings>(
@@ -110,8 +92,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-app.UseRequestLocalization(app.Services
-        .GetRequiredService<IOptions<RequestLocalizationOptions>>().Value);
+
 
 app.UseRouting();
 
