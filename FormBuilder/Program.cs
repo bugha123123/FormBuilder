@@ -90,14 +90,35 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+
+
+
+
 
 
 app.UseRouting();
 
 app.UseAuthentication(); 
 app.UseAuthorization();
+
+app.Use(async (context, next) =>
+{
+    var path = context.Request.Path.ToString().ToLower();
+
+    if (context.User.Identity?.IsAuthenticated == true &&
+        (path == "/auth/signin" || path == "/auth/signup"))
+    {
+        context.Response.Redirect("/");
+        return;
+    }
+
+    await next();
+});
+
 
 app.MapControllerRoute(
     name: "default",

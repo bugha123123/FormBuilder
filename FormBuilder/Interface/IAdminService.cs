@@ -12,5 +12,9 @@ namespace FormBuilder.Interface
         Task BlockUsersAsync(List<string> userIds);
         Task UnblockUsersAsync(List<string> userIds);
         Task DeleteUsersAsync(List<string> userIds);
+
+        Task<int> GetTemplateCountForUserAsync(string userId);
+        Task<int> GetCommentCountForUserAsync(string userId);
+        Task<int> GetLikeCountForUserAsync(string userId);
     }
 }

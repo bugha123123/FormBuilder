@@ -1,4 +1,5 @@
-﻿using FormBuilder.Interface;
+﻿using FormBuilder.Data;
+using FormBuilder.Interface;
 using FormBuilder.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -10,11 +11,12 @@ public class AdminService : IAdminService
 {
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
-
-    public AdminService(UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
+    private readonly AppDbContext _context;
+    public AdminService(UserManager<User> userManager, RoleManager<IdentityRole> roleManager, AppDbContext context)
     {
         _userManager = userManager;
         _roleManager = roleManager;
+        _context = context;
     }
 
     public async Task<List<User>> GetAllUsersAsync()
@@ -83,5 +85,24 @@ public class AdminService : IAdminService
                 await _userManager.DeleteAsync(user);
             }
         }
+    }
+
+
+    public async Task<int> GetTemplateCountForUserAsync(string userId)
+    {
+        return await _context.FormTemplates
+            .CountAsync(t => t.UserId == userId);
+    }
+
+    public async Task<int> GetCommentCountForUserAsync(string userId)
+    {
+        return await _context.Comments
+            .CountAsync(c => c.UserId == userId);
+    }
+
+    public async Task<int> GetLikeCountForUserAsync(string userId)
+    {
+        return await _context.Likes
+            .CountAsync(l => l.UserId == userId);
     }
 }

@@ -1,9 +1,11 @@
-﻿@model FormBuilder.Models.User
+﻿@using Microsoft.AspNetCore.Identity
+@model FormBuilder.Models.User
+@inject UserManager<FormBuilder.Models.User> UserManager
+@inject FormBuilder.Interface.IAdminService AdminService
 
 @{
     ViewData["Title"] = $"User Details - {Model.UserName} | Admin Panel";
 
-    // Get user initials (e.g. "JD")
     string GetInitials(string name)
     {
         if (string.IsNullOrEmpty(name)) return "";
@@ -14,8 +16,42 @@
     }
 
     string initials = GetInitials(Model.UserName);
-}
 
+    var user = await UserManager.GetUserAsync(User);
+
+    int TemplatesCount = 0;
+    int CommentsCount = 0;
+    int LikesCount = 0;
+
+    if (user != null)
+    {
+        TemplatesCount = await AdminService.GetTemplateCountForUserAsync(user.Id);
+        CommentsCount = await AdminService.GetCommentCountForUserAsync(user.Id);
+        LikesCount = await AdminService.GetLikeCountForUserAsync(user.Id);
+    }
+
+    var recentActivities = new List<dynamic>
+    {
+        new {
+            IconColor = "bg-blue-100",
+            IconSvg = "M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1",
+            Description = $"{TemplatesCount} Templates Created",
+            TimeAgo = "Recently"
+        },
+        new {
+            IconColor = "bg-green-100",
+            IconSvg = "M12 6v6m0 0v6m0-6h6m-6 0H6",
+            Description = $"{CommentsCount} Comments Made",
+            TimeAgo = "Recently"
+        },
+        new {
+            IconColor = "bg-yellow-100",
+            IconSvg = "M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z",
+            Description = $"{LikesCount} Likes Given",
+            TimeAgo = "Recently"
+        }
+    };
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -60,8 +96,6 @@
                 <!-- User Profile Card -->
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200">
                     <div class="p-6">
-                  
-
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <h3 class="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">Contact Information</h3>
@@ -72,12 +106,6 @@
                                         </svg>
                                         <span class="text-gray-900">@Model.Email</span>
                                     </div>
-                                    <!-- You can add phone and location if your User model supports those -->
-                                    <!-- Example: -->
-                                    @* <div class="flex items-center">
-                                        <svg ...>...</svg>
-                                        <span class="text-gray-900">+1 (555) 123-4567</span>
-                                    </div> *@
                                 </div>
                             </div>
                             <div>
@@ -91,7 +119,6 @@
                                         <span class="text-sm text-gray-500">Joined:</span>
                                         <span class="text-gray-900 ml-2">@Model.JoinedAt.ToString("MMMM dd, yyyy")</span>
                                     </div>
-                           
                                     <div>
                                         <span class="text-sm text-gray-500">Email Verified:</span>
                                         @if (Model.EmailConfirmed)
@@ -108,168 +135,31 @@
                         </div>
                     </div>
                 </div>
-@* 
-                <!-- Activity Statistics -->
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-                    <div class="p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Activity Statistics</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div class="text-center p-4 bg-blue-50 rounded-lg">
-                                <div class="text-2xl font-bold text-blue-600">@Model.TotalLogins</div>
-                                <div class="text-sm text-gray-600">Total Logins</div>
-                            </div>
-                            <div class="text-center p-4 bg-green-50 rounded-lg">
-                                <div class="text-2xl font-bold text-green-600">@Model.ContentCreated</div>
-                                <div class="text-sm text-gray-600">Content Created</div>
-                            </div>
-                            <div class="text-center p-4 bg-purple-50 rounded-lg">
-                                <div class="text-2xl font-bold text-purple-600">@Model.ActionsPerformed</div>
-                                <div class="text-sm text-gray-600">Actions Performed</div>
-                            </div>
-                        </div>
-                    </div>
-                </div> *@
 
                 <!-- Recent Activity -->
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200">
                     <div class="p-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
                         <div class="space-y-4">
-                            @* Example recent activity items, you can bind to a collection if available *@
-                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                                <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
-                                    </svg>
+                            @foreach (var activity in recentActivities)
+                            {
+                                <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                                    <div class="w-8 h-8 @activity.IconColor rounded-full flex items-center justify-center mr-3">
+                                        <svg class="w-4 h-4 text-current" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="@activity.IconSvg"></path>
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-gray-900">@activity.Description</p>
+                                        <p class="text-xs text-gray-500">@activity.TimeAgo</p>
+                                    </div>
                                 </div>
-                                <div class="flex-1">
-                                    <p class="text-sm font-medium text-gray-900">Logged in from New York, NY</p>
-                                    <p class="text-xs text-gray-500">2 hours ago</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                                <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
-                                    <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                    </svg>
-                                </div>
-                                <div class="flex-1">
-                                    <p class="text-sm font-medium text-gray-900">Created new content item</p>
-                                    <p class="text-xs text-gray-500">5 hours ago</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
-                                <div class="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center mr-3">
-                                    <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
-                                    </svg>
-                                </div>
-                                <div class="flex-1">
-                                    <p class="text-sm font-medium text-gray-900">Updated profile information</p>
-                                    <p class="text-xs text-gray-500">1 day ago</p>
-                                </div>
-                            </div>
+                            }
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Sidebar -->
-            <div class="space-y-6">
-                <!-- Quick Actions -->
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-                    <div class="p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-                        <div class="space-y-3">
-                            <button class="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
-                                    onclick="alert('Send Message action would be performed')">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                                </svg>
-                                Send Message
-                            </button>
-                            <button class="w-full flex items-center justify-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors"
-                                    onclick="alert('Reset Password action would be performed')">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                Reset Password
-                            </button>
-                            <form method="post" asp-controller="Admin" asp-action="BlockUser" asp-route-id="@Model.Id" onsubmit="return confirm('Are you sure you want to block this user?');">
-                                <button type="submit" class="w-full flex items-center justify-center px-4 py-2 bg-yellow-600 text-white text-sm font-medium rounded-md hover:bg-yellow-700 transition-colors">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728"></path>
-                                    </svg>
-                                    Block User
-                                </button>
-                            </form>
-
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Role Management -->
-           
-
-                <!-- Account Status -->
-                <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-                    <div class="p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Account Status</h3>
-                        <div class="space-y-4">
-                            <form method="post" asp-action="ToggleAccountStatus" asp-controller="Admin" asp-route-id="@Model.Id">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm text-gray-700">Account Active</span>
-                                    <input type="checkbox" name="isActive" id="isActive" class="toggle-checkbox" @(Model.LockoutEnd == null || Model.LockoutEnd <= DateTimeOffset.Now ? "checked" : "") />
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm text-gray-700">Email Notifications</span>
-                                    <input type="checkbox" name="emailNotifications" id="emailNotifications" class="toggle-checkbox" checked />
-                                </div>
-                                <div class="flex items-center justify-between">
-                                    <span class="text-sm text-gray-700">Two-Factor Auth</span>
-                                    <input type="checkbox" name="twoFactorAuth" id="twoFactorAuth" class="toggle-checkbox" />
-                                </div>
-                                <button type="submit" class="w-full mt-3 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">Save Status</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-        
             </div>
         </div>
     </div>
-
-    <style>
-        .toggle-checkbox {
-            position: relative;
-            width: 40px;
-            height: 20px;
-            -webkit-appearance: none;
-            background: #c6c6c6;
-            outline: none;
-            border-radius: 20px;
-            transition: background 0.3s;
-            cursor: pointer;
-        }
-        .toggle-checkbox:checked {
-            background: #68D391;
-        }
-        .toggle-checkbox::before {
-            content: "";
-            position: absolute;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            top: 1px;
-            left: 1px;
-            background: #fff;
-            transition: 0.3s;
-        }
-        .toggle-checkbox:checked::before {
-            left: 21px;
-        }
-    </style>
-
 </body>
 </html>
