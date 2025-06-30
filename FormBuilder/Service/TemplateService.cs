@@ -10,6 +10,7 @@ using Markdig;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Text.Json;
+using Microsoft.AspNetCore.Identity;
 
 namespace FormBuilder.Service
 {
@@ -19,41 +20,52 @@ namespace FormBuilder.Service
         private readonly IAuthService _authService;
         private readonly CloudinaryService _cloudinaryService;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public TemplateService(AppDbContext context, IAuthService authService, CloudinaryService cloudinaryService, IHttpContextAccessor httpContextAccessor)
+        private readonly UserManager<User> _usermanager;
+        public TemplateService(AppDbContext context, IAuthService authService, CloudinaryService cloudinaryService, IHttpContextAccessor httpContextAccessor, UserManager<User> usermanager)
         {
             _context = context;
             _authService = authService;
             _cloudinaryService = cloudinaryService;
             _httpContextAccessor = httpContextAccessor;
+            _usermanager = usermanager;
         }
+
+
 
         public async Task<List<FormTemplate>> GetFormTemplatesAsync(string search = null, string tag = null, string sort = null)
         {
+            var user = await _usermanager.GetUserAsync(_httpContextAccessor.HttpContext.User);
+            bool isAdmin = user != null && await _usermanager.IsInRoleAsync(user, "Admin");
+
             var query = _context.FormTemplates
                 .Include(f => f.Tags)
                 .Include(f => f.User)
                 .Include(f => f.Comments)
-                .Where(x => !x.isPublic)
                 .AsQueryable();
+
+            if (!isAdmin)
+            {
+                query = query.Where(f => f.isPublic);
+            }
 
             if (!string.IsNullOrEmpty(search))
             {
-                query = query.Where(f => f.Description.Contains(search)
-                                    || f.Tags.Any(t => t.Name.Contains(search)));
+                query = query.Where(f =>
+                    f.Description.Contains(search) ||
+                    f.Tags.Any(t => t.Name.Contains(search)));
             }
 
-            // Get results from DB
             var results = await query.ToListAsync();
 
             if (!string.IsNullOrEmpty(search))
             {
                 results = results.Where(f => f.Title.ToString().Contains(search)).ToList();
             }
+
             if (!string.IsNullOrEmpty(tag) && tag != "All")
             {
                 results = results.Where(f => f.Title.ToString() == tag).ToList();
             }
-
 
             results = sort switch
             {
@@ -65,6 +77,7 @@ namespace FormBuilder.Service
 
             return results;
         }
+
 
 
         public async Task<List<FormTemplate>> GetPopularTemplates(int count)
@@ -97,14 +110,23 @@ namespace FormBuilder.Service
         }
         public async Task<List<FormTemplate>> GetLatestTemplates()
         {
-            var templates = await _context.FormTemplates
+            var user = await _usermanager.GetUserAsync(_httpContextAccessor.HttpContext.User);
+            bool isAdmin = user != null && await _usermanager.IsInRoleAsync(user, "Admin");
+
+            var query = _context.FormTemplates
                 .Include(t => t.User)
                 .Include(t => t.Tags)
                 .Include(t => t.Comments)
-                .Where(x => !x.isPublic)
+                .AsQueryable();
+
+            if (!isAdmin)
+            {
+                query = query.Where(x => x.isPublic);
+            }
+
+            var templates = await query
                 .OrderByDescending(t => t.CreatedAt)
-                
-                .Take(10) 
+                .Take(10)
                 .ToListAsync();
 
             var filledCounts = await _context.Answers
