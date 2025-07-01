@@ -2,7 +2,7 @@
 @model List<FormTemplate>
 @{
     var tag = Context.Request.Query["Tag"];
-    
+
 }
 
 <div class="min-h-screen bg-gray-50">
@@ -36,8 +36,8 @@
                             <img src="@(template.ImageUrl != null
                                 ? template.ImageUrl.Replace("/upload/", "/upload/c_fill,w_400,h_200/")
                                 : "/placeholder.svg?height=200&width=400")"
-                                 alt="@($"{template.Title} preview")"
-                                 class="object-cover w-full h-full" />
+                            alt="@($"{template.Title} preview")"
+                            class="object-cover w-full h-full" />
                         </div>
                         <div class="p-6">
                             <h3 class="text-lg font-semibold text-gray-900 mb-4">@template.Title</h3>
@@ -47,11 +47,14 @@
                                     <span class="bg-purple-100 text-purple-800 text-xs font-medium px-3 py-1 rounded-full">@t</span>
                                 }
                             </div>
-                            <a asp-controller="Forms" asp-action="Create" asp-route-TemplateId="@template.Id">
-                                <button type="button" class="w-full bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:ring-purple-100 text-white py-3 px-4 rounded-lg font-medium transition-colors duration-200 focus:outline-none">
-                                    Use template
-                                </button>
-                            </a>
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <a asp-controller="Forms" asp-action="Create" asp-route-TemplateId="@template.Id">
+                                    <button type="button" class="w-full bg-purple-600 hover:bg-purple-700 focus:ring-4 focus:ring-purple-100 text-white py-3 px-4 rounded-lg font-medium transition-colors duration-200 focus:outline-none">
+                                        Use template
+                                    </button>
+                                </a>
+                            }
                         </div>
                     </div>
                 }
