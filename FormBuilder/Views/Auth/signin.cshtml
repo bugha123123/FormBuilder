@@ -1,12 +1,13 @@
 ﻿@using FormBuilder.DTO
 @model LoginViewModel
-
+@inject Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer Localizer
 <main class="flex items-center justify-center min-h-screen py-12 px-4 sm:px-6 lg:px-8">
     <div class="max-w-md w-full space-y-8">
         <div>
             <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                Sign in to your account
+                @Localizer["SignIn"]
             </h2>
+
             <p class="mt-2 text-center text-sm text-gray-600">
                 Or
                 <a asp-action="signup" asp-controller="Auth" class="font-medium text-primary hover:text-secondary transition-colors duration-200">

@@ -1,4 +1,4 @@
-using FormBuilder.Data;
+﻿using FormBuilder.Data;
 using FormBuilder.Interface;
 using FormBuilder.Interfaces;
 using FormBuilder.Models;
@@ -11,15 +11,15 @@ using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// 🌍 Localization setup
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
 builder.Services.AddControllersWithViews()
-                .AddViewLocalization();
-
+    .AddViewLocalization()
+    .AddDataAnnotationsLocalization();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")));
-
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddIdentity<User, IdentityRole>(options =>
 {
@@ -31,13 +31,9 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 .AddEntityFrameworkStores<AppDbContext>()
 .AddDefaultTokenProviders();
 
-
-
-
-
-
 builder.Services.Configure<CloudinarySettings>(
     builder.Configuration.GetSection("CloudinarySettings"));
+
 builder.Services.AddSingleton<CloudinaryService>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -48,10 +44,30 @@ builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<ITemplateStatisticsService, TemplateStatisticsService>();
 
-
 var app = builder.Build();
 
+// 🌍 Configure cultures
+var supportedCultures = new[]
+{
+    new CultureInfo("en"),
+    new CultureInfo("fr"),
+    new CultureInfo("es"),
+};
 
+var localizationOptions = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture("en"),
+    SupportedCultures = supportedCultures,
+    SupportedUICultures = supportedCultures,
+
+};
+localizationOptions.RequestCultureProviders.Insert(0, new CookieRequestCultureProvider());
+
+// Support ?culture=en query strings
+localizationOptions.RequestCultureProviders.Insert(0, new QueryStringRequestCultureProvider());
+app.UseRequestLocalization(localizationOptions);
+
+// Seed roles and admin user
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -64,7 +80,6 @@ using (var scope = app.Services.CreateScope())
             await roleManager.CreateAsync(new IdentityRole(role));
     }
 
-    // 6?b) Seed a default Admin account
     var adminEmail = "admin@example.com";
     var adminUser = await userManager.FindByEmailAsync(adminEmail);
 
@@ -77,12 +92,11 @@ using (var scope = app.Services.CreateScope())
             EmailConfirmed = true
         };
 
-        var createResult = await userManager.CreateAsync(admin, "Admin@123"); 
+        var createResult = await userManager.CreateAsync(admin, "Admin@123");
         if (createResult.Succeeded)
             await userManager.AddToRoleAsync(admin, "Admin");
     }
 }
-
 
 if (!app.Environment.IsDevelopment())
 {
@@ -90,19 +104,10 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
-
-
-
-
-
-
 app.UseRouting();
-
-app.UseAuthentication(); 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.Use(async (context, next) =>
@@ -118,7 +123,6 @@ app.Use(async (context, next) =>
 
     await next();
 });
-
 
 app.MapControllerRoute(
     name: "default",

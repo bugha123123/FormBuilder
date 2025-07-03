@@ -133,15 +133,21 @@ namespace FormBuilder.Controllers
             }));
         }
 
-        [HttpPost]
-        public async Task<IActionResult> DeleteMultiple([FromForm] List<int?> templateIds)
-        {
-            if (templateIds == null || !templateIds.Any())
-                return BadRequest("No templates selected.");
+   [HttpPost]
+public async Task<IActionResult> DeleteMultiple([FromForm] List<int?> templateIds)
+{
+    if (templateIds == null || !templateIds.Any())
+    {
+        
+        return RedirectToAction("Dashboard", "User");
+    }
 
-            await _templateService.DeleteTemplatesAsync(templateIds);
-            return RedirectToAction("Dashboard", "User");
-        }
+    await _templateService.DeleteTemplatesAsync(templateIds);
+    return RedirectToAction("Dashboard", "User");
+}
+
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(FormTemplate template, string TagNames, IFormFile ImageFile)

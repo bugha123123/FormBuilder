@@ -44,7 +44,6 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
 
-                <!-- Left side: Logo and desktop search -->
                 <div class="flex items-center space-x-8">
                     <!-- Logo -->
                     <div class="flex-shrink-0">
@@ -81,8 +80,19 @@
 
                     <!-- Desktop user actions -->
                     <div class="hidden md:flex items-center space-x-3">
+                        <div class="relative">
+                            <button id="lang-btn" class="text-gray-700 dark:text-gray-200 hover:text-purple-600 dark:hover:text-purple-400 px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all">
+                                <i class="fas fa-globe"></i>
+                            </button>
+                            <div id="lang-menu" class="hidden absolute right-0 mt-2 w-36 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg z-50">
+                                <a href="/Localization/SetLanguage?culture=en" class="block px-4 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">English</a>
+                                <a href="/Localization/SetLanguage?culture=ka-GE" class="block px-4 py-2 text-sm text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">ქართული</a>
+                            </div>
+                        </div>
                         @if (User.Identity.IsAuthenticated)
                         {
+                           
+
                             @if (User.IsInRole("Admin"))
                             {
                                 <a asp-controller="Admin" asp-action="Dashboard"
@@ -313,6 +323,19 @@
                     $resultsBox.show();
                 }
             });
+        });
+
+
+             document.getElementById('lang-btn').addEventListener('click', function () {
+            const menu = document.getElementById('lang-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        // Optional: Close menu if clicked outside
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('#lang-btn') && !e.target.closest('#lang-menu')) {
+                document.getElementById('lang-menu').classList.add('hidden');
+            }
         });
     </script>
 </body>

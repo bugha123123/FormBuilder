@@ -91,14 +91,15 @@ public class FormsController : Controller
     public async Task<IActionResult> DeleteMultipleForms([FromForm] List<int> formIds)
     {
         if (formIds == null || !formIds.Any())
-            return BadRequest("No forms selected.");
+        {
+            return RedirectToAction("Dashboard", "User");
+        }
 
         foreach (var id in formIds)
         {
             await _formService.DeleteFormAsync(id);
         }
-
-        return RedirectToAction("Dashboard","User" ); 
+        return RedirectToAction("Dashboard", "User");
     }
 
 }
