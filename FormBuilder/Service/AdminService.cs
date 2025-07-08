@@ -74,19 +74,56 @@ public class AdminService : IAdminService
             }
         }
     }
-
     public async Task DeleteUsersAsync(List<string> userIds)
     {
         foreach (var userId in userIds)
         {
+            var userTemplates = await _context.FormTemplates
+                .Where(t => t.UserId == userId)
+                .ToListAsync();
+
+            var templateIds = userTemplates.Select(t => t.Id).ToList();
+
+            var templateComments = await _context.Comments
+                .Where(c => c.TemplateId != null && templateIds.Contains(c.TemplateId.Value))
+                .ToListAsync();
+            _context.Comments.RemoveRange(templateComments);
+
+            var templateLikes = await _context.Likes
+                .Where(l => l.TemplateId != null && templateIds.Contains(l.TemplateId))
+                .ToListAsync();
+            _context.Likes.RemoveRange(templateLikes);
+
+            var forms = await _context.Forms
+                .Where(f => f.TemplateId != null && templateIds.Contains(f.TemplateId.Value))
+                .ToListAsync();
+            var formIds = forms.Select(f => f.Id).ToList();
+
+            var formComments = await _context.Comments
+                .Where(c => c.FormId != null && formIds.Contains(c.FormId.Value))
+                .ToListAsync();
+            _context.Comments.RemoveRange(formComments);
+
+            var answers = await _context.Answers
+                .Where(a => a.FormId != null && formIds.Contains(a.FormId))
+                .ToListAsync();
+
+        
+            _context.Answers.RemoveRange(answers);
+
+            _context.Forms.RemoveRange(forms);
+
+            _context.FormTemplates.RemoveRange(userTemplates);
+
             var user = await _userManager.FindByIdAsync(userId);
             if (user != null)
             {
                 await _userManager.DeleteAsync(user);
             }
         }
-    }
 
+        await _context.SaveChangesAsync();
+    }
 
     public async Task<int> GetTemplateCountForUserAsync(string userId)
     {

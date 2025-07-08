@@ -231,19 +231,22 @@
                 alert('No users selected.');
                 return;
             }
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(checkedRows)
+        }).then(async response => {
+            if (response.ok) {
+                alert('Action completed successfully.');
+                location.reload();
+            } else {
+                const errorText = await response.text();
+                alert('Something went wrong: ' + errorText);
+            }
+        }).catch(err => {
+            alert('Fetch failed: ' + err);
+        });
 
-            fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(checkedRows)
-            }).then(response => {
-                if (response.ok) {
-                    alert('Action completed successfully.');
-                    location.reload();
-                } else {
-                    alert('Something went wrong.');
-                }
-            });
         }
 
         // Initial setup

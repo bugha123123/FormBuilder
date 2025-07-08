@@ -12,7 +12,6 @@ using System.Globalization;
 var builder = WebApplication.CreateBuilder(args);
 
 // 🌍 Localization setup
-builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
 builder.Services.AddControllersWithViews()
     .AddViewLocalization()
@@ -67,36 +66,40 @@ localizationOptions.RequestCultureProviders.Insert(0, new CookieRequestCulturePr
 localizationOptions.RequestCultureProviders.Insert(0, new QueryStringRequestCultureProvider());
 app.UseRequestLocalization(localizationOptions);
 
-// Seed roles and admin user
-using (var scope = app.Services.CreateScope())
+if (AppDomain.CurrentDomain.FriendlyName != "ef")
 {
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-
-    string[] roles = { "Admin", "User" };
-    foreach (var role in roles)
+    using (var scope = app.Services.CreateScope())
     {
-        if (!await roleManager.RoleExistsAsync(role))
-            await roleManager.CreateAsync(new IdentityRole(role));
-    }
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
 
-    var adminEmail = "admin@example.com";
-    var adminUser = await userManager.FindByEmailAsync(adminEmail);
-
-    if (adminUser == null)
-    {
-        var admin = new User
+        string[] roles = { "Admin", "User" };
+        foreach (var role in roles)
         {
-            UserName = adminEmail,
-            Email = adminEmail,
-            EmailConfirmed = true
-        };
+            if (!await roleManager.RoleExistsAsync(role))
+                await roleManager.CreateAsync(new IdentityRole(role));
+        }
 
-        var createResult = await userManager.CreateAsync(admin, "Admin@123");
-        if (createResult.Succeeded)
-            await userManager.AddToRoleAsync(admin, "Admin");
+        var adminEmail = "admin@example.com";
+        var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
+        if (adminUser == null)
+        {
+            var admin = new User
+            {
+                UserName = adminEmail,
+                Email = adminEmail,
+                EmailConfirmed = true
+            };
+
+            var createResult = await userManager.CreateAsync(admin, "Admin@123");
+            if (createResult.Succeeded)
+                await userManager.AddToRoleAsync(admin, "Admin");
+        }
     }
 }
+
+
 
 if (!app.Environment.IsDevelopment())
 {

@@ -247,7 +247,6 @@ namespace FormBuilder.Service
                 var imageUrl = await _cloudinaryService.UploadImageAsync(imageFile);
                 existingTemplate.ImageUrl = imageUrl;
             }
-
             // Update SavedTags (List<string>)
             selectedTagNames ??= new List<string>();
             existingTemplate.SavedTags = selectedTagNames
@@ -255,7 +254,6 @@ namespace FormBuilder.Service
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
-            // Remove existing Questions and replace with new ones
             if (existingTemplate.Questions != null && existingTemplate.Questions.Any())
             {
                 _context.Questions.RemoveRange(existingTemplate.Questions);
@@ -387,9 +385,10 @@ namespace FormBuilder.Service
         {
             try
             {
-                var nonNullTemplateIds = templateIds.Where(id => id.HasValue).Select(id => id.Value).ToList();
-
-          
+                var nonNullTemplateIds = templateIds
+                    .Where(id => id.HasValue)
+                    .Select(id => id.Value)
+                    .ToList();
 
                 var templateComments = await _context.Comments
                     .Where(c => c.TemplateId != null && nonNullTemplateIds.Contains(c.TemplateId.Value))
@@ -406,10 +405,20 @@ namespace FormBuilder.Service
                     .ToListAsync();
                 _context.Comments.RemoveRange(formComments);
 
+
+
                 var answers = await _context.Answers
                     .Where(a => a.FormId != null && formIds.Contains(a.FormId))
                     .ToListAsync();
                 _context.Answers.RemoveRange(answers);
+
+                var templateLikes = await _context.Likes
+                    .Where(l => l.TemplateId != null && nonNullTemplateIds.Contains(l.TemplateId))
+                    .ToListAsync();
+                _context.Likes.RemoveRange(templateLikes);
+
+
+ 
 
                 _context.Forms.RemoveRange(forms);
 
@@ -425,6 +434,7 @@ namespace FormBuilder.Service
                 throw new Exception("Error deleting templates and related data.", ex);
             }
         }
+
 
         public async Task<FormTemplate> LikeTemplate(int templateId)
         {
