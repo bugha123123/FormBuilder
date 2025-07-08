@@ -365,12 +365,12 @@ namespace FormBuilder.Migrations
                 columns: new[] { "Id", "CreatedAt", "FormTemplateId", "Name", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2025, 7, 8, 13, 38, 0, 327, DateTimeKind.Local).AddTicks(6791), null, "HR", null },
-                    { 2, new DateTime(2025, 7, 8, 13, 38, 0, 327, DateTimeKind.Local).AddTicks(6801), null, "Recruitment", null },
-                    { 3, new DateTime(2025, 7, 8, 13, 38, 0, 327, DateTimeKind.Local).AddTicks(6802), null, "Event", null },
-                    { 4, new DateTime(2025, 7, 8, 13, 38, 0, 327, DateTimeKind.Local).AddTicks(6803), null, "Signup", null },
-                    { 5, new DateTime(2025, 7, 8, 13, 38, 0, 327, DateTimeKind.Local).AddTicks(6804), null, "Customer", null },
-                    { 6, new DateTime(2025, 7, 8, 13, 38, 0, 327, DateTimeKind.Local).AddTicks(6805), null, "Survey", null }
+                    { 1, new DateTime(2025, 7, 8, 15, 45, 45, 797, DateTimeKind.Local).AddTicks(8432), null, "HR", null },
+                    { 2, new DateTime(2025, 7, 8, 15, 45, 45, 797, DateTimeKind.Local).AddTicks(8446), null, "Recruitment", null },
+                    { 3, new DateTime(2025, 7, 8, 15, 45, 45, 797, DateTimeKind.Local).AddTicks(8447), null, "Event", null },
+                    { 4, new DateTime(2025, 7, 8, 15, 45, 45, 797, DateTimeKind.Local).AddTicks(8448), null, "Signup", null },
+                    { 5, new DateTime(2025, 7, 8, 15, 45, 45, 797, DateTimeKind.Local).AddTicks(8449), null, "Customer", null },
+                    { 6, new DateTime(2025, 7, 8, 15, 45, 45, 797, DateTimeKind.Local).AddTicks(8450), null, "Survey", null }
                 });
 
             migrationBuilder.CreateIndex(

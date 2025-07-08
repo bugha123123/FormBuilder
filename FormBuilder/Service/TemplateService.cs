@@ -405,8 +405,6 @@ namespace FormBuilder.Service
                     .ToListAsync();
                 _context.Comments.RemoveRange(formComments);
 
-
-
                 var answers = await _context.Answers
                     .Where(a => a.FormId != null && formIds.Contains(a.FormId))
                     .ToListAsync();
@@ -417,8 +415,7 @@ namespace FormBuilder.Service
                     .ToListAsync();
                 _context.Likes.RemoveRange(templateLikes);
 
-
- 
+  
 
                 _context.Forms.RemoveRange(forms);
 
@@ -434,6 +431,7 @@ namespace FormBuilder.Service
                 throw new Exception("Error deleting templates and related data.", ex);
             }
         }
+
 
 
         public async Task<FormTemplate> LikeTemplate(int templateId)
