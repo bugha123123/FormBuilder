@@ -39,6 +39,17 @@
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
+        @if (TempData["Message"] != null)
+        {
+            <div class="alert alert-success mb-4 p-4 bg-green-100 text-green-800 rounded">@TempData["Message"]</div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger mb-4 p-4 bg-red-100 text-red-800 rounded">@TempData["Error"]</div>
+        }
+
+        <p class="mb-6 text-gray-700">Use the <strong>Salesforce</strong> button at the bottom-right to connect, sync, or disconnect.</p>
+
         <!-- Tabs -->
         <div class="mb-8 border-b border-gray-200">
             <nav class="flex space-x-8" aria-label="Tabs">
@@ -169,6 +180,51 @@
 
     </main>
 
+    <!-- Salesforce Modal -->
+    <div id="salesforceModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+        <div class="bg-white rounded-md shadow-lg max-w-lg w-full p-6 relative">
+            <button onclick="closeSalesforceModal()" class="absolute top-3 right-3 text-gray-600 hover:text-gray-900 text-xl font-bold">&times;</button>
+
+            <h2 class="text-xl font-semibold mb-4">Salesforce Integration</h2>
+
+            @if (Context.Session.GetString("SalesforceAccessToken") == null)
+            {
+                <a href="/Salesforce/Login" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+                    Connect to Salesforce
+                </a>
+            }
+            else
+            {
+                <form asp-action="Sync" asp-controller="User" method="post" class="space-y-4">
+                    <div>
+                        <label class="block font-medium mb-1">Company Name <span class="text-red-600">*</span></label>
+                        <input type="text" name="companyName" class="w-full border border-gray-300 rounded-md p-2" required />
+                    </div>
+                    <div>
+                        <label class="block font-medium mb-1">Phone Number</label>
+                        <input type="text" name="phoneNumber" class="w-full border border-gray-300 rounded-md p-2" />
+                    </div>
+                    <div>
+                        <label class="block font-medium mb-1">Use Case</label>
+                        <textarea name="useCase" rows="3" class="w-full border border-gray-300 rounded-md p-2"></textarea>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">Sync to Salesforce</button>
+
+                        <form asp-controller="Salesforce" asp-action="Disconnect" method="post" onsubmit="return confirm('Are you sure you want to disconnect from Salesforce?');">
+                            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md">Disconnect</button>
+                        </form>
+                    </div>
+                </form>
+            }
+        </div>
+    </div>
+
+    <!-- Floating Salesforce button -->
+    <button onclick="openSalesforceModal()" class="fixed bottom-8 right-8 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-full shadow-lg">
+        Salesforce
+    </button>
+
     <script>
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -184,6 +240,15 @@
         }
 
         switchTab('templates');
+
+        function openSalesforceModal() {
+            document.getElementById('salesforceModal').classList.remove('hidden');
+            document.getElementById('salesforceModal').classList.add('flex');
+        }
+        function closeSalesforceModal() {
+            document.getElementById('salesforceModal').classList.add('hidden');
+            document.getElementById('salesforceModal').classList.remove('flex');
+        }
     </script>
 
 </body>

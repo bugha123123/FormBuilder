@@ -42,7 +42,10 @@ builder.Services.AddScoped<IFormService, FormService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<ITemplateStatisticsService, TemplateStatisticsService>();
-
+builder.Services.AddScoped<ISalesForceService, SalesForceService>();
+builder.Services.AddHttpClient();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddSession();
 var app = builder.Build();
 
 // 🌍 Configure cultures
@@ -112,7 +115,7 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-
+app.UseSession();
 app.Use(async (context, next) =>
 {
     var path = context.Request.Path.ToString().ToLower();
