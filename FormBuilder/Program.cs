@@ -3,11 +3,13 @@ using FormBuilder.Interface;
 using FormBuilder.Interfaces;
 using FormBuilder.Models;
 using FormBuilder.Service;
+using FormBuilder.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.Globalization;
+using static Dropbox.Api.TeamLog.EventCategory;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +45,17 @@ builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<ITemplateStatisticsService, TemplateStatisticsService>();
 builder.Services.AddScoped<ISalesForceService, SalesForceService>();
+builder.Services.AddScoped<ISupportTicketService, SupportTicketService>();
+
+var dropboxAccessToken = builder.Configuration["Dropbox:AccessToken"];
+
+builder.Services.AddScoped<IDropboxService>(sp => new DropboxService(dropboxAccessToken));
+
+
+builder.Services.AddScoped<ISupportTicketService, SupportTicketService>();
+
+
+
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddSession();
@@ -83,21 +96,28 @@ if (AppDomain.CurrentDomain.FriendlyName != "ef")
                 await roleManager.CreateAsync(new IdentityRole(role));
         }
 
-        var adminEmail = "admin@example.com";
-        var adminUser = await userManager.FindByEmailAsync(adminEmail);
-
-        if (adminUser == null)
+        var admins = new[]
         {
-            var admin = new User
-            {
-                UserName = adminEmail,
-                Email = adminEmail,
-                EmailConfirmed = true
-            };
+            new { Email = "admin@example.com", Password = "Admin@123" },
+            new { Email = "bughasteam123@gmail.com", Password = "BughaAdmin@123" }
+        };
 
-            var createResult = await userManager.CreateAsync(admin, "Admin@123");
-            if (createResult.Succeeded)
-                await userManager.AddToRoleAsync(admin, "Admin");
+        foreach (var entry in admins)
+        {
+            var existingUser = await userManager.FindByEmailAsync(entry.Email);
+            if (existingUser == null)
+            {
+                var newAdmin = new User
+                {
+                    UserName = entry.Email,
+                    Email = entry.Email,
+                    EmailConfirmed = true
+                };
+
+                var result = await userManager.CreateAsync(newAdmin, entry.Password);
+                if (result.Succeeded)
+                    await userManager.AddToRoleAsync(newAdmin, "Admin");
+            }
         }
     }
 }

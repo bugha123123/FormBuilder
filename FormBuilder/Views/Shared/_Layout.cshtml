@@ -1,8 +1,12 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var path = Context.Request.Path.ToString().ToLower();
+}
+
+<!DOCTYPE html>
 <html lang="en" class="">
 <head>
     <meta charset="utf-8" />
-
+  
 
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -239,11 +243,92 @@
         </div>
     </footer>
 
+    @if (!path.StartsWith("/auth"))
+    {
+        <button id="help-icon"
+                title="Help"
+                class="fixed bottom-6 left-6 bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-full shadow-lg z-50"
+                aria-label="Open Help Modal">
+            <i class="fas fa-question"></i>
+        </button>
+    }
+
+
+    <div id="help-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full relative">
+            <!-- Close button -->
+            <button id="close-modal"
+                    class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                    aria-label="Close Help Modal">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">Create Support Ticket</h2>
+
+            <form asp-controller="Support" asp-action="SubmitSupportTicket" method="post">
+                <div class="mb-3">
+                    <label for="Summary" class="block mb-1 text-gray-700 dark:text-gray-300">Summary</label>
+                    <input type="text" name="Summary" id="Summary" class="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-white" required maxlength="200" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="Priority" class="block mb-1 text-gray-700 dark:text-gray-300">Priority</label>
+                    <select name="Priority" id="Priority" class="w-full px-3 py-2 border rounded-md dark:bg-gray-700 dark:text-white" required>
+                        <option value="">-- Select Priority --</option>
+                        <option value="High">High</option>
+                        <option value="Average">Average</option>
+                        <option value="Low">Low</option>
+                    </select>
+                </div>
+
+                <input type="hidden" name="PageUrl" id="PageUrl" />
+
+                <button type="submit" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition">Submit Ticket</button>
+            </form>
+        </div>
+    </div>
+
+
+
+
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Mobile menu toggle
+
+                   document.addEventListener("DOMContentLoaded", () => {
+            const helpIcon = document.getElementById('help-icon');
+            const helpModal = document.getElementById('help-modal');
+            const closeModalBtn = document.getElementById('close-modal');
+
+            if (!helpIcon || !helpModal || !closeModalBtn) {
+                console.error("Help modal elements are missing!");
+                return;
+            }
+
+            closeModalBtn.addEventListener('click', () => {
+                helpModal.classList.add('hidden');
+                helpModal.classList.remove('flex');
+            });
+
+            helpModal.addEventListener('click', (e) => {
+                if (e.target === helpModal) {
+                    helpModal.classList.add('hidden');
+                    helpModal.classList.remove('flex');
+                }
+            });
+
+            helpIcon.addEventListener('click', () => {
+                document.getElementById('PageUrl').value = window.location.href;
+
+                helpModal.classList.remove('hidden');
+                helpModal.classList.add('flex');
+            });
+        });
+
+
+
         document.getElementById('mobile-menu-button').addEventListener('click', function () {
             const menu = document.getElementById('mobile-menu');
             menu.classList.toggle('hidden');
