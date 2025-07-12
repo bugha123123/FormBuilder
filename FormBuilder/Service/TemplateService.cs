@@ -38,7 +38,6 @@ namespace FormBuilder.Service
             bool isAdmin = user != null && await _usermanager.IsInRoleAsync(user, "Admin");
 
             var query = _context.FormTemplates
-                .Include(f => f.Tags)
                 .Include(f => f.User)
                 .Include(f => f.Comments)
                 .AsQueryable();
@@ -192,7 +191,6 @@ namespace FormBuilder.Service
                 await _context.SaveChangesAsync();
             }
 
-            // Combine tags
             var allTags = existingTags.Concat(newTags).ToList();
 
             if (template.Tags == null)
@@ -236,7 +234,6 @@ namespace FormBuilder.Service
             if (existingTemplate == null)
                 throw new Exception("Template not found.");
 
-            // Update basic fields
             existingTemplate.Title = template.Title;
             var pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
             existingTemplate.Description = Markdown.ToHtml(template.Description ?? "", pipeline);
@@ -247,7 +244,6 @@ namespace FormBuilder.Service
                 var imageUrl = await _cloudinaryService.UploadImageAsync(imageFile);
                 existingTemplate.ImageUrl = imageUrl;
             }
-            // Update SavedTags (List<string>)
             selectedTagNames ??= new List<string>();
             existingTemplate.SavedTags = selectedTagNames
                 .Where(t => !string.IsNullOrWhiteSpace(t))
@@ -283,7 +279,6 @@ namespace FormBuilder.Service
                 .Distinct(StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
-            // Update owner
             var loggedInUser = await _authService.GetLoggedInUserAsync();
             existingTemplate.User = loggedInUser;
             existingTemplate.UserId = loggedInUser.Id;
@@ -415,10 +410,11 @@ namespace FormBuilder.Service
                     .ToListAsync();
                 _context.Likes.RemoveRange(templateLikes);
 
-  
+            
 
                 _context.Forms.RemoveRange(forms);
 
+                // Finally, delete the templates
                 var templates = await _context.FormTemplates
                     .Where(t => nonNullTemplateIds.Contains(t.Id))
                     .ToListAsync();

@@ -208,16 +208,15 @@
                         <label class="block font-medium mb-1">Use Case</label>
                         <textarea name="useCase" rows="3" class="w-full border border-gray-300 rounded-md p-2"></textarea>
                     </div>
-                    <div class="flex justify-between items-center">
-                        <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">Sync to Salesforce</button>
+                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">Sync to Salesforce</button>
+                </form>
 
-                        <form asp-controller="Salesforce" asp-action="Disconnect" method="post" onsubmit="return confirm('Are you sure you want to disconnect from Salesforce?');">
-                            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md">Disconnect</button>
-                        </form>
-                    </div>
+                <form asp-controller="Salesforce" asp-action="Disconnect" method="post" class="mt-4" onsubmit="return confirm('Are you sure you want to disconnect from Salesforce?');">
+                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md">Disconnect</button>
                 </form>
             }
         </div>
+
     </div>
 
     <!-- Floating Salesforce button -->

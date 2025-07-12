@@ -11,7 +11,6 @@ namespace FormBuilder.Models
         [MaxLength(50)]
         public string Name { get; set; }
 
-
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public DateTime? UpdatedAt { get; set; }
