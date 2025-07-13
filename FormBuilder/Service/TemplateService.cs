@@ -411,7 +411,7 @@ namespace FormBuilder.Service
                 _context.Likes.RemoveRange(templateLikes);
 
             
-
+               
                 _context.Forms.RemoveRange(forms);
 
                 // Finally, delete the templates

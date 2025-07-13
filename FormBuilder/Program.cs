@@ -47,9 +47,8 @@ builder.Services.AddScoped<ITemplateStatisticsService, TemplateStatisticsService
 builder.Services.AddScoped<ISalesForceService, SalesForceService>();
 builder.Services.AddScoped<ISupportTicketService, SupportTicketService>();
 
-var dropboxAccessToken = builder.Configuration["Dropbox:AccessToken"];
+builder.Services.AddScoped<IDropboxService, DropboxService>();
 
-builder.Services.AddScoped<IDropboxService>(sp => new DropboxService(dropboxAccessToken));
 
 
 builder.Services.AddScoped<ISupportTicketService, SupportTicketService>();
