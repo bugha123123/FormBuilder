@@ -1,11 +1,13 @@
 ﻿@using FormBuilder.Interface
+@using FormBuilder.Interfaces
 @using FormBuilder.Models
 @inject ITemplateService _templateService
 @inject IFormService _formService
-
+@inject  IAuthService _authService;
 @{
     var UserTemplates = await _templateService.GetUserTemplates() ?? new List<FormTemplate>();
     var Forms = await _formService.GetFormsForUser() ?? new List<Form>();
+    var LoggedInUser = await _authService.GetLoggedInUserAsync();
 }
 
 <!DOCTYPE html>
@@ -25,7 +27,9 @@
             <div class="flex justify-between items-center py-6">
                 <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
                 <div class="flex items-center space-x-4">
-                    <span class="text-sm text-gray-500">Welcome back, @User.Identity.Name?.Substring(0, Math.Min(7, User.Identity.Name.Length))</span>
+                    <span class="text-sm text-gray-500">
+                        Welcome back, @User.Identity.Name?.Substring(0, Math.Min(7, User.Identity.Name.Length))  @(LoggedInUser.ApiToken = Guid.NewGuid().ToString("N"));
+                    </span>
                     <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                         <span class="text-white text-sm font-medium">
                             @User.Identity.Name?.Substring(0, 2).ToUpper()
