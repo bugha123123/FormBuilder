@@ -12,7 +12,7 @@ public class OdooController : ControllerBase
     {
         _db = db;
     }
-
+    // DOES NOT WORK 
     [HttpGet("aggregated")]
     public IActionResult GetAggregatedResults([FromQuery] string token)
     {
