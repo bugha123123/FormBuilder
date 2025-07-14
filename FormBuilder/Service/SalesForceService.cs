@@ -58,7 +58,7 @@ public class SalesForceService : ISalesForceService
             //Comments_Count__c = commentCount
         };
         var accountContent = new StringContent(JsonSerializer.Serialize(accountPayload));
-        accountContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+        accountContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
         var accountResponse = await client.PostAsync($"{instanceUrl}/services/data/v58.0/sobjects/Account", accountContent);
         if (!accountResponse.IsSuccessStatusCode)
@@ -79,7 +79,7 @@ public class SalesForceService : ISalesForceService
         };
 
         var contactContent = new StringContent(JsonSerializer.Serialize(contactPayload));
-        contactContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+        contactContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
 
         var contactResponse = await client.PostAsync($"{instanceUrl}/services/data/v58.0/sobjects/Contact", contactContent);
         if (!contactResponse.IsSuccessStatusCode)
